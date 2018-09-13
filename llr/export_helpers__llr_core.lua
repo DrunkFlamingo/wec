@@ -107,8 +107,8 @@ local function respec_char_with_army(player_faction, lord, character)
 
 end
 
---v function(player_faction: string, lord: LLR_LORD, character: CA_CHAR)
-local function respec_wounded_character(player_faction, lord, character)
+--v function(player_faction: string, lord: LLR_LORD, character: CA_CHAR, do_not_wound: boolean?)
+local function respec_wounded_character(player_faction, lord, character, do_not_wound)
     llr:log("Respecing lord with subtype ["..lord:subtype().."] who is wounded ")
     lord:set_lord_rank(character:rank())
     lord:set_coordinates(character:faction():home_region():settlement():logical_position_x() + 1, character:faction():home_region():settlement():logical_position_y() + 1)
@@ -157,10 +157,11 @@ local function respec_wounded_character(player_faction, lord, character)
     0.1
     );
     --wound the character again!
-    cm:callback(function()
-        cm:kill_character(lord._newCQI, true, true)
-    end, 0.5)
-    
+    if not do_not_wound then
+        cm:callback(function()
+            cm:kill_character(lord._newCQI, true, true)
+        end, 0.5)
+    end
 end
 
 --v function(human_faction_name: string, lord: LLR_LORD)
@@ -202,8 +203,13 @@ local function player_faction_confederation(faction_name, confederation_name)
                 respec_wounded_character(confederation_name, current_lord, character)
                 setup_quest_listeners(confederation_name, current_lord)
             else
-                respec_char_with_army(confederation_name, current_lord, character)
-                setup_quest_listeners(confederation_name, current_lord)
+                if character:has_military_force() then
+                    respec_char_with_army(confederation_name, current_lord, character)
+                    setup_quest_listeners(confederation_name, current_lord)
+                else
+                    respec_wounded_character(confederation_name, current_lord, character, true)
+                    setup_quest_listeners(confederation_name, current_lord)
+                end
             end
         else
             respawn_to_pool(confederation_name, current_lord)
