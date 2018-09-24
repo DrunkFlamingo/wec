@@ -174,8 +174,7 @@ core:add_listener(
 
 
 
-function BookOfGrudges()
-
+events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = function()
 	GRULOG("the grudges custom script launched");
 	cm:set_saved_value("df_grudges_dwf", true);
 	
@@ -191,5 +190,4 @@ function BookOfGrudges()
 			grudge_issuer("wh_main_dwf_kraka_drak");
 		end
 	end
-	
-end;
+end
