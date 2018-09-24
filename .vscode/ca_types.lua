@@ -503,8 +503,8 @@
 
 --# assume global class MISSION_MANAGER
 --# type global CA_MISSION_OBJECTIVE =
---# "CAPTURE_REGIONS" | "SCRIPTED"
-
+--# "CAPTURE_REGIONS" | "SCRIPTED" | "RAZE_OR_SACK_N_DIFFERENT_SETTLEMENTS_INCLUDING" |
+--# "ELIMINATE_CHARACTER_IN_BATTLE" | "MOVE_TO_REGION" | "DEFEAT_N_ARMIES_OF_FACTION"
 --creation
 --# assume MISSION_MANAGER.new: method(faction_key: string, mission_key: string, success_callback: function?, failure_callback: function?, cancellation_callback: function?) --> MISSION_MANAGER
 
@@ -556,3 +556,5 @@
 --# assume global mission_manager: MISSION_MANAGER
 --# assume global rite_unlock: RITE_UNLOCK
 --# assume global ll_unlock: LL_UNLOCK
+
+--string extensions
