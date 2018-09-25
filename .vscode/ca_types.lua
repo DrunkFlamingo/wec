@@ -445,7 +445,8 @@
 --# assume CORE.add_ui_created_callback: method(function())
 --# assume CORE.get_screen_resolution: method() --> (number, number)
 --# assume CORE.trigger_event: method(event_name: string)
-
+--# assume CORE.add_static_object: method(name: string, object: WHATEVER, overwride: boolean?)
+--# assume CORE.get_static_object: method(name: string)
 
 
 -- GLOBAL FUNCTIONS

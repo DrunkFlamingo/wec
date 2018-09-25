@@ -378,6 +378,9 @@ function mcm_tweaker.new(mod, name, ui_title, ui_tooltip)
     self._uiTitle = ui_title or "Un-named tweaker"
     self._uiToolTip = ui_tooltip or ""
 
+    self._options = {} --:map<string, MCM_OPTION>
+    self._selectedOption = nil --:MCM_OPTION
+
     return self
 end
 
@@ -393,15 +396,11 @@ function mcm_tweaker.null(mod)
     self._uiTitle = ""
     self._uiToolTip = ""
 
-    self._options = {} --:map<string, MCM_OPTION>
-    self._selectedOption = nil --:MCM_OPTION
+    self._options = {} 
+    self._selectedOption = nil 
 
     return self
 end
-
-
-
-
 
 --v function(self: MCM_TWEAKER) --> boolean
 function mcm_tweaker.is_null_interface(self)
@@ -422,8 +421,9 @@ end
 function mcm_tweaker.log(self, text)
     self:mod():log(text)
 end
-
-
+--OPTIONS
+----------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 local mcm_option = {} --# assume mcm_option: MCM_OPTION
 
 --v function(tweaker: MCM_TWEAKER, key: string, ui_name: string?, ui_tooltip: string?) --> MCM_OPTION
@@ -439,7 +439,6 @@ function mcm_option.new(tweaker, key, ui_name, ui_tooltip)
     self._uiToolTip = ui_tooltip or ""
     self._callback = nil --: function(context: MOD_CONFIGURATION_MANAGER)
     return self
-
 end
 
 --v function(tweaker: MCM_TWEAKER) --> MCM_OPTION
@@ -453,6 +452,7 @@ function mcm_option.null(tweaker)
     self._name = "NULL_OPTION"
     self._uiName = ""
     self._uiToolTip = ""
+    self._callback = nil 
     return self
 end
 
@@ -514,7 +514,9 @@ function mcm_option.ui_tooltip(self)
     return self._uiToolTip
 end
 
-
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
 --v function(self: MCM_TWEAKER, option: MCM_OPTION)
 function mcm_tweaker.set_selected_option(self, option)
     self._selectedOption = option
@@ -585,9 +587,9 @@ function mcm_tweaker.ui_tooltip(self)
     return self._uiToolTip
 end
     
-    
-
-
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
 
 --v function(self: MCM_MOD) --> map<string, MCM_TWEAKER>
 function mcm_mod.tweakers(self)
@@ -727,3 +729,4 @@ end
 
 
 mod_configuration_manager.init()
+core:add_static_object("mod_configuration_manager", _G.mcm, true)
