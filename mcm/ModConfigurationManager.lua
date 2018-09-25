@@ -1,0 +1,658 @@
+--Log script to text
+--v function(text: string | number | boolean | CA_CQI)
+local function LOG(text)
+    ftext = "MOD_SETTINGS" 
+
+    if not __write_output_to_logfile then
+        return;
+    end
+
+    local logText = tostring(text)
+    local logContext = tostring(ftext)
+    local logTimeStamp = os.date("%d, %m %Y %X")
+    local popLog = io.open("MOD_SETTINGS_LOG.txt","a")
+    --# assume logTimeStamp: string
+    popLog :write("LE:  [".. logTimeStamp .. "]:  "..logText .. "  \n")
+    popLog :flush()
+    popLog :close()
+end
+
+--v function()
+local function GPSESSIONLOG()
+    if not __write_output_to_logfile then
+        return;
+    end
+    local logTimeStamp = os.date("%d, %m %Y %X")
+    --# assume logTimeStamp: string
+
+    local popLog = io.open("MOD_SETTINGS_LOG.txt","w+")
+    popLog :write("NEW LOG ["..logTimeStamp.."] \n")
+    popLog :flush()
+    popLog :close() 
+end
+GPSESSIONLOG()
+
+
+
+
+local mod_configuration_manager = {} --# assume mod_configuration_manager: MOD_CONFIGURATION_MANAGER
+
+function mod_configuration_manager.init()
+    local self = {} 
+    setmetatable(self, {
+        __index = mod_configuration_manager,
+        __tostring = function() return "MOD_CONFIGURATION_MANAGER" end
+    })--# assume self: MOD_CONFIGURATION_MANAGER
+
+    self._modConfigStack = {} --:vector<function(context: MOD_CONFIGURATION_MANAGER)>
+    self._registeredMods = {} --:map<string, MCM_MOD>
+
+    _G.mcm = self
+end
+
+--v function(self: MOD_CONFIGURATION_MANAGER, text: any)
+function mod_configuration_manager.log(self, text)
+    LOG(tostring(text))
+end
+
+--v function(self: MOD_CONFIGURATION_MANAGER) --> vector<function(context: MOD_CONFIGURATION_MANAGER)>
+function mod_configuration_manager.get_stack(self)
+    return self._modConfigStack
+end
+
+--v function(self:MOD_CONFIGURATION_MANAGER, callback: function(context: MOD_CONFIGURATION_MANAGER) )
+function mod_configuration_manager.add_callback_to_stack(self, callback)
+    table.insert(self:get_stack(), callback)
+end
+
+--v function(self: MOD_CONFIGURATION_MANAGER)
+function mod_configuration_manager.do_callback_on_stack(self)
+    self:get_stack()[#self:get_stack()](self)
+    table.remove(self:get_stack())
+end
+
+
+
+
+local mcm_mod = {} --# assume mcm_mod: MCM_MOD
+
+
+
+
+
+--v function(model: MOD_CONFIGURATION_MANAGER, name: string, ui_name: string?, ui_tooltip: string?) --> MCM_MOD
+function mcm_mod.new(model, name, ui_name, ui_tooltip)
+    local self = {}
+    setmetatable(self, {
+        __index = mcm_mod,
+        __tostring = function() return "MCM_MOD" end
+    }) --# assume self: MCM_MOD
+
+    self._name = name
+    self._model = model
+    self._tweakers = {} --:map<string, MCM_TWEAKER>
+    self._variables = {} --:map<string, MCM_VAR> 
+
+    self._uiName = ui_name or "unnamed mod"
+    self.uiToolTip = ui_tooltip or ""
+
+    return self
+end
+
+--v function (model: MOD_CONFIGURATION_MANAGER) --> MCM_MOD
+function mcm_mod.null(model)
+    local self = {}
+    setmetatable(self, {
+        __index = mcm_mod,
+        __tostring = function() return "NULL_SCRIPT_INTERFACE" end
+    }) --# assume self: MCM_MOD
+    self._name = ""
+    self._model = model
+    self._tweakers = {}
+    self._variables = {}
+    self._uiName = "NULL INTERFACE"
+    self._uiToolTip = "NULL_INTERFACE"
+    return self
+end
+
+
+
+--v function(self: MCM_MOD) --> string
+function mcm_mod.name(self) 
+    return self._name
+end
+
+--v function(self: MCM_MOD) --> MOD_CONFIGURATION_MANAGER
+function mcm_mod.model(self)
+    return self._model
+end
+
+--v function(self: MCM_MOD, text: any)
+function mcm_mod.log(self, text)
+    self:model():log(text)
+end
+
+
+local mcm_var = {}--# assume mcm_var: MCM_VAR
+
+--v function(mod: MCM_MOD, name: string, min: number, max: number, default: number, step: number, ui_name: string?, ui_tooltip: string?) --> MCM_VAR
+function mcm_var.new(mod, name, min, max, default, step, ui_name, ui_tooltip)
+    local self = {}
+    setmetatable(self, {
+        __index = mcm_var,
+        __tostring = function() return "MCM_VAR" end
+    }) --# assume self: MCM_VAR
+
+    self._mod = mod
+    self._name = name
+    self._minValue = min
+    self._maxValue = max
+    self._stepValue = step
+    self._uiName = ui_name
+    self._uiToolTip = ui_tooltip
+
+    self._currentValue = default
+    
+
+    return self
+end
+
+--v function(mod: MCM_MOD) --> MCM_VAR
+function mcm_var.null(mod)
+    local self = {}
+    setmetatable(self, {
+        __index = mcm_var,
+        __tostring = function() return "NULL_SCRIPT_INTERFACE" end
+    }) --# assume self: MCM_VAR
+
+    self._mod = mod
+    self._name = ""
+    self._minValue = 0
+    self._maxValue = 0
+    self._currentValue = 0
+    self._stepValue = 0
+    self._uiName = ""
+    self._uiToolTip = ""
+    self._callback = nil --:function(context: MOD_CONFIGURATION_MANAGER)
+    return self
+end
+
+
+--v function(self: MCM_VAR) --> boolean
+function mcm_var.is_null_interface(self)
+    return tostring(self) == "NULL_SCRIPT_INTERFACE"
+end
+
+--v function(self: MCM_VAR) --> string
+function mcm_var.name(self)
+    return self._name
+end
+
+--v function(self: MCM_VAR) --> MCM_MOD
+function mcm_var.mod(self)
+    return self._mod
+end
+
+--v function(self: MCM_VAR, text: any)
+function mcm_var.log(self, text)
+    self:mod():log(text)
+end
+    
+
+
+--v function(self: MCM_VAR) --> number
+function mcm_var.current_value(self)
+    return self._currentValue
+end
+
+--v function(self: MCM_VAR) --> number
+function mcm_var.maximum(self)
+    return self._maxValue
+end
+
+--v function(self: MCM_VAR) --> number
+function mcm_var.minimum(self)
+    return self._minValue
+end
+
+--v function(self: MCM_VAR) --> boolean
+function mcm_var.at_max(self)
+    return self._currentValue == self:maximum()
+end
+
+--v function(self: MCM_VAR) --> boolean
+function mcm_var.at_min(self)
+    return self._currentValue == self:minimum()
+end
+
+
+
+--v function(self: MCM_VAR, value: number)
+function mcm_var.set_current_value(self, value)
+    self:log("Set the value of var ["..self:name().."] in mod ["..self:mod():name().."] to ["..value.."]")
+    if value > self:maximum() then
+        value = self:maximum()
+        self:log("value was over the maximum, lowered it!")
+    elseif value < self:minimum() then
+        value = self:minimum()
+        self:log("value was under the minimum, raised it!")
+    end
+    self._currentValue = value
+end
+
+--v function(self: MCM_VAR) --> number
+function mcm_var.step(self)
+    return self._stepValue
+end
+
+
+
+
+--v function(self: MCM_VAR)
+function mcm_var.increment_value(self)
+    self:set_current_value(self:current_value() + self:step())
+end
+
+--v function(self: MCM_VAR)
+function mcm_var.decrement_value(self)
+    self:set_current_value(self:current_value() - self:step())
+end
+
+--v function(self: MCM_VAR) --> function(context: MOD_CONFIGURATION_MANAGER)
+function mcm_var.callback(self)
+    return self._callback
+end
+
+--v function(self: MCM_VAR) --> boolean
+function mcm_var.has_callback(self)
+    return not not self:callback()
+end
+
+--v function(self: MCM_VAR, callback: function(context: MOD_CONFIGURATION_MANAGER))
+function mcm_var.add_callback(self, callback)
+    self:log("added callback to variable ["..self:name().."] ")
+    self._callback = callback
+end
+
+--v function(self: MCM_VAR, text: string)
+function mcm_var.set_ui_name(self, text)
+    self._uiName = text
+end
+
+--v function(self: MCM_VAR, text: string)
+function mcm_var.set_ui_tooltip(self, text)
+    self._uiToolTip = text
+end
+
+--v function(self: MCM_VAR) --> string
+function mcm_var.ui_name(self)
+    return self._uiName
+end
+
+--v function (self: MCM_VAR) --> string
+function mcm_var.ui_tooltip(self)
+    return self._uiToolTip
+end
+
+local mcm_tweaker = {} --# assume mcm_tweaker: MCM_TWEAKER
+
+--v function(mod: MCM_MOD, name: string, ui_title: string?, ui_tooltip: string?) --> MCM_TWEAKER
+function mcm_tweaker.new(mod, name, ui_title, ui_tooltip)
+    local self = {}
+    setmetatable(self, {
+        __index = mcm_tweaker,
+        __tostring =  function() return "MCM_TWEAKER" end
+    })--# assume self: MCM_TWEAKER
+    self._mod = mod
+    self._name = name
+    self._uiTitle = ui_title or "Un-named tweaker"
+    self._uiToolTip = ui_tooltip or ""
+
+    return self
+end
+
+--v function(mod: MCM_MOD) --> MCM_TWEAKER
+function mcm_tweaker.null(mod)
+    local self = {}
+    setmetatable(self, {
+        __index = mcm_tweaker,
+        __tostring =  function() return "NULL_SCRIPT_INTERFACE" end
+    })--# assume self: MCM_TWEAKER
+    self._mod = mod
+    self._name = ""
+    self._uiTitle = ""
+    self._uiToolTip = ""
+
+    self._options = {} --:map<string, MCM_OPTION>
+    self._selectedOption = nil --:MCM_OPTION
+
+    return self
+end
+
+
+
+
+
+--v function(self: MCM_TWEAKER) --> boolean
+function mcm_tweaker.is_null_interface(self)
+    return tostring(self) == "NULL_SCRIPT_INTERFACE"
+end
+
+--v function(self: MCM_TWEAKER) --> MCM_MOD
+function mcm_tweaker.mod(self)
+    return self._mod
+end
+
+--v function(self: MCM_TWEAKER) --> string
+function mcm_tweaker.name(self)
+    return self._name
+end
+
+--v function(self: MCM_TWEAKER, text: any)
+function mcm_tweaker.log(self, text)
+    self:mod():log(text)
+end
+
+
+local mcm_option = {} --# assume mcm_option: MCM_OPTION
+
+--v function(tweaker: MCM_TWEAKER, key: string, ui_name: string?, ui_tooltip: string?) --> MCM_OPTION
+function mcm_option.new(tweaker, key, ui_name, ui_tooltip)
+    local self = {}
+    setmetatable(self, {
+        __index = mcm_option,
+        __tostring = function() return "MCM_OPTION" end
+    }) --# assume self: MCM_OPTION
+    self._tweaker = tweaker
+    self._name = key
+    self._uiName = ui_name or "Unnamed Option"
+    self._uiToolTip = ui_tooltip or ""
+    self._callback = nil --: function(context: MOD_CONFIGURATION_MANAGER)
+    return self
+
+end
+
+--v function(tweaker: MCM_TWEAKER) --> MCM_OPTION
+function mcm_option.null(tweaker)
+    local self = {}
+    setmetatable(self, {
+        __index = mcm_option,
+        __tostring = function() return "NULL_SCRIPT_INTERFACE" end
+    }) --# assume self: MCM_OPTION
+    self._tweaker = tweaker
+    self._name = "NULL_OPTION"
+    self._uiName = ""
+    self._uiToolTip = ""
+    return self
+end
+
+--v function(self: MCM_OPTION) --> boolean
+function mcm_option.is_null_interface(self)
+    return tostring(self) == "NULL_SCRIPT_INTERFACE"
+end
+
+--v function(self: MCM_OPTION) --> string
+function mcm_option.name(self)
+    return self._name
+end
+
+--v function(self: MCM_OPTION) --> MCM_TWEAKER
+function mcm_option.tweaker(self)
+    return self._tweaker
+end
+
+--v function(self: MCM_OPTION, text: any)
+function mcm_option.log(self, text)
+    self:tweaker():log(text)
+end
+
+--v function(self: MCM_OPTION) --> function(context: MOD_CONFIGURATION_MANAGER)
+function mcm_option.callback(self)
+    return self._callback
+end
+
+
+--v function(self: MCM_OPTION) --> boolean
+function mcm_option.has_callback(self)
+    return not not self:callback()
+end
+
+--v function(self: MCM_OPTION, callback: function(context: MOD_CONFIGURATION_MANAGER))
+function mcm_option.add_callback(self, callback)
+    self:log("added callback to option ["..self:name().."] ")
+    self._callback = callback
+end
+
+
+--v function(self: MCM_OPTION, text: string)
+function mcm_option.set_ui_name(self, text)
+    self._uiName = text
+end
+
+--v function(self: MCM_OPTION, text: string)
+function mcm_option.set_ui_tooltip(self, text)
+    self._uiToolTip = text
+end
+
+--v function(self: MCM_OPTION) --> string
+function mcm_option.ui_name(self)
+    return self._uiName
+end
+
+--v function (self: MCM_OPTION) --> string
+function mcm_option.ui_tooltip(self)
+    return self._uiToolTip
+end
+
+
+--v function(self: MCM_TWEAKER, option: MCM_OPTION)
+function mcm_tweaker.set_selected_option(self, option)
+    self._selectedOption = option
+end
+
+
+--v function(self: MCM_TWEAKER) --> MCM_OPTION
+function mcm_tweaker.selected_option(self)
+    return self._selectedOption
+end
+
+
+--v function(self: MCM_TWEAKER) --> map<string, MCM_OPTION>
+function mcm_tweaker.options(self)
+    return self._options
+end
+
+--v function(self: MCM_TWEAKER, key: string) --> MCM_OPTION
+function mcm_tweaker.get_option_with_key(self, key)
+    if self:options()[key] == nil then
+        self:log("ERROR: Asked for option ["..key.."] which does not exist for the tweaker ["..self:name().."] in the mod ["..self:mod():name().."] ")
+        return mcm_option.null(self)
+    end
+    return self:options()[key]
+end
+
+
+
+
+--v function(self: MCM_TWEAKER, key: string, ui_name: string?, ui_tooltip: string?) --> MCM_OPTION
+function mcm_tweaker.add_option(self, key, ui_name, ui_tooltip)
+    if not (is_string(key) and  (is_string(ui_name) or not ui_name) and (is_string(ui_tooltip) or not ui_tooltip)) then
+        self:log("ERROR: attempted to create a new option for tweaker ["..self:name().."] in mod ["..self:mod():name().."], but a provided key, ui_name or ui_tooltip was not a string!")
+        return mcm_option.null(self)
+    end
+    if not not self:options()[key] then
+        self:log("WARNING: attempted to create an option with key ["..key.."] for tweaker ["..self:name().."] in mod ["..self:mod():name().."], but an option with that key already exists! Returning the existing option instead")
+        return self:options()[key]
+    end
+
+    local new_option = mcm_option.new(self, key, ui_name, ui_tooltip)
+    self:options()[key] = new_option
+    self:log("Created Option with key ["..key.."] for tweaker ["..self:name().."] in mod ["..self:mod():name().."]")
+    if self:selected_option() == nil then
+        self:set_selected_option(new_option)
+        self:log("Created Option is the first option for this tweaker, setting it to be the default!")
+    end
+    return self:options()[key]
+end
+
+--v function(self: MCM_TWEAKER, text: string)
+function mcm_tweaker.set_ui_name(self, text)
+    self._uiName = text
+end
+
+--v function(self: MCM_TWEAKER, text: string)
+function mcm_tweaker.set_ui_tooltip(self, text)
+    self._uiToolTip = text
+end
+
+--v function(self: MCM_TWEAKER) --> string
+function mcm_tweaker.ui_name(self)
+    return self._uiName
+end
+
+--v function (self: MCM_TWEAKER) --> string
+function mcm_tweaker.ui_tooltip(self)
+    return self._uiToolTip
+end
+    
+    
+
+
+
+--v function(self: MCM_MOD) --> map<string, MCM_TWEAKER>
+function mcm_mod.tweakers(self)
+    return self._tweakers
+end
+
+--v function(self: MCM_MOD)--> map<string, MCM_VAR>
+function mcm_mod.variables(self)
+    return self._variables
+end
+
+--v function(self: MCM_MOD, key: string) --> MCM_TWEAKER
+function mcm_mod.get_tweaker_with_key(self, key)
+    if self:tweakers()[key] == nil then
+        self:log("ERROR: Asked for tweaker ["..key.."] which does not exist for the mod ["..self:name().."]")
+        return mcm_tweaker.null(self)
+    end
+    return self:tweakers()[key]
+end
+
+--v function(self: MCM_MOD, key: string) --> MCM_VAR
+function mcm_mod.get_variable_with_key(self, key)
+    if self:variables()[key] == nil then
+        self:log("ERROR: Asked for tweaker ["..key.."] which does not exist for the mod ["..self:name().."]")
+        return mcm_var.null(self)
+    end
+    return self:variables()[key]
+end
+
+
+
+--v function(self: MCM_MOD, key: string, ui_name: string?, ui_tooltip: string?) --> MCM_TWEAKER
+function mcm_mod.add_tweaker(self, key, ui_name, ui_tooltip)
+    if not (is_string(key) and  (is_string(ui_name) or not ui_name) and (is_string(ui_tooltip) or not ui_tooltip)) then
+        self:log("ERROR: attempted to create a new tweaker for mod ["..self:name().."], but a provided key, ui_name or ui_tooltip was not a string!")
+        return mcm_tweaker.null(self)
+    end
+    if not not self:tweakers()[key] then
+        self:log("WARNING: attempted to create a tweaker with key ["..key.."] for mod ["..self:name().."], but a tweaker with that key already exists! Returning the existing tweaker instead")
+        return self:tweakers()[key]
+    end
+
+    local new_tweaker = mcm_tweaker.new(self, key, ui_name, ui_tooltip)
+    self:tweakers()[key] = new_tweaker
+    self:log("created tweaker ["..key.."] for mod ["..self:name().."]")
+    return self:tweakers()[key]
+end
+
+--v function(self: MCM_MOD, key: string, min: number, max: number, default: number, step: number, ui_name: string?, ui_tooltip: string?) --> MCM_VAR
+function mcm_mod.add_variable(self, key, min, max, default, step, ui_name, ui_tooltip)
+    if (ui_name and not is_string(ui_name)) or (ui_tooltip and not is_string(ui_tooltip)) or (not is_string(key)) then
+        self:log("ERROR: attempted to create a new variable for mod ["..self:name().."], but a provided key, ui_name or ui_tooltip was not a string!")
+        return mcm_var.null(self)
+    end
+    if not (is_number(min) and is_number(max) and is_number(default) and is_number(step)) then
+        self:log("ERROR: attempted to create a new variable for mod ["..self:name().."], but a provided min, max, default, or step was not a number!")
+        return mcm_var.null(self)
+    end
+    if not not self:variables()[key] then
+        self:log("WARNING: attempted to create a variable with key ["..key.."] for mod ["..self:name().."], but a variable with that key already exists! Returning the existing variable instead")
+        return self:variables()[key]
+    end
+    local new_variable = mcm_var.new(self, key, min, max, default, step, ui_name, ui_tooltip)
+    self:variables()[key] = new_variable
+    self:log("created variable ["..key.."] for mod ["..self:name().."]")
+    return self:variables()[key]
+end
+
+
+
+--v function(self: MOD_CONFIGURATION_MANAGER) --> map<string, MCM_MOD>
+function mod_configuration_manager.get_mods(self)
+    return self._registeredMods
+end
+
+
+
+--v function(self: MOD_CONFIGURATION_MANAGER, key: string, ui_name: string?, ui_tooltip: string?) --> MCM_MOD
+function mod_configuration_manager.register_mod(self, key, ui_name, ui_tooltip)
+    if not (is_string(key) and (is_string(ui_name) or not ui_name) and (is_string(ui_tooltip) or not ui_tooltip))then 
+        self:log("ERROR: attempted to create a new mod, but a provided key, ui_text, or ui_tooltip is not a string!")
+        return mcm_mod.null(self)
+    end
+    if not not self:get_mods()[key] then
+        self:log("WARNING: attempted to create a new mod, but a mod already exists with the provided key!; returning that instead")
+        return self:get_mods()[key]
+    end
+    local new_mod = mcm_mod.new(self, key, ui_name, ui_tooltip)
+    self:get_mods()[key] = new_mod
+    self:log("registered mod ["..key.."]")
+    return self:get_mods()[key]
+end
+
+--v function(self: MOD_CONFIGURATION_MANAGER, key: string) --> MCM_MOD
+function mod_configuration_manager.get_mod(self, key) 
+    if not self:get_mods()[key] then
+        self:log("ERROR: Called get mod for key ["..key.."] but no mod exists with this key!")
+        return mcm_mod.null(self)
+    end
+    return self:get_mods()[key]
+end
+
+
+
+--v function(self: MOD_CONFIGURATION_MANAGER, variable: MCM_VAR) 
+function mod_configuration_manager.handle_variable(self, variable)
+    cm:set_saved_value("mcm_variable_"..variable:mod():name().."_"..variable:name().."_value", variable:current_value())
+    if variable:has_callback() then
+        self:add_callback_to_stack(variable:callback())
+    end
+    core:trigger_event("mcm_variable_"..variable:mod():name().."_"..variable:name().."_event")
+end
+        
+--v function(self: MOD_CONFIGURATION_MANAGER, tweaker: MCM_TWEAKER)
+function mod_configuration_manager.handle_tweaker(self, tweaker)
+    cm:set_saved_value("mcm_tweaker_"..tweaker:mod():name().."_"..tweaker:name().."_value", tweaker:selected_option():name())
+    if tweaker:selected_option():has_callback() then
+        self:add_callback_to_stack(tweaker:selected_option():callback())
+    end
+    core:trigger_event("mcm_tweaker_"..tweaker:mod():name().."_"..tweaker:name().."_event")
+end
+
+--v function(self: MOD_CONFIGURATION_MANAGER)
+function mod_configuration_manager.process_all_mods(self)
+    for name, mod in pairs(self:get_mods()) do
+        for tweaker_key, tweaker in pairs(mod:tweakers()) do
+            self:handle_tweaker(tweaker)
+        end
+        for variable_key, variable in pairs(mod:variables()) do
+            self:handle_variable(variable)
+        end
+    end
+    for i = 1, #self:get_stack() do
+        self:do_callback_on_stack()
+    end
+end
+
+
