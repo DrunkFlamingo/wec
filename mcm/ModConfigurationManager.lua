@@ -55,6 +55,76 @@ function mod_configuration_manager.log(self, text)
     LOG(tostring(text))
 end
 
+--logs lua errors to a file after this is called.
+--v [NO_CHECK] 
+--v function (self: MOD_CONFIGURATION_MANAGER)
+function mod_configuration_manager.error_checker(self)
+    --Vanish's PCaller
+    --All credits to vanish
+    --v function(func: function) --> any
+    function safeCall(func)
+        local status, result = pcall(func)
+        if not status then
+            LOG("ERROR")
+            LOG(tostring(result))
+            LOG(debug.traceback());
+        end
+        return result;
+    end
+    
+    
+    --v [NO_CHECK] function(...: any)
+    function pack2(...) return {n=select('#', ...), ...} end
+    --v [NO_CHECK] function(t: vector<WHATEVER>) --> vector<WHATEVER>
+    function unpack2(t) return unpack(t, 1, t.n) end
+    
+    --v [NO_CHECK] function(f: function(), argProcessor: function()) --> function()
+    function wrapFunction(f, argProcessor)
+        return function(...)
+            local someArguments = pack2(...);
+            if argProcessor then
+                safeCall(function() argProcessor(someArguments) end)
+            end
+            local result = pack2(safeCall(function() return f(unpack2( someArguments )) end));
+            return unpack2(result);
+            end
+    end
+    
+    core.trigger_event = wrapFunction(
+        core.trigger_event,
+        function(ab)
+        end
+    );
+    
+    cm.check_callbacks = wrapFunction(
+        cm.check_callbacks,
+        function(ab)
+        end
+    )
+    
+    local currentAddListener = core.add_listener;
+    --v [NO_CHECK] function(core: any, listenerName: any, eventName: any, conditionFunc: any, listenerFunc: any, persistent: any)
+    function myAddListener(core, listenerName, eventName, conditionFunc, listenerFunc, persistent)
+        local wrappedCondition = nil;
+        if is_function(conditionFunc) then
+            --wrappedCondition =  wrapFunction(conditionFunc, function(arg) output("Callback condition called: " .. listenerName .. ", for event: " .. eventName); end);
+            wrappedCondition =  wrapFunction(conditionFunc);
+        else
+            wrappedCondition = conditionFunc;
+        end
+        currentAddListener(
+            core, listenerName, eventName, wrappedCondition, wrapFunction(listenerFunc), persistent
+            --core, listenerName, eventName, wrappedCondition, wrapFunction(listenerFunc, function(arg) output("Callback called: " .. listenerName .. ", for event: " .. eventName); end), persistent
+        )
+    end
+    core.add_listener = myAddListener;
+
+end
+
+
+
+
+
 --v function(self: MOD_CONFIGURATION_MANAGER) --> vector<function(context: MOD_CONFIGURATION_MANAGER)>
 function mod_configuration_manager.get_stack(self)
     return self._modConfigStack
@@ -656,3 +726,4 @@ function mod_configuration_manager.process_all_mods(self)
 end
 
 
+mod_configuration_manager.init()

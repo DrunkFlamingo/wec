@@ -12,4 +12,5 @@ require("exterior_scripting/export_helpers__faction_replacement")
 --require("emil_qb/battle_script");
 
 
-require("mcm/mod_configuration")
+require("mcm/ModCOnfigurationManager")
+require("mcm/export_helpers__mcm_ui")
