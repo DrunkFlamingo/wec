@@ -34,6 +34,15 @@ require("chaos_gates/export_helpers__chaos_gates")
 require("grudges/BookOfGrudges")
 --]]
 
+---[[ Lords in Exile
+require("lords_in_exile/LordsInExile")
+require("lords_in_exile/export_helpers__exiled_lords_ebs")
+--]]
+
+
+
+
+
 
 --unupdated/vandies trash
 
@@ -48,3 +57,4 @@ require("grudges/BookOfGrudges")
 --require("le/wec_loreful_empires")
 
 --require("emil_qb/battle_script");
+

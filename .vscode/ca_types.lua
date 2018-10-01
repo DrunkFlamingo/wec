@@ -295,7 +295,9 @@
 -- MILITARY FORCE
 --# assume CA_MILITARY_FORCE.general_character: method() --> CA_CHAR
 --# assume CA_MILITARY_FORCE.unit_list: method() --> CA_UNIT_LIST
-
+--# assume CA_MILITARY_FORCE.command_queue_index: method() --> CA_CQI
+--# assume CA_MILITARY_FORCE.has_effect_bundle: method(bundle: string) --> boolean
+--# assume CA_MILITARY_FORCE.character_list: method() --> CA_CHAR_LIST
 
 -- MILITARY FORCE LIST
 --# assume CA_MILITARY_FORCE_LIST.num_items: method() --> number
@@ -421,7 +423,8 @@
 --# assume CA_FACTION.faction_leader: method() --> CA_CHAR
 --# assume CA_FACTION.has_home_region: method() --> boolean
 --# assume CA_FACTION.factions_met: method() --> CA_FACTION_LIST
-
+--# assume CA_FACTION.factions_at_war_with: method() --> CA_FACTION_LIST
+--# assume CA_FACTION.at_war: method() --> boolean
 -- FACTION LIST
 --# assume CA_FACTION_LIST.num_items: method() --> number
 --# assume CA_FACTION_LIST.item_at: method(index: number) --> CA_FACTION
