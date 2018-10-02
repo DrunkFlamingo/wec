@@ -3,6 +3,8 @@
 -- CLASS DECLARATION
 --# assume global class CM
 --# assume global class CUIM
+--# assume global class CUIM_OVERRIDE
+--# assume global class CA_CampaignUI
 --# assume global class CA_UIC
 --# assume global class CA_Component
 --# assume global class CA_UIContext
@@ -257,7 +259,14 @@
 -- CAMPAIGN UI MANAGER
 --# assume CUIM.get_char_selected: method() --> string
 --# assume CUIM.settlement_selected: string
+--# assume CUIM.override: method(ui_override: string) --> CUIM_OVERRIDE
 
+-- CAMPAIGN UI MANAGER OVERRIDES
+--# assume CUIM_OVERRIDE.set_allowed: method(allowed: bool)
+
+--CA CAMPAIGN_UI
+--# assume CA_CampaignUI.TriggerCampaignScriptEvent: function(cqi: CA_CQI, event: string)
+--# assume CA_CampaignUI.ClearSelection: function()
 
 -- GAME INTERFACE
 --# assume CA_GAME.filesystem_lookup: method(filePath: string, matchRegex:string) --> string
@@ -298,6 +307,7 @@
 --# assume CA_MILITARY_FORCE.command_queue_index: method() --> CA_CQI
 --# assume CA_MILITARY_FORCE.has_effect_bundle: method(bundle: string) --> boolean
 --# assume CA_MILITARY_FORCE.character_list: method() --> CA_CHAR_LIST
+
 
 -- MILITARY FORCE LIST
 --# assume CA_MILITARY_FORCE_LIST.num_items: method() --> number
@@ -487,7 +497,7 @@
 --# assume global Get_Character_Side_In_Last_Battle: function(char: CA_CHAR) --> BATTLE_SIDE
 --# assume global q_setup: function()
 --# assume global set_up_rank_up_listener: function(quest_table: vector<vector<string | number>>, subtype: string, infotext: vector<string | number>)
-
+--# assume global CampaignUI: CA_CampaignUI
 
 
 

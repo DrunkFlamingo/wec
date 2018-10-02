@@ -201,6 +201,10 @@ function exiles.create_exiled_army_for_faction(self, faction_key, accepting_fact
             local character = cm:get_character_by_cqi(cqi)
             cm:scroll_camera_from_current(1, false, {character:display_position_x(), character:display_position_y(), 14.7, 0.0, 12.0});
         end)
+
+        cm:callback(function() 
+            CampaignUI.ClearSelection();
+        end, 0.4)
         
 end
 
@@ -266,6 +270,8 @@ function exiles.disable_buttons(self)
             uic:SetTooltipText("You cannot access this function on an exiled army!", true)
         end
     end
+    local uim = cm:get_campaign_ui_manager();
+    uim:override("disband_unit"):set_allowed(false);
     self._buttonsDisabled = true
 end
 
@@ -283,6 +289,8 @@ function exiles.enable_buttons(self)
                 end
             end
         end
+        local uim = cm:get_campaign_ui_manager();
+        uim:override("disband_unit"):set_allowed(true);
     end
     self._buttonsDisabled = false
 end
