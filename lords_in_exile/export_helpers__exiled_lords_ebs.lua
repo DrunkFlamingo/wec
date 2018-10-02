@@ -6,6 +6,11 @@ exile_manager:enable_culture_as_recipient("wh_main_sc_emp_empire")
 exile_manager:enable_culture_as_recipient("wh_main_sc_brt_bretonnia")
 exile_manager:enable_culture_as_recipient("wh2_main_sc_hef_high_elves")
 exile_manager:enable_culture_as_recipient("wh_main_sc_dwf_dwarfs")
+exile_manager:add_button_to_disable({"layout", "info_panel_holder", "primary_info_panel_holder", "info_panel_background", "CharacterInfoPopup", "rank", "skills", "skill_button"})
+exile_manager:add_button_to_disable({"layout", "info_panel_holder", "primary_info_panel_holder", "info_button_list", "button_general"})
+exile_manager:add_button_to_disable({"layout", "BL_parent", "land_stance_button_stack"})
+exile_manager:add_button_to_disable({"layout", "hud_center_docker", "hud_center", "small_bar", "button_group_army", "button_recruitment"})
+exile_manager:add_button_to_disable({"layout", "hud_center_docker", "hud_center", "small_bar", "button_group_army", "button_renown"})
 
 --high elves
 exile_manager:add_faction("wh2_main_hef_avelorn", "wec_exiles_dilemma_wh2_main_hef_avelorn", 
@@ -216,6 +221,7 @@ core:add_listener(
     end,
     function(context)
         local faction = string.gsub(context:dilemma(), "wec_exiles_dilemma_", "")
+        cm:set_saved_value("exiles_occured_"..faction, true)
         if context:choice() == 0 then
             exile_manager:create_exiled_army_for_faction(faction, context:faction():name())
         end
@@ -258,7 +264,52 @@ core:add_listener(
         return exile_manager:army_is_exiles(context:character():cqi())
     end,
     function(context)
-        exile_manager:revive_faction(context:character():cqi(), context:garrison_residence():region():name())
+        exile_manager:revive_faction(context:character():cqi(), context:garrison_residence():region())
     end,
     true
 )
+
+core:add_listener(
+    "ExilesCharacterSelected",
+    "CharacterSelected",
+    function(context)
+        return context:character():faction():is_human()
+    end,
+    function(context)
+        local cqi = context:character():cqi() --:CA_CQI
+        if exile_manager:army_is_exiles(cqi) then
+            exile_manager:disable_buttons()
+        else
+            exile_manager:enable_buttons()
+        end
+    end,
+    true
+)
+
+
+
+
+
+--[[ testing code
+events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1]  = function()
+    local vlad_armies = cm:get_faction("wh_main_dwf_dwarfs"):character_list()
+    for i = 0, vlad_armies:num_items() -1 do
+        cm:callback(function()
+            cm:kill_character(vlad_armies:item_at(i):cqi(), true, true)
+        end, i+1/10)
+    end
+
+    local provinces_to_transfer_to_mannfred = {
+        "wh_main_the_silver_road_karaz_a_karak"
+    } --:vector<string>
+    
+    --give sylvania to mannfred
+    
+    for i = 1, #provinces_to_transfer_to_mannfred do
+        cm:callback( function()
+        cm:transfer_region_to_faction(provinces_to_transfer_to_mannfred[i], "wh_main_vmp_vampire_counts");
+        end, (i/10));
+    end
+end
+
+--]]
