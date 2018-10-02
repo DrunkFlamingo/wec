@@ -44,7 +44,7 @@ end;
 --# assume global class EXILES
 local exiles = {} --# assume exiles: EXILES
 
-
+--instantiation function
 --v function() --> EXILES
 function exiles.init()
     local self = {}
@@ -54,16 +54,19 @@ function exiles.init()
 
     self._activeExiles = {} --:map<CA_CQI, string> -- <CA_CQI> CQI of the exiles army, <string> name of the faction who is exiled
     self._exiledArmyLists = {} --:map<string, vector<string>> -- <string> name of the faction who is exiled, <vector<string>> list of unit keys for use in create force.
-    self._exiledLeaders = {} --:map<string, {surname: map<string, string>, forename: map<string, string>, subtype: string}> -- <string> faction_key of exile, {surname: string, forename: string, subtype: string} leader info
+    self._exiledLeaders = {} --:map<string, {surname: map<string, string>, forename: map<string, string>, subtype: string}> -- <string> faction_key of exile, 
+                                                                                                                            --{surname: map<string, string>, forename: map<string, string>, subtype: string} leader info
+                                                                                                                            -- the maps are culture to name key to get around the restrictions.
     self._enabledCultures = {} --:map<string, boolean> -- <string> subculture key of the faction who may recieve, <boolean> flag to recieve.
     self._exileDilemmas = {} --:map<string, string> -- <string> faction who can be an exile, <string> dilemma to trigger
     self._disabledButtonPaths = {} --:vector<vector<string>> -- <vector<vector<string>>> vector of file paths to use in find_by_table.
-    self._tooltips = {} --:map<string, string>
-    self._buttonsDisabled = false --:boolean
+    self._tooltips = {} --:map<string, string> -- <string> component ID, <string> former tooltip
+    self._buttonsDisabled = false --:boolean --flag if UI is modified currently.
     _G.exile_manager = self
     return self
 end
 
+--tunnel to log
 --v method(text: any)
 function exiles:log(text)
     EXLOG(tostring(text))
@@ -136,47 +139,54 @@ function exiles.error_checker(self)
 
 end
 
-
+--create a table of necessary save data
 --v function(self: EXILES) --> map<string, string>
 function exiles.save(self)
     self:log("Saving exiles data: ")
     local savedata = {} --:map<string, string>
     for cqi, faction in pairs(self._activeExiles) do
         self:log("Active exile army with cqi ["..tostring(cqi).."] for faction ["..faction.."] ")
+        --convert CQI's to string, overwise when the table is loaded the numbers will be reset to 1, 2, 3 etc. due to serialisation.
         savedata[tostring(cqi)] = faction
     end
     return savedata
 end
 
+--load values from a save table. NO CHECK because Kailua doesn't aprove of flexible typing. 
 --v [NO_CHECK] function(self: EXILES, savedata: map<string, string>)
 function exiles.load(self, savedata)
     self:log("Loading exiles data: ")
     for cqi, faction in pairs(savedata) do
         self:log("Active exile army with cqi ["..cqi.."] for faction ["..faction.."] ")
+        --we saved numbers as strings, return them to number
         self._activeExiles[tonumber(cqi)] = faction
     end
 end
 
 
-
+--is the given CQI an exiled army?
 --v function(self: EXILES, cqi: CA_CQI) --> boolean
 function exiles.army_is_exiles(self, cqi)
     return not not self._activeExiles[cqi]
 end
 
 
-
+--create an exiled army, store it, and apply the correct bundles.
 --v function(self: EXILES, faction_key: string, accepting_faction: string)
 function exiles.create_exiled_army_for_faction(self, faction_key, accepting_faction)
     
+    -- vary army size randomly.
     local army_size = 15 - cm:random_number(5)
-    local army_list = self._exiledArmyLists[faction_key]
-    local army = army_list[cm:random_number(#army_list)]
+    local army_list = self._exiledArmyLists[faction_key] 
+    local army = army_list[cm:random_number(#army_list)] --start with a random unit
     for i = 1, army_size - 1 do
+        --add more units until size is reached.
         local next_unit = army_list[cm:random_number(#army_list)]
         army = army..","..next_unit
     end
+
     local region = cm:get_faction(accepting_faction):home_region()
+    --should be sufficient for now. 
     local x = region:settlement():logical_position_x() - 1
     local y = region:settlement():logical_position_y() - 1
     local leader_info = self._exiledLeaders[faction_key]
@@ -190,7 +200,7 @@ function exiles.create_exiled_army_for_faction(self, faction_key, accepting_fact
         y,
         "general",
         leader_info.subtype,
-        leader_info.forename[sc],
+        leader_info.forename[sc], --sc used to get a name which will display properly. 
         "",
         leader_info.surname[sc],
         "",
@@ -202,6 +212,8 @@ function exiles.create_exiled_army_for_faction(self, faction_key, accepting_fact
             cm:scroll_camera_from_current(1, false, {character:display_position_x(), character:display_position_y(), 14.7, 0.0, 12.0});
         end)
 
+        --the create force command autoselects generals, but the UI events don't trigger and the bundle doesn't appear. 
+        --Clear selection to prevent this. 
         cm:callback(function() 
             CampaignUI.ClearSelection();
         end, 0.4)
@@ -223,6 +235,7 @@ function exiles.revive_faction(self, conquesting_army, region)
     self._activeExiles[conquesting_army] = nil
     cm:callback(function() cm:disable_event_feed_events(false, "", "wh_event_subcategory_character_deaths", "") end, 1);
     --next, spawn a new army for the faction.
+    --re using the spawn logic from above. Should be a minor detail.
     local army_size = 15 - cm:random_number(5)
     local army_list = self._exiledArmyLists[faction_to_revive]
     local army = army_list[cm:random_number(#army_list)]
@@ -234,6 +247,7 @@ function exiles.revive_faction(self, conquesting_army, region)
     local y = region:settlement():logical_position_y() - 1
     local leader_info = self._exiledLeaders[faction_to_revive]
     local sc = cm:get_faction(faction_to_revive):subculture()
+
     cm:create_force_with_general(
         faction_to_revive,
         army,
@@ -250,7 +264,7 @@ function exiles.revive_faction(self, conquesting_army, region)
         function(cqi)
         end)
         cm:callback(function()
-        --finally, transfer the region
+        --finally, transfer the region; must be done on a delay to get around the bug with transfer and dead factions.
         cm:transfer_region_to_faction(region:name(), faction_to_revive)
         end, 0.5);
 
@@ -271,12 +285,14 @@ function exiles.disable_buttons(self)
         end
     end
     local uim = cm:get_campaign_ui_manager();
-    uim:override("disband_unit"):set_allowed(false);
+    --this CA function is much cleaner than anything I could code.
+    uim:override("disband_unit"):set_allowed(false); 
     self._buttonsDisabled = true
 end
 
 --v function(self: EXILES)
 function exiles.enable_buttons(self)
+    --ignore command if flag isn't set.
     if self._buttonsDisabled == true then
         local button_paths = self._disabledButtonPaths
         for i = 1, #button_paths do
@@ -299,15 +315,21 @@ end
 --v function(self: EXILES, human_faction: CA_FACTION)
 function exiles.trigger_valid_exiles(self, human_faction)
     local factions = self._exileDilemmas
+    --check if we have enough money
     if human_faction:treasury() < 6000 then
         return 
     end
+    --if we do, check if we are the correct culture
     if self._enabledCultures[human_faction:subculture()] then
         for faction, dilemma in pairs(factions) do
             local faction_obj = cm:get_faction(faction)
+            --if the exilable faction is dead
             if faction_obj:is_dead() then
+                --if the exile hasn't occured yet.
                 if not cm:get_saved_value("exiles_occured_"..faction) then
+                    --if the exiled faction was not at war with us before they died
                     if not cm:get_saved_value("exiles_war_"..human_faction:name()..faction) then
+                        --if the exiled faction doesn't belong to our culture
                         if (human_faction:subculture() == faction_obj:subculture()) then
 
                         else
@@ -324,6 +346,7 @@ end
 
 --v function(self: EXILES, human_faction: CA_FACTION)
 function exiles.exclude_wars(self, human_faction)
+    --find the wars the human faction is involved in and set a save value to prevent exiles from that faction,
     if human_faction:at_war() then
         local at_war_list = human_faction:factions_at_war_with()
         for i = 1, at_war_list:num_items() - 1 do
@@ -339,12 +362,14 @@ end
 function exiles.check_active_exiles(self)
     for CQI, faction in pairs(self._activeExiles) do
         local mf = cm:get_character_by_cqi(CQI):military_force()
+        --check if they still have their bundle
         if not mf:has_effect_bundle(CONST_EXILE_ARMY_BUNDLE) then
             self:log("An exiles timer has run out! Killing them!")
             cm:disable_event_feed_events(true, "", "wh_event_subcategory_character_deaths", "");
             cm:kill_character(CQI, true, true)
             self._activeExiles[CQI] = nil
             cm:callback(function() cm:disable_event_feed_events(false, "", "wh_event_subcategory_character_deaths", "") end, 1);
+        --check if they have been revived through other means.
         elseif not cm:get_faction(faction):is_dead() then
             cm:disable_event_feed_events(true, "", "wh_event_subcategory_character_deaths", "");
             cm:kill_character(CQI, true, true)
@@ -358,6 +383,8 @@ end
 
 --EXTERNAL API
 
+--adds an exilable faction to the model.
+--requires a full DB setup including: Name keys for each culture, culture animation permissions for all units, a dilemma, and a reward bundle. 
 --v function(self: EXILES, faction_key: string, dilemma_key: string, army_list: vector<string>, leader_subtype: string, leader_forename: map<string, string>, leader_surname: map<string,string>)
 function exiles.add_faction(self, faction_key, dilemma_key, army_list, leader_subtype, leader_forename, leader_surname)
     self:log("Adding faction: ["..faction_key.."] as an exilable!")
@@ -370,21 +397,24 @@ function exiles.add_faction(self, faction_key, dilemma_key, army_list, leader_su
     self._exiledLeaders[faction_key] = leader_info
 end
 
-
+--enables culture as a recpient of these events. 
 --v function(self: EXILES, subculture: string)
 function exiles.enable_culture_as_recipient(self, subculture)
     self:log("enabling sc ["..subculture.."] to recieve exiles!")
     self._enabledCultures[subculture] = true
 end
 
+--add a button that needs to be disabled. Should not be necessary except for many on UI mods. 
 --v function(self: EXILES, button_path: vector<string>)
 function exiles.add_button_to_disable(self, button_path)
     table.insert(self._disabledButtonPaths, button_path)
 end
 
 
-
+--instantiate the manager with the error checker on.
 exiles.init():error_checker()
+
+--register save and load callbacks.
 
 cm:add_saving_game_callback(function(context)
     local em = _G.exile_manager

@@ -142,6 +142,7 @@ exile_manager:add_faction("wh_main_emp_empire", "wec_exiles_dilemma_wh_main_emp_
         wh_main_sc_dwf_dwarfs = "names_name_1920011342"        
     }
 )
+-- the bukkits
 exile_manager:add_faction("wh_main_brt_carcassonne", "wec_exiles_dilemma_wh_main_brt_carcassonne", 
 {
     "wh_dlc07_brt_inf_men_at_arms_2",
@@ -206,6 +207,7 @@ exile_manager:add_faction("wh_main_brt_bretonnia", "wec_exiles_dilemma_wh_main_b
         wh_main_sc_emp_empire = "names_name_1887142773"
     }
 )
+-- vertically challenged people
 exile_manager:add_faction("wh_main_dwf_dwarfs", "wec_exiles_dilemma_wh_main_dwf_dwarfs", 
 {
     "wh_main_dwf_inf_dwarf_warrior_0",
@@ -305,7 +307,7 @@ exile_manager:add_faction("wh_main_dwf_karak_izor", "wec_exiles_dilemma_wh_main_
 
 
 
---ebs
+--event based scripting
 
 
 core:add_listener(
@@ -315,8 +317,13 @@ core:add_listener(
         return context:faction():is_human() 
     end,
     function(context)
-        exile_manager:check_active_exiles()
+        --check if we have any valid exiles that need to be squished. On a small callback so it happens after the game processes bundle changes.
+        cm:callback(function()
+            exile_manager:check_active_exiles()
+        end, 0.5)
+        --exclude any wars we need to exclude
         exile_manager:exclude_wars(context:faction())
+        --trigger the check for valid exiles.
         exile_manager:trigger_valid_exiles(context:faction())
     end,
     true)
@@ -325,11 +332,15 @@ core:add_listener(
     "ExilesDilemmaDecision",
     "DilemmaChoiceMadeEvent",
     function(context)
+        --check for our prefix.
         return context:dilemma():starts_with("wec_exiles_dilemma_")
     end,
     function(context)
+        --grab our faction by removing the prefix.
         local faction = string.gsub(context:dilemma(), "wec_exiles_dilemma_", "")
+        --set the already occured value.
         cm:set_saved_value("exiles_occured_"..faction, true)
+        --if they say yes, trigger the exile army. 
         if context:choice() == 0 then
             exile_manager:create_exiled_army_for_faction(faction, context:faction():name())
         end
@@ -340,7 +351,7 @@ core:add_listener(
 
 
 
-
+--check whenever the human makes a peace treaty and re-enable exiles for the peaced- out faction.
 core:add_listener(
     "ExilesWarEnds",
     "PositiveDiplomaticEvent",
@@ -365,13 +376,16 @@ core:add_listener(
     true
 )
 
+
 core:add_listener(
     "ExilesGarrisonOccupation",
     "GarrisonOccupiedEvent",
     function(context)
+        --is the occupying faction an exile?
         return exile_manager:army_is_exiles(context:character():cqi())
     end,
     function(context)
+        --revive them and gift them the settlement. 
         exile_manager:revive_faction(context:character():cqi(), context:garrison_residence():region())
     end,
     true
@@ -381,9 +395,11 @@ core:add_listener(
     "ExilesCharacterSelected",
     "CharacterSelected",
     function(context)
+        --are we selecting a human character?
         return context:character():faction():is_human()
     end,
     function(context)
+        --disable or enable their buttons, depending on whether they are an exile.
         local cqi = context:character():cqi() --:CA_CQI
         if exile_manager:army_is_exiles(cqi) then
             exile_manager:disable_buttons()
@@ -399,6 +415,7 @@ core:add_listener(
     "FactionJoinsConfederation",
     true,
     function(context)
+        --lock the exile event for AI factions who get confederated. Otherwise our script will see them as dead!
         local confed_faction = context:faction():name()
         cm:set_saved_value("exiles_occured_"..confed_faction, true)
     end,
