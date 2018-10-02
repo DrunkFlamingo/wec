@@ -255,7 +255,7 @@
 --# assume CM.unlock_starting_general_recruitment: method(startpos: string, faction: string)
 --# assume CM.win_next_autoresolve_battle: method(faction: string)
 --# assume CM.modify_next_autoresolve_battle: method(attacker_win_chance: number, defender_win_chance: number, attacker_losses_modifier: number, defender_losses_modifier: number, wipe_out_loser: boolean)
-
+--# assume CM.char_is_mobile_general_with_army: method(char: CA_CHAR) --> boolean
 -- CAMPAIGN UI MANAGER
 --# assume CUIM.get_char_selected: method() --> string
 --# assume CUIM.settlement_selected: string

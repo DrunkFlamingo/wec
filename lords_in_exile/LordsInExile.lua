@@ -62,6 +62,7 @@ function exiles.init()
     self._disabledButtonPaths = {} --:vector<vector<string>> -- <vector<vector<string>>> vector of file paths to use in find_by_table.
     self._tooltips = {} --:map<string, string> -- <string> component ID, <string> former tooltip
     self._buttonsDisabled = false --:boolean --flag if UI is modified currently.
+    self._currentChar = nil --:CA_CQI --currently selected character, used for tracking exchanges.
     _G.exile_manager = self
     return self
 end
@@ -287,6 +288,10 @@ function exiles.disable_buttons(self)
     local uim = cm:get_campaign_ui_manager();
     --this CA function is much cleaner than anything I could code.
     uim:override("disband_unit"):set_allowed(false); 
+    uim:override("character_details"):set_allowed(false); 
+    uim:override("recruit_units"):set_allowed(false);
+    uim:override("recruit_mercenaries"):set_allowed(false);
+    uim:override("regiments_of_renown"):set_allowed(false);
     self._buttonsDisabled = true
 end
 
@@ -307,6 +312,10 @@ function exiles.enable_buttons(self)
         end
         local uim = cm:get_campaign_ui_manager();
         uim:override("disband_unit"):set_allowed(true);
+        uim:override("character_details"):set_allowed(true); 
+        uim:override("recruit_units"):set_allowed(true);
+        uim:override("recruit_mercenaries"):set_allowed(true);
+        uim:override("regiments_of_renown"):set_allowed(true);
     end
     self._buttonsDisabled = false
 end

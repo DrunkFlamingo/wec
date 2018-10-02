@@ -6,11 +6,11 @@ exile_manager:enable_culture_as_recipient("wh_main_sc_emp_empire")
 exile_manager:enable_culture_as_recipient("wh_main_sc_brt_bretonnia")
 exile_manager:enable_culture_as_recipient("wh2_main_sc_hef_high_elves")
 exile_manager:enable_culture_as_recipient("wh_main_sc_dwf_dwarfs")
-exile_manager:add_button_to_disable({"layout", "info_panel_holder", "primary_info_panel_holder", "info_panel_background", "CharacterInfoPopup", "rank", "skills", "skill_button"})
-exile_manager:add_button_to_disable({"layout", "info_panel_holder", "primary_info_panel_holder", "info_button_list", "button_general"})
-exile_manager:add_button_to_disable({"layout", "BL_parent", "land_stance_button_stack"})
-exile_manager:add_button_to_disable({"layout", "hud_center_docker", "hud_center", "small_bar", "button_group_army", "button_recruitment"})
-exile_manager:add_button_to_disable({"layout", "hud_center_docker", "hud_center", "small_bar", "button_group_army", "button_renown"})
+--exile_manager:add_button_to_disable({"layout", "info_panel_holder", "primary_info_panel_holder", "info_panel_background", "CharacterInfoPopup", "rank", "skills", "skill_button"})
+--exile_manager:add_button_to_disable({"layout", "info_panel_holder", "primary_info_panel_holder", "info_button_list", "button_general"})
+--exile_manager:add_button_to_disable({"layout", "BL_parent", "land_stance_button_stack"})
+--exile_manager:add_button_to_disable({"layout", "hud_center_docker", "hud_center", "small_bar", "button_group_army", "button_recruitment"})
+--exile_manager:add_button_to_disable({"layout", "hud_center_docker", "hud_center", "small_bar", "button_group_army", "button_renown"})
 
 --high elves
 exile_manager:add_faction("wh2_main_hef_avelorn", "wec_exiles_dilemma_wh2_main_hef_avelorn", 
@@ -401,6 +401,7 @@ core:add_listener(
     function(context)
         --disable or enable their buttons, depending on whether they are an exile.
         local cqi = context:character():cqi() --:CA_CQI
+        exile_manager._currentChar = cqi
         if exile_manager:army_is_exiles(cqi) then
             exile_manager:disable_buttons()
         else
@@ -451,3 +452,84 @@ events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1]  = funct
 end
 
 --]]
+
+
+--disabling exchanges 
+--function stolen from RM in weo lib
+--v function() --> CA_CQI
+local function find_second_army()
+
+    --v function(ax: number, ay: number, bx: number, by: number) --> number
+    local function distance_2D(ax, ay, bx, by)
+        return (((bx - ax) ^ 2 + (by - ay) ^ 2) ^ 0.5);
+    end;
+    local first_char = cm:get_character_by_cqi(exile_manager._currentChar)
+    local char_list = first_char:faction():character_list()
+    local closest_char --:CA_CHAR
+    local last_distance = 50 --:number
+    local ax = first_char:logical_position_x()
+    local ay = first_char:logical_position_y()
+    for i = 0, char_list:num_items() - 1 do
+        local char = char_list:item_at(i)
+        if cm:char_is_mobile_general_with_army(char) then
+            if char:cqi() == first_char:cqi() then
+
+            else
+                local dist = distance_2D(ax, ay, char:logical_position_x(), char:logical_position_y())
+                if dist < last_distance then
+                    last_distance = dist
+                    closest_char = char
+                end
+            end
+        end
+    end
+    if closest_char then
+        return closest_char:cqi()
+    else
+        exile_manager:log("failed to find the other char!")
+        return nil
+    end
+end
+--v function()
+local function LockExchangeButton()
+    local ok_button = find_uicomponent(core:get_ui_root(), "unit_exchange", "hud_center_docker", "ok_cancel_buttongroup", "button_ok")
+    if not not ok_button then
+        ok_button:SetInteractive(false)
+        ok_button:SetImage("ui/skins/default/icon_disband.png")
+    else
+        exile_manager:log("ERROR: could not find the exchange ok button!")
+    end
+end
+
+--v function()
+local function UnlockExchangeButton()
+    local ok_button = find_uicomponent(core:get_ui_root(), "unit_exchange", "hud_center_docker", "ok_cancel_buttongroup", "button_ok")
+    if not not ok_button then
+        ok_button:SetInteractive(true)
+        ok_button:SetImage("ui/skins/default/icon_check.png")
+    else
+        exile_manager:log("ERROR: could not find the exchange ok button!")
+    end
+end
+
+
+core:add_listener(
+    "ExilesPanelOpenedExchange",
+    "PanelOpenedCampaign",
+    function(context) 
+        return context.string == "unit_exchange"; 
+    end,
+    function(context)
+        cm:callback(function() --do this on a delay so the panel has time to fully open before the script tries to change it!
+            local first = exile_manager._currentChar
+            local second = find_second_army()
+            --if either army is an exile army, disable the exchange!
+            if exile_manager:army_is_exiles(first) or exile_manager:army_is_exiles(second) then
+                LockExchangeButton()
+            else
+                UnlockExchangeButton()
+            end
+        end, 0.1)
+    end,
+    true
+)
