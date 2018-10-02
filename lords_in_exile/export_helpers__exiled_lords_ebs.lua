@@ -394,11 +394,21 @@ core:add_listener(
     true
 )
 
+core:add_listener(
+    "ExilesConfederation",
+    "FactionJoinsConfederation",
+    true,
+    function(context)
+        local confed_faction = context:faction():name()
+        cm:set_saved_value("exiles_occured_"..confed_faction, true)
+    end,
+    true
+)
 
 
 
 
----[[ testing code
+--[[ testing code
 events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1]  = function()
     if not cm:get_saved_value("exiles_test") then
         local vlad_armies = cm:get_faction("wh_main_dwf_dwarfs"):character_list()
