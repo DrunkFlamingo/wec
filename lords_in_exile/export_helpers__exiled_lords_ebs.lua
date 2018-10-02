@@ -14,25 +14,37 @@ exile_manager:add_button_to_disable({"layout", "hud_center_docker", "hud_center"
 
 --high elves
 exile_manager:add_faction("wh2_main_hef_avelorn", "wec_exiles_dilemma_wh2_main_hef_avelorn", 
-{
-    "wh2_main_hef_inf_spearmen_0",
-    "wh2_main_hef_inf_spearmen_0",
-    "wh2_main_hef_inf_spearmen_0",
-    "wh2_main_hef_inf_spearmen_0",
-    "wh2_main_hef_inf_spearmen_0",
-    "wh2_main_hef_inf_spearmen_0",
-    "wh2_main_hef_inf_archers_0",
-    "wh2_main_hef_inf_archers_0",
-    "wh2_main_hef_inf_archers_0",
-    "wh2_main_hef_cav_silver_helms_1",
-    "wh2_main_hef_cav_silver_helms_1",
-    "wh2_main_hef_cav_silver_helms_1",
-    "wh2_dlc10_hef_inf_sisters_of_avelorn_0",
-    "wh2_dlc10_hef_inf_sisters_of_avelorn_0",
-    "wh2_dlc10_hef_inf_sisters_of_avelorn_0",
-    "wh2_dlc10_hef_mon_treekin_0",
-    "wh2_dlc10_hef_mon_treekin_0"
-}, "wh2_dlc10_hef_alarielle", "names_name_898828143", "")
+    {
+        "wh2_main_hef_inf_spearmen_0",
+        "wh2_main_hef_inf_spearmen_0",
+        "wh2_main_hef_inf_spearmen_0",
+        "wh2_main_hef_inf_spearmen_0",
+        "wh2_main_hef_inf_spearmen_0",
+        "wh2_main_hef_inf_spearmen_0",
+        "wh2_main_hef_inf_archers_0",
+        "wh2_main_hef_inf_archers_0",
+        "wh2_main_hef_inf_archers_0",
+        "wh2_main_hef_cav_silver_helms_1",
+        "wh2_main_hef_cav_silver_helms_1",
+        "wh2_main_hef_cav_silver_helms_1",
+        "wh2_dlc10_hef_inf_sisters_of_avelorn_0",
+        "wh2_dlc10_hef_inf_sisters_of_avelorn_0",
+        "wh2_dlc10_hef_inf_sisters_of_avelorn_0",
+        "wh2_dlc10_hef_mon_treekin_0",
+        "wh2_dlc10_hef_mon_treekin_0"
+    }, "wh2_dlc10_hef_alarielle", {
+        wh_main_sc_dwf_dwarfs = "names_name_32174022",
+        wh_main_sc_emp_empire = "names_name_167674321",
+        wh_main_sc_brt_bretonnia = "names_name_361064528",
+        wh2_main_sc_hef_high_elves = "names_name_1478429232"
+        },
+        {
+        wh_main_sc_dwf_dwarfs = "",
+        wh_main_sc_emp_empire = "",
+        wh_main_sc_brt_bretonnia = "",
+        wh2_main_sc_hef_high_elves = ""
+        }
+    )
 exile_manager:add_faction("wh2_main_hef_eataine", "wec_exiles_dilemma_wh2_main_hef_eataine", 
 {
     "wh2_main_hef_inf_spearmen_0",
@@ -52,7 +64,19 @@ exile_manager:add_faction("wh2_main_hef_eataine", "wec_exiles_dilemma_wh2_main_h
     "wh2_main_hef_inf_lothern_sea_guard_1",
     "wh2_main_hef_inf_white_lions_of_chrace_0",
     "wh2_main_hef_inf_white_lions_of_chrace_0"
-}, "wh2_main_hef_tyrion", "names_name_2147360906", "names_name_2147360506")
+}, "wh2_main_hef_tyrion",{
+    wh_main_sc_dwf_dwarfs = "names_name_202441981",
+    wh_main_sc_emp_empire = "names_name_167674321",
+    wh_main_sc_brt_bretonnia = "names_name_1050136400",
+    wh2_main_sc_hef_high_elves = "names_name_1845118216"
+    },
+    {
+    wh_main_sc_dwf_dwarfs = "",
+    wh_main_sc_emp_empire = "",
+    wh_main_sc_brt_bretonnia = "",
+    wh2_main_sc_hef_high_elves = ""
+    }
+)
 exile_manager:add_faction("wh2_main_hef_order_of_loremasters", "wec_exiles_dilemma_wh2_main_hef_order_of_loremasters", 
 {
     "wh2_main_hef_inf_spearmen_0",
@@ -72,7 +96,19 @@ exile_manager:add_faction("wh2_main_hef_order_of_loremasters", "wec_exiles_dilem
     "wh2_main_hef_inf_swordmasters_of_hoeth_0",
     "wh2_main_hef_mon_phoenix_frostheart",
     "wh2_main_hef_mon_phoenix_frostheart"
-}, "wh2_main_hef_teclis", "names_name_2147359256", "names_name_2147360506")
+}, "wh2_main_hef_teclis", {
+    wh_main_sc_brt_bretonnia = "names_name_436515028",
+    wh_main_sc_dwf_dwarfs = "names_name_824231526",
+    wh2_main_sc_hef_high_elves = "names_name_1453133800",
+    wh_main_sc_emp_empire = "names_name_1578248859"    
+    },
+    {
+    wh_main_sc_dwf_dwarfs = "",
+    wh_main_sc_emp_empire = "",
+    wh_main_sc_brt_bretonnia = "",
+    wh2_main_sc_hef_high_elves = ""
+    }
+)
 --karl frunz
 exile_manager:add_faction("wh_main_emp_empire", "wec_exiles_dilemma_wh_main_emp_empire", 
 {
@@ -82,10 +118,10 @@ exile_manager:add_faction("wh_main_emp_empire", "wec_exiles_dilemma_wh_main_emp_
     "wh_main_emp_inf_swordsmen",
     "wh_main_emp_inf_swordsmen",
     "wh_main_emp_inf_swordsmen",
+    "wh_main_emp_inf_spearmen_1",
     "wh_main_emp_inf_handgunners",
     "wh_main_emp_inf_handgunners",
-    "wh_main_emp_inf_handgunners",
-    "wh_main_emp_cav_reiksguard",
+    "wh_main_emp_inf_swordsmen",
     "wh_main_emp_cav_reiksguard",
     "wh_main_emp_cav_reiksguard",
     "wh_main_emp_inf_greatswords",
@@ -93,7 +129,19 @@ exile_manager:add_faction("wh_main_emp_empire", "wec_exiles_dilemma_wh_main_emp_
     "wh_main_emp_inf_greatswords",
     "wh_main_emp_art_great_cannon",
     "wh_main_emp_art_great_cannon"
-}, "emp_karl_franz", "names_name_2147343849", "names_name_2147343858")
+}, "emp_karl_franz", {
+    wh2_main_sc_hef_high_elves = "names_name_12481177",
+    wh_main_sc_dwf_dwarfs = "names_name_1485513084",
+    wh_main_sc_brt_bretonnia = "names_name_1530078133",
+    wh_main_sc_emp_empire = "names_name_1542273247"    
+    },
+    {
+        wh_main_sc_brt_bretonnia = "names_name_439921391",
+        wh_main_sc_emp_empire = "names_name_460471875",
+        wh2_main_sc_hef_high_elves = "names_name_638474139",
+        wh_main_sc_dwf_dwarfs = "names_name_1920011342"        
+    }
+)
 exile_manager:add_faction("wh_main_brt_carcassonne", "wec_exiles_dilemma_wh_main_brt_carcassonne", 
 {
     "wh_dlc07_brt_inf_men_at_arms_2",
@@ -113,7 +161,19 @@ exile_manager:add_faction("wh_main_brt_carcassonne", "wec_exiles_dilemma_wh_main
     "wh_dlc07_brt_cav_grail_guardians_0",
     "wh_dlc07_brt_art_blessed_field_trebuchet_0",
     "wh_dlc07_brt_art_blessed_field_trebuchet_0"
-}, "dlc07_brt_fay_enchantress", "names_name_2147358931", "names_name_2147359018")
+}, "dlc07_brt_fay_enchantress", {
+    wh_main_sc_dwf_dwarfs = "names_name_332789182",
+    wh2_main_sc_hef_high_elves = "names_name_530719269",
+    wh_main_sc_emp_empire = "names_name_639265014",
+    wh_main_sc_brt_bretonnia = "names_name_810950678"
+    },
+    {
+    wh_main_sc_dwf_dwarfs = "",
+    wh_main_sc_emp_empire = "",
+    wh_main_sc_brt_bretonnia = "",
+    wh2_main_sc_hef_high_elves = ""
+    }
+)
 exile_manager:add_faction("wh_main_brt_bretonnia", "wec_exiles_dilemma_wh_main_brt_bretonnia", 
 {
     "wh_dlc07_brt_inf_men_at_arms_2",
@@ -133,7 +193,19 @@ exile_manager:add_faction("wh_main_brt_bretonnia", "wec_exiles_dilemma_wh_main_b
     "wh_main_brt_cav_grail_knights",
     "wh_dlc07_brt_art_blessed_field_trebuchet_0",
     "wh_dlc07_brt_art_blessed_field_trebuchet_0"
-}, "brt_louen_leoncouer", "names_name_2147343915", "names_name_2147343917")
+}, "brt_louen_leoncouer", {
+        wh_main_sc_emp_empire = "names_name_13470887",
+        wh_main_sc_brt_bretonnia = "names_name_89056585",
+        wh_main_sc_dwf_dwarfs = "names_name_210366883",
+        wh2_main_sc_hef_high_elves = "names_name_938560958"
+    },
+    {
+        wh_main_sc_brt_bretonnia = "names_name_346719012",
+        wh_main_sc_dwf_dwarfs = "names_name_1297431622",
+        wh2_main_sc_hef_high_elves = "names_name_1333188909",
+        wh_main_sc_emp_empire = "names_name_1887142773"
+    }
+)
 exile_manager:add_faction("wh_main_dwf_dwarfs", "wec_exiles_dilemma_wh_main_dwf_dwarfs", 
 {
     "wh_main_dwf_inf_dwarf_warrior_0",
@@ -142,10 +214,10 @@ exile_manager:add_faction("wh_main_dwf_dwarfs", "wec_exiles_dilemma_wh_main_dwf_
     "wh_main_dwf_inf_longbeards",
     "wh_main_dwf_inf_longbeards",
     "wh_main_dwf_inf_longbeards",
+    "wh_main_dwf_inf_longbeards",
     "wh_main_dwf_inf_thunderers_0",
     "wh_main_dwf_inf_thunderers_0",
-    "wh_main_dwf_inf_thunderers_0",
-    "wh_main_dwf_art_grudge_thrower",
+    "wh_main_dwf_inf_dwarf_warrior_0",
     "wh_main_dwf_art_grudge_thrower",
     "wh_main_dwf_art_grudge_thrower",
     "wh_main_dwf_inf_ironbreakers",
@@ -153,7 +225,19 @@ exile_manager:add_faction("wh_main_dwf_dwarfs", "wec_exiles_dilemma_wh_main_dwf_
     "wh_main_dwf_inf_ironbreakers",
     "wh_main_dwf_veh_gyrocopter_0",
     "wh_main_dwf_veh_gyrocopter_0"
-}, "dwf_thorgrim_grudgebearer", "names_name_2147343883", "names_name_2147343884")
+}, "dwf_thorgrim_grudgebearer", {
+    wh_main_sc_emp_empire = "names_name_403254495",
+    wh_main_sc_brt_bretonnia = "names_name_800319601",
+    wh_main_sc_dwf_dwarfs = "names_name_1170610257",
+    wh2_main_sc_hef_high_elves = "names_name_1934702858"
+    },
+    {
+        wh_main_sc_emp_empire = "names_name_139741743",
+        wh_main_sc_dwf_dwarfs = "names_name_1128587319",
+        wh_main_sc_brt_bretonnia = "names_name_1328018081",
+        wh2_main_sc_hef_high_elves = "names_name_1918049497"        
+    }
+)
 exile_manager:add_faction("wh_main_dwf_karak_kadrin", "wec_exiles_dilemma_wh_main_dwf_karak_kadrin", 
 {
     "wh_main_dwf_inf_dwarf_warrior_0",
@@ -162,7 +246,7 @@ exile_manager:add_faction("wh_main_dwf_karak_kadrin", "wec_exiles_dilemma_wh_mai
     "wh_main_dwf_inf_longbeards",
     "wh_main_dwf_inf_longbeards",
     "wh_main_dwf_inf_longbeards",
-    "wh_main_dwf_inf_thunderers_0",
+    "wh_main_dwf_inf_longbeards",
     "wh_main_dwf_inf_thunderers_0",
     "wh_main_dwf_inf_thunderers_0",
     "wh_main_dwf_art_grudge_thrower",
@@ -173,7 +257,19 @@ exile_manager:add_faction("wh_main_dwf_karak_kadrin", "wec_exiles_dilemma_wh_mai
     "wh2_dlc10_dwf_inf_giant_slayers",
     "wh2_dlc10_dwf_inf_giant_slayers",
     "wh_main_dwf_inf_irondrakes_0"
-}, "dwf_ungrim_ironfist", "names_name_2147344414", "names_name_2147344423")
+}, "dwf_ungrim_ironfist", {
+        wh_main_sc_emp_empire = "names_name_27370129",
+        wh2_main_sc_hef_high_elves = "names_name_677405888",
+        wh_main_sc_brt_bretonnia = "names_name_1448418685",
+        wh_main_sc_dwf_dwarfs = "names_name_1884875597"    
+    },
+    {
+        wh2_main_sc_hef_high_elves = "names_name_897354597",
+        wh_main_sc_brt_bretonnia = "names_name_973980367",
+        wh_main_sc_emp_empire = "names_name_1307045098",
+        wh_main_sc_dwf_dwarfs = "names_name_1688526055"        
+    }
+)
 exile_manager:add_faction("wh_main_dwf_karak_izor", "wec_exiles_dilemma_wh_main_dwf_karak_izor", 
 {
     "wh_main_dwf_inf_dwarf_warrior_0",
@@ -182,10 +278,10 @@ exile_manager:add_faction("wh_main_dwf_karak_izor", "wec_exiles_dilemma_wh_main_
     "wh_main_dwf_inf_longbeards",
     "wh_main_dwf_inf_longbeards",
     "wh_main_dwf_inf_longbeards",
+    "wh_dlc06_dwf_inf_rangers_0",
+    "wh_main_dwf_inf_longbeards",
     "wh_main_dwf_inf_thunderers_0",
-    "wh_main_dwf_inf_thunderers_0",
-    "wh_main_dwf_inf_thunderers_0",
-    "wh_main_dwf_art_grudge_thrower",
+    "wh_main_dwf_inf_dwarf_warrior_0",
     "wh_main_dwf_art_grudge_thrower",
     "wh_main_dwf_art_grudge_thrower",
     "wh_dlc06_dwf_inf_rangers_0",
@@ -193,7 +289,19 @@ exile_manager:add_faction("wh_main_dwf_karak_izor", "wec_exiles_dilemma_wh_main_
     "wh_main_dwf_inf_hammerers",
     "wh_main_dwf_inf_hammerers",
     "wh_main_dwf_inf_hammerers"
-}, "dlc06_dwf_belegar", "names_name_2147358029", "names_name_2147358036")
+}, "dlc06_dwf_belegar", {
+        wh2_main_sc_hef_high_elves = "names_name_513508839",
+        wh_main_sc_dwf_dwarfs = "names_name_927075448",
+        wh_main_sc_emp_empire = "names_name_1638708374",
+        wh_main_sc_brt_bretonnia = "names_name_2088835242"    
+    },
+    {
+        wh2_main_sc_hef_high_elves = "names_name_297346204",
+        wh_main_sc_emp_empire = "names_name_579314739",
+        wh_main_sc_dwf_dwarfs = "names_name_1715607445",
+        wh_main_sc_brt_bretonnia = "names_name_1991304257"        
+    }
+)
 
 
 
@@ -290,25 +398,28 @@ core:add_listener(
 
 
 
---[[ testing code
+---[[ testing code
 events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1]  = function()
-    local vlad_armies = cm:get_faction("wh_main_dwf_dwarfs"):character_list()
-    for i = 0, vlad_armies:num_items() -1 do
-        cm:callback(function()
-            cm:kill_character(vlad_armies:item_at(i):cqi(), true, true)
-        end, i+1/10)
-    end
+    if not cm:get_saved_value("exiles_test") then
+        local vlad_armies = cm:get_faction("wh_main_dwf_dwarfs"):character_list()
+        for i = 0, vlad_armies:num_items() -1 do
+            cm:callback(function()
+                cm:kill_character(vlad_armies:item_at(i):cqi(), true, true)
+            end, i+1/10)
+        end
 
-    local provinces_to_transfer_to_mannfred = {
-        "wh_main_the_silver_road_karaz_a_karak"
-    } --:vector<string>
-    
-    --give sylvania to mannfred
-    
-    for i = 1, #provinces_to_transfer_to_mannfred do
-        cm:callback( function()
-        cm:transfer_region_to_faction(provinces_to_transfer_to_mannfred[i], "wh_main_vmp_vampire_counts");
-        end, (i/10));
+        local provinces_to_transfer_to_mannfred = {
+            "wh_main_the_silver_road_karaz_a_karak"
+        } --:vector<string>
+        
+        --give sylvania to mannfred
+        
+        for i = 1, #provinces_to_transfer_to_mannfred do
+            cm:callback( function()
+            cm:transfer_region_to_faction(provinces_to_transfer_to_mannfred[i], "wh_main_vmp_vampire_counts");
+            end, (i/10));
+        end
+        cm:set_saved_value("exiles_test", true)
     end
 end
 
