@@ -53,6 +53,7 @@
 
 --object creation functions
 --# assume BUTTON.new: function(name: string, parent: WHATEVER, form: BUTTON_TYPE, imagePath: string) --> BUTTON
+--# assume TEXT_BUTTON.new: function(name: string, parent: WHATEVER, form: TEXT_BUTTON_TYPE, text: string) --> TEXT_BUTTON
 --# assume FRAME.new: function(name: string) --> FRAME
 --# assume IMAGE.new: function(name: string, parent: WHATEVER, imagepath: string) --> IMAGE
 --# assume TEXT.new: function(name: string, parent: WHATEVER, form: TEXT_TYPE, text: string) --> TEXT
@@ -65,7 +66,7 @@
 --# assume UTIL.getComponentWithName: function(name: string) --> COMPONENT_TYPE
 --# assume UTIL.centreComponentOnScreen: function(component: WHATEVER)
 --# assume UTIL.centreComponentOnComponent: function(component: WHATEVER, other_component: WHATEVER)    
-
+--# assume UTIL.recurseThroughChildrenApplyingFunction: function(parent: WHATEVER, callback:function(child: WHATEVER))
 
 
 
@@ -79,6 +80,8 @@
 --# assume BUTTON.Visible: method() --> boolean
 --# assume BUTTON.Position: method() --> (number, number)
 --# assume BUTTON.Bounds: method() --> (number, number)
+--# assume BUTTON.Width: method() --> number
+--# assume BUTTON.Height: method() --> number
 --# assume BUTTON.GetContentComponent: method() --> CA_UIC
 --# assume BUTTON.GetPositioningComponent: method() --> CA_UIC
 --# assume BUTTON.Delete: method()
@@ -89,7 +92,19 @@
 --# assume BUTTON.RegisterForClick: method(callback: function(context: WHATEVER?))
 --# assume BUTTON.SetImage: method(path: string)
 --# assume BUTTON.SetDisabled: method(disabled: boolean)
-
+--text button
+--# assume TEXT_BUTTON.MoveTo: method(xPos: number, yPos: number)
+--# assume TEXT_BUTTON.Move: method(XMove: number, yMove: number)
+--# assume TEXT_BUTTON.PositionRelativeTo: method(component: WHATEVER, xDiff: number, yDiff: number)
+--# assume TEXT_BUTTON.Scale: method(factor:number)
+--# assume TEXT_BUTTON.Resize: method(width: number, height: number)
+--# assume TEXT_BUTTON.SetVisible: method(visible: boolean)
+--# assume TEXT_BUTTON.Visible: method() --> boolean
+--# assume TEXT_BUTTON.Position: method() --> (number, number)
+--# assume TEXT_BUTTON.Bounds: method() --> (number, number)
+--# assume TEXT_BUTTON.RegisterForClick: method(callback: function(context: WHATEVER?))
+--# assume TEXT_BUTTON.SetDisabled: method(disabled: boolean)
+--# assume TEXT_BUTTON.GetContentComponent: method() --> CA_UIC
 --frame
 --# assume FRAME.MoveTo: method(xPos: number, yPos: number)
 --# assume FRAME.Move: method(xMove: number, yMove: number)
@@ -117,16 +132,24 @@
 --# assume IMAGE.PositionRelativeTo: method(component: WHATEVER, xDiff: number, yDiff: number)
 --# assume IMAGE.Scale: method(factor: number)
 --# assume IMAGE.Move: method(xMove: number, yMove: number)
+--# assume IMAGE.SetImage: method(path: string)
+--# assume IMAGE.GetContentComponent: method() --> CA_UIC
+--# assume IMAGE.SetVisible: method(boolean)
+--# assume IMAGE.Delete: method()
 --text
 --# assume TEXT.PositionRelativeTo: method(component: WHATEVER, xDiff: number, yDiff: number)
 --# assume TEXT.SetText: method(str: string)
 --# assume TEXT.Bounds: method() --> (number, number)
 --# assume TEXT.Resize: method(x: number, y: number)
+--# assume TEXT.SetVisible: method(visible: boolean)
 --container
 --# assume CONTAINER.AddComponent: method(component: WHATEVER)
 --# assume CONTAINER.GetContentComponent: method() --> CA_UIC
 --# assume CONTAINER.AddGap: method(num: number)
 --# assume CONTAINER.PositionRelativeTo: method(component: WHATEVER, xDiff: number, yDiff: number)
+--# assume CONTAINER.MoveTo: method(x: number, y: number)
+--# assume CONTAINER.Bounds: method() --> (number, number)
+--# assume CONTAINER.RecursiveRetrieveAllComponents: method() --> vector<WHATEVER>
 
 --listview
 --# assume LIST_VIEW.AddComponent: method(component: WHATEVER)

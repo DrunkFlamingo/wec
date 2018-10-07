@@ -164,7 +164,7 @@ function mcm_mod.new(model, name, ui_name, ui_tooltip)
     self._variables = {} --:map<string, MCM_VAR> 
 
     self._uiName = ui_name or "unnamed mod"
-    self.uiToolTip = ui_tooltip or ""
+    self._uiToolTip = ui_tooltip or ""
 
     return self
 end
