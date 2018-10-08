@@ -1,5 +1,6 @@
 mcm = _G.mcm
 local mod = mcm:register_mod("tests", "test mod", "toooool tip xd")
+local mod2 = mcm:register_mod("secondtest", "second test", "tooooooooollllltiiiiiiipppppp")
 local multiple_choice = mod:add_tweaker("test_tweaker", "test tweaker", "fuck you thats what")
 local choice_1 = multiple_choice:add_option("key", "An option"):add_callback(function(context) end)
 local choice_2 = multiple_choice:add_option("Key2", "Another option")
@@ -14,8 +15,16 @@ local function PopulatePanel(MCMMainFrame)
     local fbX, fbY = MCMMainFrame:Bounds()
     local sX, sY = core:get_screen_resolution()
 
-    local ModHeaderHolder = Container.new(FlowLayout.HORIZONTAL)
+    local ModHeaderListHolder = Container.new(FlowLayout.HORIZONTAL)
+    local ModHeaderListView = ListView.new(UIPANELNAME.."_MOD_HEADER_LISTVIEW", MCMMainFrame, "HORIZONTAL")
+    ModHeaderListView:Scale(1)
+    ModHeaderListView:Resize(200, 100)
+        local ModHeaderListBufferContainer = Container.new(FlowLayout.HORIZONTAL)
+        ModHeaderListBufferContainer:AddGap(10)
+
+    ModHeaderListView:AddContainer(ModHeaderListBufferContainer)
     local mods = mcm._registeredMods
+
 
     for key, mod in pairs(mcm._registeredMods) do
         local uiName = mod._uiName
@@ -23,9 +32,12 @@ local function PopulatePanel(MCMMainFrame)
         local modTextButton = TextButton.new(UIPANELNAME.."_MOD_HEADER_BUTTON_"..key, MCMMainFrame, "TEXT", uiName)
         modTextButton:Resize(200, 40)
         modTextButton:GetContentComponent():SetTooltipText(uiToolTip, false)
-        ModHeaderHolder:AddComponent(modTextButton)
+
+        ModHeaderListView:AddComponent(modTextButton)        
     end;
     
+    ModHeaderListHolder:AddComponent(ModHeaderListView)
+    ModHeaderListHolder:MoveTo(500,500)
 
 
 end;
