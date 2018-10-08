@@ -46,6 +46,7 @@ function mod_configuration_manager.init()
 
     self._modConfigStack = {} --:vector<function(context: MOD_CONFIGURATION_MANAGER)>
     self._registeredMods = {} --:map<string, MCM_MOD>
+    self._selectedMod = nil --:MCM_MOD
 
     _G.mcm = self
 end
@@ -54,6 +55,28 @@ end
 function mod_configuration_manager.log(self, text)
     LOG(tostring(text))
 end
+
+--v function (self: MOD_CONFIGURATION_MANAGER) --> boolean
+function mod_configuration_manager.has_selected_mod(self)
+    return not not self._selectedMod
+end
+
+--v function(self: MOD_CONFIGURATION_MANAGER, mod_key: string)
+function mod_configuration_manager.make_mod_with_key_selected(self, mod_key)
+    self._selectedMod = self._registeredMods[mod_key]
+end
+
+--v function(self: MOD_CONFIGURATION_MANAGER) --> MCM_MOD
+function mod_configuration_manager.get_current_mod(self)
+    if self._selectedMod == nil then
+        self:log("ERROR: called get_current_mod() with no mod selected!")
+        local null_responce = {} --# assume null_responce: MCM_MOD
+        null_responce.is_null_interface = function() return true end
+        return null_responce
+    end
+    return self._selectedMod
+end
+
 
 --logs lua errors to a file after this is called.
 --v [NO_CHECK] 
@@ -163,8 +186,8 @@ function mcm_mod.new(model, name, ui_name, ui_tooltip)
     self._tweakers = {} --:map<string, MCM_TWEAKER>
     self._variables = {} --:map<string, MCM_VAR> 
 
-    self._uiName = ui_name or "unnamed mod"
-    self._uiToolTip = ui_tooltip or ""
+    self._UIName = ui_name or "unnamed mod"
+    self._UIToolTip = ui_tooltip or ""
 
     return self
 end
@@ -180,8 +203,8 @@ function mcm_mod.null(model)
     self._model = model
     self._tweakers = {}
     self._variables = {}
-    self._uiName = "NULL INTERFACE"
-    self._uiToolTip = "NULL_INTERFACE"
+    self._UIName = "NULL INTERFACE"
+    self._UIToolTip = "NULL_INTERFACE"
     return self
 end
 
@@ -218,8 +241,8 @@ function mcm_var.new(mod, name, min, max, default, step, ui_name, ui_tooltip)
     self._minValue = min
     self._maxValue = max
     self._stepValue = step
-    self._uiName = ui_name
-    self._uiToolTip = ui_tooltip
+    self._UIName = ui_name
+    self._UIToolTip = ui_tooltip
 
     self._currentValue = default
     
@@ -241,8 +264,8 @@ function mcm_var.null(mod)
     self._maxValue = 0
     self._currentValue = 0
     self._stepValue = 0
-    self._uiName = ""
-    self._uiToolTip = ""
+    self._UIName = ""
+    self._UIToolTip = ""
     self._callback = nil --:function(context: MOD_CONFIGURATION_MANAGER)
     return self
 end
@@ -346,22 +369,22 @@ end
 
 --v function(self: MCM_VAR, text: string)
 function mcm_var.set_ui_name(self, text)
-    self._uiName = text
+    self._UIName = text
 end
 
 --v function(self: MCM_VAR, text: string)
 function mcm_var.set_ui_tooltip(self, text)
-    self._uiToolTip = text
+    self._UIToolTip = text
 end
 
 --v function(self: MCM_VAR) --> string
 function mcm_var.ui_name(self)
-    return self._uiName
+    return self._UIName
 end
 
 --v function (self: MCM_VAR) --> string
 function mcm_var.ui_tooltip(self)
-    return self._uiToolTip
+    return self._UIToolTip
 end
 
 local mcm_tweaker = {} --# assume mcm_tweaker: MCM_TWEAKER
@@ -375,8 +398,8 @@ function mcm_tweaker.new(mod, name, ui_title, ui_tooltip)
     })--# assume self: MCM_TWEAKER
     self._mod = mod
     self._name = name
-    self._uiTitle = ui_title or "Un-named tweaker"
-    self._uiToolTip = ui_tooltip or ""
+    self._UITitle = ui_title or "Un-named tweaker"
+    self._UIToolTip = ui_tooltip or ""
 
     self._options = {} --:map<string, MCM_OPTION>
     self._selectedOption = nil --:MCM_OPTION
@@ -393,8 +416,8 @@ function mcm_tweaker.null(mod)
     })--# assume self: MCM_TWEAKER
     self._mod = mod
     self._name = ""
-    self._uiTitle = ""
-    self._uiToolTip = ""
+    self._UITitle = ""
+    self._UIToolTip = ""
 
     self._options = {} 
     self._selectedOption = nil 
@@ -435,8 +458,8 @@ function mcm_option.new(tweaker, key, ui_name, ui_tooltip)
     }) --# assume self: MCM_OPTION
     self._tweaker = tweaker
     self._name = key
-    self._uiName = ui_name or "Unnamed Option"
-    self._uiToolTip = ui_tooltip or ""
+    self._UIName = ui_name or "Unnamed Option"
+    self._UIToolTip = ui_tooltip or ""
     self._callback = nil --: function(context: MOD_CONFIGURATION_MANAGER)
     return self
 end
@@ -450,8 +473,8 @@ function mcm_option.null(tweaker)
     }) --# assume self: MCM_OPTION
     self._tweaker = tweaker
     self._name = "NULL_OPTION"
-    self._uiName = ""
-    self._uiToolTip = ""
+    self._UIName = ""
+    self._UIToolTip = ""
     self._callback = nil 
     return self
 end
@@ -496,22 +519,22 @@ end
 
 --v function(self: MCM_OPTION, text: string)
 function mcm_option.set_ui_name(self, text)
-    self._uiName = text
+    self._UIName = text
 end
 
 --v function(self: MCM_OPTION, text: string)
 function mcm_option.set_ui_tooltip(self, text)
-    self._uiToolTip = text
+    self._UIToolTip = text
 end
 
 --v function(self: MCM_OPTION) --> string
 function mcm_option.ui_name(self)
-    return self._uiName
+    return self._UIName
 end
 
 --v function (self: MCM_OPTION) --> string
 function mcm_option.ui_tooltip(self)
-    return self._uiToolTip
+    return self._UIToolTip
 end
 
 ------------------------------------------------------------------------------
@@ -569,22 +592,22 @@ end
 
 --v function(self: MCM_TWEAKER, text: string)
 function mcm_tweaker.set_ui_name(self, text)
-    self._uiName = text
+    self._UIName = text
 end
 
 --v function(self: MCM_TWEAKER, text: string)
 function mcm_tweaker.set_ui_tooltip(self, text)
-    self._uiToolTip = text
+    self._UIToolTip = text
 end
 
 --v function(self: MCM_TWEAKER) --> string
 function mcm_tweaker.ui_name(self)
-    return self._uiName
+    return self._UIName
 end
 
 --v function (self: MCM_TWEAKER) --> string
 function mcm_tweaker.ui_tooltip(self)
-    return self._uiToolTip
+    return self._UIToolTip
 end
     
 ------------------------------------------------------------------------------
