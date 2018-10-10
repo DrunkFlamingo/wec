@@ -27,8 +27,8 @@ local function PopulatePanel(MCMMainFrame)
 
 
     for key, mod in pairs(mcm._registeredMods) do
-        local uiName = mod._uiName
-        local uiToolTip = mod._uiToolTip
+        local uiName = mod._UIName
+        local uiToolTip = mod._UIToolTip
         local modTextButton = TextButton.new(UIPANELNAME.."_MOD_HEADER_BUTTON_"..key, MCMMainFrame, "TEXT", uiName)
         modTextButton:Resize(200, 40)
         modTextButton:GetContentComponent():SetTooltipText(uiToolTip, false)
