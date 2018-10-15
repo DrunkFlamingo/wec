@@ -19,8 +19,8 @@ local function owr_rite_unlock_listeners()
             function(context, --: WHATEVER
             faction_name --: string 	
             )
-                    local character = context:character();
-                    local pb = context:pending_battle();
+                    local character = context:character() --:CA_CHAR
+                    local pb = context:pending_battle() --:CA_PENDING_BATTLE
                     --# assume character: CA_CHAR
                     --# assume pb: CA_PENDING_BATTLE
                     return character:faction():name() == faction_name and pb:ambush_battle() and character == pb:attacker() and character:won_battle();
@@ -37,7 +37,7 @@ local function owr_rite_unlock_listeners()
             function(context --: WHATEVER
                 ,faction_name --: string 	
             )
-                    local character = context:character();
+                    local character = context:character() --:CA_CHAR
                     
                     return character:faction():name() == faction_name and character:character_type("wizard") and character:rank() >= 10;
                 end
@@ -107,7 +107,7 @@ local function owr_rite_unlock_listeners()
             function(context --: WHATEVER
                 ,faction_name --: string 	
             )
-                    local building = context:building();
+                    local building = context:building() --:CA_BUILDING
                     
                     return building:faction():name() == faction_name and building:name() == "wh_main_vmp_balefire_3";
                 end
@@ -120,7 +120,7 @@ local function owr_rite_unlock_listeners()
             function(context --: WHATEVER
                 ,faction_name --: string 	
             )
-                    local region = context:garrison_residence():region();
+                    local region = context:garrison_residence():region() --:CA_REGION
                     
                     return context:character():faction():name() == faction_name and region:building_exists("wh_main_vmp_balefire_3");
                 end
@@ -158,7 +158,7 @@ local function owr_rite_unlock_listeners()
             function(context --: WHATEVER
                 ,faction_name --: string 	
             )
-                    local character = context:character();
+                    local character = context:character() --:CA_CHAR
                     
                     return character:faction():name() == faction_name and tonumber(character:rank()) >= 7;
                 end
@@ -190,7 +190,7 @@ local function owr_rite_unlock_listeners()
             function(context --: WHATEVER
                 ,faction_name --: string 	
             )
-                    local faction = context:character():faction();
+                    local faction = context:character():faction() --:CA_FACTION
                     
                     return faction:name() == faction_name and faction:region_list():num_items() >= 6;
                 end
@@ -206,7 +206,7 @@ local function owr_rite_unlock_listeners()
             function(context --: WHATEVER
                 ,faction_name --: string 	
             )
-                    local character = context:character();
+                    local character = context:character() --:CA_CHAR
                     
                     return character:faction():name() == faction_name and tonumber(character:rank()) >= 7;
                 end
@@ -222,7 +222,7 @@ local function owr_rite_unlock_listeners()
             function(context --: WHATEVER
                 ,faction_name --: string 	
             )
-                    local building = context:building();
+                    local building = context:building() --:CA_BUILDING
                     
                     return building:faction():name() == faction_name and building:name() == "wh_main_dwf_slayer_2";
                 end
@@ -236,7 +236,7 @@ local function owr_rite_unlock_listeners()
             function(context --: WHATEVER
                 ,faction_name --: string 	
             )
-                    local region = context:garrison_residence():region();
+                    local region = context:garrison_residence():region() --:CA_REGION
                     
                     return context:character():faction():name() == faction_name and region:building_exists("wh_main_dwf_slayer_2");
                 end
@@ -340,7 +340,7 @@ local function owr_rite_unlock_listeners()
             function(context --: WHATEVER
                 ,faction_name --: string 	
             )
-                    local building = context:building();
+                    local building = context:building() --:CA_BUILDING
                     
                     return building:faction():name() == faction_name and building:name() == "wh_main_emp_forges_3";
                 end
@@ -354,7 +354,7 @@ local function owr_rite_unlock_listeners()
             function(context --: WHATEVER
                 ,faction_name --: string 	
             )
-                    local region = context:garrison_residence():region();
+                    local region = context:garrison_residence():region() --:CA_REGION
                     
                     return context:character():faction():name() == faction_name and region:building_exists("wh_main_emp_forges_3");
                 end
@@ -370,7 +370,7 @@ local function owr_rite_unlock_listeners()
             function(context --: WHATEVER
                 ,faction_name --: string 	
             )
-                    local character = context:character();
+                    local character = context:character() --:CA_CHAR
                     
                     return character:faction():name() == faction_name and character:character_type("wizard");
                 end
@@ -383,7 +383,7 @@ local function owr_rite_unlock_listeners()
             function(context --: WHATEVER
                 ,faction_name --: string 	
             )
-                    local character = context:character();
+                    local character = context:character() --:CA_CHAR
                     
                     return character:faction():name() == faction_name and character:character_type("wizard");
                 end
@@ -399,11 +399,11 @@ local function owr_rite_unlock_listeners()
             function(context --: WHATEVER
                 ,faction_name --: string 	
             )
-                    local faction = context:faction();
+                    local faction = context:faction() --:CA_FACTION
                     
                     if faction:name() == faction_name then
                         local mf_list = faction:military_force_list();
-                        local units = 0;
+                        local units = 0 --:number
                         
                         for i = 0, mf_list:num_items() - 1 do
                             local current_mf = mf_list:item_at(i);

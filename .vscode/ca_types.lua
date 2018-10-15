@@ -310,6 +310,7 @@
 --# assume CA_CHAR.faction: method() --> CA_FACTION
 --# assume CA_CHAR.military_force: method() --> CA_MILITARY_FORCE
 --# assume CA_CHAR.character_subtype: method(subtype: string) --> boolean
+--# assume CA_CHAR.character_type: method(char_type: string) --> boolean
 --# assume CA_CHAR.get_forename: method() --> string
 --# assume CA_CHAR.get_surname: method() --> string
 --# assume CA_CHAR.command_queue_index: method() --> CA_CQI
@@ -334,7 +335,8 @@
 --# assume CA_MILITARY_FORCE.command_queue_index: method() --> CA_CQI
 --# assume CA_MILITARY_FORCE.has_effect_bundle: method(bundle: string) --> boolean
 --# assume CA_MILITARY_FORCE.character_list: method() --> CA_CHAR_LIST
-
+--# assume CA_MILITARY_FORCE.has_general: method() --> boolean
+--# assume CA_MILITARY_FORCE.is_armed_citizenry: method() --> boolean
 
 -- MILITARY FORCE LIST
 --# assume CA_MILITARY_FORCE_LIST.num_items: method() --> number
