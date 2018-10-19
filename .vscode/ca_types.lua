@@ -327,6 +327,7 @@
 --# assume CA_CHAR.region: method() --> CA_REGION
 --# assume CA_CHAR.faction: method() --> CA_FACTION
 --# assume CA_CHAR.military_force: method() --> CA_MILITARY_FORCE
+--# assume CA_CHAR.garrison_residence: method() --> CA_GARRISON_RESIDENCE
 --# assume CA_CHAR.character_subtype: method(subtype: string) --> boolean
 --# assume CA_CHAR.character_type: method(char_type: string) --> boolean
 --# assume CA_CHAR.get_forename: method() --> string
@@ -342,6 +343,8 @@
 --# assume CA_CHAR.family_member: method() --> CA_CHAR
 --# assume CA_CHAR.is_null_interface: method() --> boolean
 --# assume CA_CHAR.has_skill: method(skill_key: string) --> boolean
+--# assume CA_CHAR.is_politician: method() --> boolean
+--# assume CA_CHAR.has_garrison_residence: method() --> boolean
 
 -- CHARACTER LIST
 --# assume CA_CHAR_LIST.num_items: method() --> number

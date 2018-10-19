@@ -45,7 +45,7 @@ require("controllable_waaghs/export_helpers__control_waaagh")
 
 
 
-
+require("patreon_requests/StuckHeroFix")
 --unupdated/vandies trash
 
 --require("owr/wec_rites")
