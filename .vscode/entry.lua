@@ -37,6 +37,8 @@ require("grudges/BookOfGrudges")
 ---[[ Lords in Exile
 require("lords_in_exile/LordsInExile")
 require("lords_in_exile/export_helpers__exiled_lords_ebs")
+require("controllable_waaghs/ControlWaaaghs")
+require("controllable_waaghs/export_helpers__control_waaagh")
 --]]
 
 

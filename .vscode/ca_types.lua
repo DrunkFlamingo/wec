@@ -353,6 +353,7 @@
 --# assume CA_MILITARY_FORCE.character_list: method() --> CA_CHAR_LIST
 --# assume CA_MILITARY_FORCE.has_general: method() --> boolean
 --# assume CA_MILITARY_FORCE.is_armed_citizenry: method() --> boolean
+--# assume CA_MILITARY_FORCE.morale: method() --> number
 
 -- MILITARY FORCE LIST
 --# assume CA_MILITARY_FORCE_LIST.num_items: method() --> number
