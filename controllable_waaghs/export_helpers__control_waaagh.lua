@@ -8,7 +8,8 @@ core:add_listener(
         return context:character():faction():is_human()
     end,
     function(context)
-        if cc:is_army_companion(context:character():cqi()) then
+        cc._currentChar = context:character():cqi()
+        if cc:is_char_companion(context:character():cqi()) then
             cc:disable_buttons()
         else
             cc:enable_buttons()
@@ -33,31 +34,38 @@ core:add_listener(
 --checking if the waaagh is still valid #1
 core:add_listener(
     "CompControlUnitEventChecks",
-    "UnitEvent",
+    "UnitDisbanded",
     function(context)
         return cc:is_army_linked(context:unit():force_commander():cqi())
     end,
     function(context)
         local char = context:unit():force_commander() --:CA_CHAR
-        if char:military_force():unit_list():num_items() < 17 or char:military_force():morale() < 80 then
-            cc:kill_linked_force(char:cqi())
-        end
+        cc:check_linked_char_validity(char)
+    end,
+    true
+)
+core:add_listener(
+    "CompControlUnitEventChecks",
+    "UnitMergedAndDestroyed",
+    function(context)
+        return cc:is_army_linked(context:unit():force_commander():cqi())
+    end,
+    function(context)
+        local char = context:unit():force_commander() --:CA_CHAR
+        cc:check_linked_char_validity(char)
     end,
     true
 )
 --checking if the waaagh is still valid #2
 core:add_listener(
     "CompControlCharacterEventChecks",
-    "CharacterEvent",
+    "CharacterTurnStart",
     function(context)
         return cc:is_army_linked(context:character():cqi())
     end,
     function(context)
         local char = context:character()--:CA_CHAR
-        cc._currentChar = char:cqi()
-        if (not cm:char_is_mobile_general_with_army(char)) or char:military_force():unit_list():num_items() < 17 or char:military_force():morale() < 80 then
-            cc:kill_linked_force(char:cqi())
-        end
+        cc:check_linked_char_validity(char)
     end,
     true
 )
@@ -72,12 +80,47 @@ core:add_listener(
     function(context)
         local pb = context:pending_battle() --:CA_PENDING_BATTLE
         local character = context:character() --:CA_CHAR
+        if cc:is_army_linked(character:cqi()) then
+            cc:check_linked_char_validity(character)
+        end
         local enemies = cm:pending_battle_cache_get_enemies_of_char(character)
         for i = 1, #enemies do
             local enemy = enemies[i]
             if cc:is_army_linked(enemy:cqi()) then
-                if (not cm:char_is_mobile_general_with_army(enemy)) or enemy:military_force():unit_list():num_items() < 17 or enemy:military_force():morale() < 80 then
-                    cc:kill_linked_force(enemy:cqi())
+                cc:check_linked_char_validity(enemy)
+            end
+        end
+    end,
+    true
+)
+
+--check if the force is still valid #4
+core:add_listener(
+    "CCBattleCompletedCheckForces",
+    "CompletedBattle",
+    function(context)
+        local humans = cm:get_human_factions()
+        for i = 1, #humans do
+            if cm:pending_battle_cache_faction_is_involved(humans[i]) then
+                return true
+            end
+        end
+        return false
+    end,
+    function(context)
+        for i = 1, cm:pending_battle_cache_num_attackers() do
+            local this_char_cqi, this_mf_cqi, current_faction_name = cm:pending_battle_cache_get_attacker(i);
+            if cm:get_faction(current_faction_name):is_human() then
+                if cc:is_char_companion(this_char_cqi) then
+                    cc:check_companion_mf_validity(cm:model():military_force_for_command_queue_index(this_mf_cqi))
+                end
+            end
+        end
+        for i = 1, cm:pending_battle_cache_num_defenders() do
+            local this_char_cqi, this_mf_cqi, current_faction_name = cm:pending_battle_cache_get_defender(i);
+            if cm:get_faction(current_faction_name):is_human() then
+                if cc:is_char_companion(this_char_cqi) then
+                    cc:check_companion_mf_validity(cm:model():military_force_for_command_queue_index(this_mf_cqi))
                 end
             end
         end
@@ -85,7 +128,20 @@ core:add_listener(
     true
 )
 
-
+--check if force is still valid #5
+core:add_listener(
+    "CCFactionTurnStartCheckAll",
+    "FactionTurnStart",
+    function(context)
+        return context:faction():is_human()
+    end,
+    function(context)
+        for mf_cqi, link_cqi in pairs(cc._companionForces) do
+            cc:check_companion_mf_validity(cm:model():military_force_for_command_queue_index(mf_cqi))
+        end
+    end,
+    true
+)
 
 
 --disabling exchanges 
@@ -153,7 +209,7 @@ core:add_listener(
             local first = cc._currentChar
             local second = find_second_army()
             --if either army is an companion army, disable the exchange!
-            if cc:is_army_companion(first) or cc:is_army_companion(second) then
+            if cc:is_char_companion(first) or cc:is_char_companion(second) then
                 LockExchangeButton()
             else
                 UnlockExchangeButton()

@@ -251,6 +251,9 @@
 --# assume CM.pending_battle_cache_get_attacker: method(pos: int) --> (CA_CQI, CA_CQI, string)
 --# assume CM.pending_battle_cache_get_enemies_of_char: method(char: CA_CHAR) --> vector<CA_CHAR>
 --# assume CM.pending_battle_cache_attacker_victory: method() --> boolean
+--# assume CM.pending_battle_cache_faction_is_involved: method(faction_key: string) --> boolean
+--# assume CM.pending_battle_cache_num_attackers: method() --> int
+--# assume CM.pending_battle_cache_num_defenders: method() --> int
 --CAI
 --# assume CM.force_change_cai_faction_personality: method(key: string, personality: string)
 ---Markers
@@ -308,7 +311,7 @@
 --CA CAMPAIGN_UI
 --# assume CA_CampaignUI.TriggerCampaignScriptEvent: function(cqi: CA_CQI, event: string)
 --# assume CA_CampaignUI.ClearSelection: function()
-
+--# assume CA_CampaignUI.UpdateSettlementEffectIcons: function()
 
 -- GAME INTERFACE
 --# assume CA_GAME.filesystem_lookup: method(filePath: string, matchRegex:string) --> string

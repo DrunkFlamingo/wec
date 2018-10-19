@@ -26,9 +26,10 @@ function companion_controller.init()
     }) --# assume self: COMPANION_CONTROLLER
 
     self._companions = {} --:map<CA_CQI, boolean>
-    self._armyLinks = {} --:map<CA_CQI, CA_CQI>
-    self._linkedArmies = {} --:map<CA_CQI, boolean>
-    self._currentChar = nil --:CA_CQI
+    self._armyLinks = {} --:map<CA_CQI, CA_CQI> -- charcqi of linked char to charcqi of companion
+    self._linkedArmies = {} --:map<CA_CQI, boolean> --generals who have a companion
+    self._currentChar = nil --:CA_CQI 
+    self._companionForces = {} --:map<CA_CQI, CA_CQI> --companion force (mf)CQI to the linked general (char)CQI
 
     _G.companion_control = self
     return self
@@ -101,7 +102,7 @@ end
 
 
 --v function(self: COMPANION_CONTROLLER, cqi: CA_CQI) --> boolean
-function companion_controller.is_army_companion(self, cqi)
+function companion_controller.is_char_companion(self, cqi)
     return not not self._companions[cqi]
 end
 
@@ -122,6 +123,7 @@ function companion_controller.disable_buttons(self)
     uim:override("recruit_units"):set_allowed(false);
     uim:override("recruit_mercenaries"):set_allowed(false);
     uim:override("regiments_of_renown"):set_allowed(false);
+    uim:override("stances"):set_allowed(false);
     self._buttonsDisabled = true
 end
     
@@ -135,13 +137,19 @@ function companion_controller.enable_buttons(self)
         uim:override("recruit_units"):set_allowed(true);
         uim:override("recruit_mercenaries"):set_allowed(true);
         uim:override("regiments_of_renown"):set_allowed(true);
+        uim:override("stances"):set_allowed(true);
     end
     self._buttonsDisabled = false
 end
 
 --v function(self: COMPANION_CONTROLLER, cqi: CA_CQI)
 function companion_controller.switch_out_waaagh(self, cqi)
-    
+    --abort in MP games!
+    if cm:is_multiplayer() then
+        return
+    end
+
+    cm:disable_event_feed_events(true, "", "", "military_companion_army_destroyed");
     --CA isn't sure
     local char = cm:get_character_by_cqi(cqi)
     local faction_1 = char:faction():name()
@@ -209,17 +217,26 @@ function companion_controller.switch_out_waaagh(self, cqi)
         army_string = comp_army:military_force():unit_list():item_at(1):unit_key()
         for i = 2, comp_army:military_force():unit_list():num_items() - 1 do
             local next_unit = comp_army:military_force():unit_list():item_at(i):unit_key()
-            if not next_unit:find("_cha_)") then
+            if not next_unit:find("_cha_") then
                 army_string = army_string..","..next_unit
             end
         end
         army_location.x, army_location.y = comp_army:logical_position_x(), comp_army:logical_position_y()
         army_region = comp_army:region():name()
     end
+    --make sure the army getting the waaagh isn't a companion army!
+    if self:is_char_companion(army_to_link:cqi()) then
+        cm:disable_event_feed_events(true, "", "", "military_companion_army_ours");
+        cm:kill_character(comp_army:cqi(), true, true)
+        cm:callback(function() cm:disable_event_feed_events(false, "", "", "military_companion_army_destroyed") end, 1);
+        cm:callback(function() cm:disable_event_feed_events(false, "", "", "military_companion_army_ours") end, 1);
+        return
+    end
 
     self._linkedArmies[army_to_link:cqi()] = true
 
     cm:kill_character(comp_army:cqi(), true, true)
+    cm:callback(function() cm:disable_event_feed_events(false, "", "", "military_companion_army_destroyed") end, 1);
     CCLOG("Replacing the army belonging to ["..comp_faction.."] with an army for ["..real_faction.."]")
     CCLOG("\t Spawning at:  ["..tostring(army_location.x).."], ["..tostring(army_location.y).."], in region ["..army_region.."]")
     CCLOG("\t with force: ["..army_string.."]")
@@ -233,6 +250,7 @@ function companion_controller.switch_out_waaagh(self, cqi)
         true,
         function(cqi)
             self._armyLinks[army_to_link:cqi()] = cqi
+            self._companionForces[cm:get_character_by_cqi(cqi):military_force():command_queue_index()] = army_to_link:cqi()
             self._companions[cqi] = true
             cm:apply_effect_bundle_to_characters_force("wh_main_bundle_military_upkeep_free_force", cqi, 0, true)
             cm:apply_effect_bundle_to_characters_force("wec_controlled_companion", cqi, 0, true)
@@ -242,16 +260,72 @@ function companion_controller.switch_out_waaagh(self, cqi)
 end
 
 
---v function(self: COMPANION_CONTROLLER, linked_army: CA_CQI)
-function companion_controller.kill_linked_force(self, linked_army)
+--v function(self: COMPANION_CONTROLLER, linked_army: CA_CQI, mf_to_kill: CA_MILITARY_FORCE?)
+function companion_controller.kill_linked_force(self, linked_army, mf_to_kill)
     CCLOG("Destroying linked force for ["..tostring(linked_army).."] which is force ["..tostring(self._armyLinks[linked_army]).."] ")
     if not self:is_army_linked(linked_army) then
         return 
     end
+    cm:disable_event_feed_events(true, "", "wh_event_subcategory_character_deaths", "");
     self._linkedArmies[linked_army] = nil
+    local mf = cm:get_character_by_cqi(self._armyLinks[linked_army]):military_force():command_queue_index()
+    self._companionForces[mf] = nil
+    if mf_to_kill then
+        --# assume mf_to_kill: CA_MILITARY_FORCE
+        cm:kill_character(mf_to_kill:general_character():cqi(), true, true)
+    end
     cm:kill_character(self._armyLinks[linked_army], true, true)
+    cm:callback(function() cm:disable_event_feed_events(false, "", "wh_event_subcategory_character_deaths", "") end, 1);
     self._armyLinks[linked_army] = nil
+    if cm:char_is_mobile_general_with_army(cm:get_character_by_cqi(linked_army)) then
+        cm:apply_effect_bundle_to_characters_force("wec_post_waaagh_blues", linked_army, 4, true)
+        CampaignUI.UpdateSettlementEffectIcons();
+    end
+    cm:show_message_event(
+    cm:get_character_by_cqi(linked_army):faction():name(),
+    "event_feed_strings_text_waaagh_disbands_title",
+    "event_feed_strings_text_waaagh_disbands_secondary",
+    "event_feed_strings_text_waaagh_disbands_text",
+    true,
+    593
+    )
 end
+
+--v function(self: COMPANION_CONTROLLER, owner_char: CA_CHAR)
+function companion_controller.check_linked_char_validity(self, owner_char)
+    local linked_cqi = owner_char:cqi()
+    local companion_char_cqi = self._armyLinks[linked_cqi]
+    --make sure the character who is supposed to own the waaagh does own it
+    if self._companionForces[cm:get_character_by_cqi(companion_char_cqi):military_force():command_queue_index()] == linked_cqi then
+        if cm:char_is_mobile_general_with_army(owner_char) and owner_char:military_force():unit_list():num_items() >= 17 and owner_char:military_force():morale() >= 80 then
+            --the generals still match, and the linked force is still valid!
+            return
+        end
+    end
+    --our validity check failed somewhere, kill it!
+    self:kill_linked_force(linked_cqi)
+end
+
+--v function(self: COMPANION_CONTROLLER, companion: CA_MILITARY_FORCE)
+function companion_controller.check_companion_mf_validity(self, companion)
+    local mf_cqi = companion:command_queue_index()
+    local linked_cqi = self._companionForces[mf_cqi]
+    local companion_char_cqi = self._armyLinks[linked_cqi]
+    --make sure the character who is supposed to own the waaagh does own it
+    if companion:general_character():cqi() == companion_char_cqi then
+        --make sure the character who owns the linked force is still valid
+        local linked_char = cm:get_character_by_cqi(linked_cqi)
+        if cm:char_is_mobile_general_with_army(linked_char) and linked_char:military_force():unit_list():num_items() >= 17 and linked_char:military_force():morale() >= 80 then
+            --the generals still match, and the linked force is still valid!
+            return
+        end
+    end
+    --our validity check failed somewhere, kill it!
+    self:kill_linked_force(linked_cqi)
+end
+
+
+
 
 companion_controller.init():error_checker()
 CCLOG("Init")
