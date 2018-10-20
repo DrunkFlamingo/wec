@@ -35,6 +35,61 @@ function companion_controller.init()
     return self
 end
 
+
+--create a table of necessary save data
+--v function(self: COMPANION_CONTROLLER) --> map<string, CA_CQI>
+function companion_controller.save_links(self)
+    CCLOG("Saving CC links data: ")
+    local savedata = {} --:map<string, CA_CQI>
+    for link_cqi, comp_cqi in pairs(self._armyLinks) do
+        CCLOG("\t Active comppanion link with linked cqi ["..tostring(link_cqi).."] for companioncqi ["..tostring(comp_cqi).."] ")
+        --convert CQI's to string, overwise when the table is loaded the numbers will be reset to 1, 2, 3 etc. due to serialisation.
+        savedata[tostring(link_cqi)] = comp_cqi
+    end
+    CCLOG("Done saving")
+    return savedata
+end
+
+--v function(self: COMPANION_CONTROLLER) --> map<string, CA_CQI>
+function companion_controller.save_forces(self)
+    CCLOG("Saving CC forces data: ")
+    local savedata = {} --:map<string, CA_CQI>
+    for comp_mf_cqi, link_cqi in pairs(self._companionForces) do
+        CCLOG("\t Active companion army with cqi ["..tostring(comp_mf_cqi).."] for linked char ["..tostring(link_cqi).."] ")
+        --convert CQI's to string, overwise when the table is loaded the numbers will be reset to 1, 2, 3 etc. due to serialisation.
+        savedata[tostring(comp_mf_cqi)] = link_cqi
+    end
+    CCLOG("Done saving")
+    return savedata
+end
+
+--load values from a save table. NO CHECK because Kailua doesn't aprove of flexible typing. 
+--v [NO_CHECK] function(self: COMPANION_CONTROLLER, savedata: map<string, CA_CQI>)
+function companion_controller.load_links(self, savedata)
+    CCLOG("Loading exiles data: ")
+    for link_cqi, comp_cqi in pairs(savedata) do
+        CCLOG("\t Active comppanion link with linked cqi ["..tostring(link_cqi).."] for companioncqi ["..tostring(comp_cqi).."] ")
+        --we saved numbers as strings, return them to number
+        self._armyLinks[tonumber(link_cqi)] = comp_cqi
+        self._companions[comp_cqi] = true
+        self._linkedArmies[tonumber(link_cqi)] = true
+    end
+    CCLOG("Finished loading")
+end
+--v [NO_CHECK] function(self: COMPANION_CONTROLLER, savedata: map<string, CA_CQI>)
+function companion_controller.load_forces(self, savedata)
+    CCLOG("Loading exiles data: ")
+    for comp_mf_cqi, link_cqi in pairs(savedata) do
+        CCLOG("\t Active companion army with cqi ["..tostring(comp_mf_cqi).."] for linked char ["..tostring(link_cqi).."] ")
+        --we saved numbers as strings, return them to number
+        self._activeExiles[tonumber(comp_mf_cqi)] = link_cqi
+    end
+    CCLOG("Finished loading")
+end
+
+
+
+
 --v [NO_CHECK] function(self: COMPANION_CONTROLLER)
 function companion_controller.error_checker(self)
 --Vanish's PCaller
@@ -233,8 +288,6 @@ function companion_controller.switch_out_waaagh(self, cqi)
         return
     end
 
-    self._linkedArmies[army_to_link:cqi()] = true
-
     cm:kill_character(comp_army:cqi(), true, true)
     cm:callback(function() cm:disable_event_feed_events(false, "", "", "military_companion_army_destroyed") end, 1);
     CCLOG("Replacing the army belonging to ["..comp_faction.."] with an army for ["..real_faction.."]")
@@ -250,6 +303,7 @@ function companion_controller.switch_out_waaagh(self, cqi)
         true,
         function(cqi)
             self._armyLinks[army_to_link:cqi()] = cqi
+            self._linkedArmies[army_to_link:cqi()] = true
             self._companionForces[cm:get_character_by_cqi(cqi):military_force():command_queue_index()] = army_to_link:cqi()
             self._companions[cqi] = true
             cm:apply_effect_bundle_to_characters_force("wh_main_bundle_military_upkeep_free_force", cqi, 0, true)
@@ -329,3 +383,17 @@ end
 
 companion_controller.init():error_checker()
 CCLOG("Init")
+
+cm:add_saving_game_callback(function(context)
+    local cc = _G.companion_control
+    local linked_armies = cc:save_links()
+    local comp_forces = cc:save_forces()
+    cm:save_named_value("wec_cc_linked_armies", linked_armies, context)
+    cm:save_named_value("wec_cc_comp_forces", comp_forces, context)
+end)
+
+cm:add_loading_game_callback(function(context)
+    local cc = _G.companion_control
+    cc:load_links(cm:load_named_value("wec_cc_linked_armies", {}, context))
+    cc:load_forces(cm:load_named_value("wec_cc_comp_forces", {}, context))
+end)
