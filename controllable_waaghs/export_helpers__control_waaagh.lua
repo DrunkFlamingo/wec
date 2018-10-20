@@ -218,3 +218,35 @@ core:add_listener(
     end,
     true
 )
+
+--OVERWRITE CA FUNCTION
+
+-- loop through the player's armys and apply
+--v function(faction: CA_FACTION)
+function apply_upkeep_penalty(faction)
+	local difficulty = cm:model():combined_difficulty_level();
+	
+	local effect_bundle = "wh_main_bundle_force_additional_army_upkeep_easy";				-- easy
+	
+	if difficulty == 0 then
+		effect_bundle = "wh_main_bundle_force_additional_army_upkeep_normal";				-- normal
+	elseif difficulty == -1 then
+		effect_bundle = "wh_main_bundle_force_additional_army_upkeep_hard";					-- hard
+	elseif difficulty == -2 then
+		effect_bundle = "wh_main_bundle_force_additional_army_upkeep_very_hard";			-- very hard
+	elseif difficulty == -3 then
+		effect_bundle = "wh_main_bundle_force_additional_army_upkeep_legendary";			-- legendary
+	end;
+	
+	local mf_list = faction:military_force_list();
+	local num_items = mf_list:num_items();
+	--# assume character_is_black_ark: function(character: CA_CHAR) --> boolean
+	-- go through every general the player has, ignoring the first, and apply the effect bundles	
+	for i = 1, mf_list:num_items() - 1 do
+		current_mf = mf_list:item_at(i);
+		
+		if not current_mf:is_armed_citizenry() and not current_mf:has_effect_bundle(effect_bundle) and current_mf:has_general() and not character_is_black_ark(current_mf:general_character()) and (not _G.companion_control:is_army_linked(current_mf:general_character():cqi())) then
+			cm:apply_effect_bundle_to_characters_force(effect_bundle, current_mf:general_character():cqi(), 0, true);
+		end;
+	end;
+end;
