@@ -148,7 +148,6 @@ core:add_listener(
 --function stolen from RM in weo lib
 --v function() --> CA_CQI
 local function find_second_army()
-
     --v function(ax: number, ay: number, bx: number, by: number) --> number
     local function distance_2D(ax, ay, bx, by)
         return (((bx - ax) ^ 2 + (by - ay) ^ 2) ^ 0.5);
@@ -220,7 +219,7 @@ core:add_listener(
 )
 
 --OVERWRITE CA FUNCTION
-
+--[[
 -- loop through the player's armys and apply
 --v function(faction: CA_FACTION)
 function apply_upkeep_penalty(faction)
@@ -250,3 +249,4 @@ function apply_upkeep_penalty(faction)
 		end;
 	end;
 end;
+--]]
