@@ -37,7 +37,7 @@ local function PopulateModOptions(MCMMainFrame)
     ModOptionListHeader:Resize(400, 40)
     ModOptionListHeader:PositionRelativeTo(MCMMainFrame, fbX*0.04 + 350, fbY*0.04)
     local ModOptionListView = ListView.new(UIPANELNAME.."_MOD_OPTIONS_LISTVIEW", MCMMainFrame, "VERTICAL")
-    ModOptionListView:Resize(1000, 800)
+    ModOptionListView:Resize(1400, 800)
     local ModOptionListBuffer = Container.new(FlowLayout.VERTICAL)
     ModOptionListBuffer:AddGap(10)
     ModOptionListView:AddContainer(ModOptionListBuffer)
@@ -187,6 +187,7 @@ local function CreatePanel()
     if cm:get_saved_value("mcm_finalized") == nil then
         local layout = find_uicomponent(core:get_ui_root(), "layout")
         layout:SetVisible(false)
+        CampaignUI.ClearSelection()
         local MCMMainFrame = Frame.new(UIPANELNAME)
 
 
