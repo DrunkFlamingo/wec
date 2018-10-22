@@ -42,7 +42,6 @@ function mod_configuration_manager.init()
         __tostring = function() return "MOD_CONFIGURATION_MANAGER" end
     })--# assume self: MOD_CONFIGURATION_MANAGER
 
-    self._modConfigStack = {} --:vector<function(context: MOD_CONFIGURATION_MANAGER)>
     self._registeredMods = {} --:map<string, MCM_MOD>
     self._selectedMod = nil --:MCM_MOD
     self._postProcessCallbacks = {} --:vector<function()>
@@ -160,25 +159,6 @@ function mod_configuration_manager.error_checker(self)
     core.add_listener = myAddListener;
 end
 
-
-
-
-
---v function(self: MOD_CONFIGURATION_MANAGER) --> vector<function(context: MOD_CONFIGURATION_MANAGER)>
-function mod_configuration_manager.get_stack(self)
-    return self._modConfigStack
-end
-
---v function(self:MOD_CONFIGURATION_MANAGER, callback: function(context: MOD_CONFIGURATION_MANAGER) )
-function mod_configuration_manager.add_callback_to_stack(self, callback)
-    table.insert(self:get_stack(), callback)
-end
-
---v function(self: MOD_CONFIGURATION_MANAGER)
-function mod_configuration_manager.do_callback_on_stack(self)
-    self:get_stack()[#self:get_stack()](self)
-    table.remove(self:get_stack())
-end
 
 
 
@@ -364,14 +344,14 @@ function mcm_var.decrement_value(self)
     self:set_current_value(self:current_value() - self:step())
 end
 
---v function(self: MCM_VAR) --> function(context: MOD_CONFIGURATION_MANAGER)
+--v function(self: MCM_VAR)
 function mcm_var.callback(self)
-    return self._callback
+    self._callback(self:mod():model())
 end
 
 --v function(self: MCM_VAR) --> boolean
 function mcm_var.has_callback(self)
-    return not not self:callback()
+    return not not self._callback
 end
 
 --v function(self: MCM_VAR, callback: function(context: MOD_CONFIGURATION_MANAGER))
@@ -512,15 +492,15 @@ function mcm_option.log(self, text)
     self:tweaker():log(text)
 end
 
---v function(self: MCM_OPTION) --> function(context: MOD_CONFIGURATION_MANAGER)
+--v function(self: MCM_OPTION)
 function mcm_option.callback(self)
-    return self._callback
+    self._callback(self:tweaker():mod():model())
 end
 
 
 --v function(self: MCM_OPTION) --> boolean
 function mcm_option.has_callback(self)
-    return not not self:callback()
+    return not not self._callback
 end
 
 --v function(self: MCM_OPTION, callback: function(context: MOD_CONFIGURATION_MANAGER))
@@ -745,18 +725,18 @@ end
 function mod_configuration_manager.handle_variable(self, variable)
     cm:set_saved_value("mcm_variable_"..variable:mod():name().."_"..variable:name().."_value", variable:current_value())
     if variable:has_callback() then
-        self:add_callback_to_stack(variable:callback())
+        variable:callback()
     end
-    core:trigger_event("mcm_variable_"..variable:mod():name().."_"..variable:name().."_event")
+    core:trigger_event("mcm_variable_"..variable:mod():name().."_"..variable:name().."_event", tostring(variable:current_value()))
 end
         
 --v function(self: MOD_CONFIGURATION_MANAGER, tweaker: MCM_TWEAKER)
 function mod_configuration_manager.handle_tweaker(self, tweaker)
     cm:set_saved_value("mcm_tweaker_"..tweaker:mod():name().."_"..tweaker:name().."_value", tweaker:selected_option():name())
     if tweaker:selected_option():has_callback() then
-        self:add_callback_to_stack(tweaker:selected_option():callback())
+        tweaker:selected_option():callback()
     end
-    core:trigger_event("mcm_tweaker_"..tweaker:mod():name().."_"..tweaker:name().."_event")
+    core:trigger_event("mcm_tweaker_"..tweaker:mod():name().."_"..tweaker:name().."_event", tostring(tweaker:selected_option():name()))
 end
 
 --v function(self: MOD_CONFIGURATION_MANAGER)
@@ -782,33 +762,32 @@ end
 
 --v function(self: MOD_CONFIGURATION_MANAGER)
 function mod_configuration_manager.process_all_mods(self)
+    local mcm_finalized = cm:get_saved_value("mcm_finalized") or false
     for i = 1, #self._preProcessCallbacks do
         self._preProcessCallbacks[i]()
     end
-    if cm:get_saved_value("mcm_finalized") == true then
+    if mcm_finalized then
         self:restore_save_state()
-    else
+    end
+
+    for name, mod in pairs(self:get_mods()) do
+        for tweaker_key, tweaker in pairs(mod:tweakers()) do
+            self:handle_tweaker(tweaker)
+        end
+        for variable_key, variable in pairs(mod:variables()) do
+            self:handle_variable(variable)
+        end
+    end
+    if not mcm_finalized then
         for i = 1, #self._newGameOnlyCallbacks do
             self._newGameOnlyCallbacks[i]()
         end
-
-        for name, mod in pairs(self:get_mods()) do
-            for tweaker_key, tweaker in pairs(mod:tweakers()) do
-                self:handle_tweaker(tweaker)
-            end
-            for variable_key, variable in pairs(mod:variables()) do
-                self:handle_variable(variable)
-            end
-        end
-    end
-    for i = 1, #self:get_stack() do
-        self:do_callback_on_stack()
     end
 
     for i = 1, #self._postProcessCallbacks do
         self._postProcessCallbacks[i]()
     end
-
+    cm:set_saved_value("mcm_finalized", true)
 end
 
 --v function(self: MOD_CONFIGURATION_MANAGER, callback: function())
