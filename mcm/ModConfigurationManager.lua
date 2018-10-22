@@ -1,18 +1,15 @@
 --Log script to text
 --v function(text: string | number | boolean | CA_CQI)
 local function LOG(text)
-    ftext = "MOD_SETTINGS" 
-
     if not __write_output_to_logfile then
         return;
     end
 
     local logText = tostring(text)
-    local logContext = tostring(ftext)
     local logTimeStamp = os.date("%d, %m %Y %X")
     local popLog = io.open("MOD_SETTINGS_LOG.txt","a")
     --# assume logTimeStamp: string
-    popLog :write("LE:  [".. logTimeStamp .. "]:  "..logText .. "  \n")
+    popLog :write("MCM:  [".. logTimeStamp .. "]:  "..logText .. "  \n")
     popLog :flush()
     popLog :close()
 end
