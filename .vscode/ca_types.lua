@@ -539,6 +539,7 @@
 --# assume global core: CORE
 --# assume global effect: CA_EFFECT
 --# assume global __write_output_to_logfile: boolean
+--# assume global __logfile_path: string
 --# assume global mission_manager: MISSION_MANAGER
 --# assume global rite_unlock: RITE_UNLOCK
 --# assume global events: map<string, vector<function(context:WHATEVER?)>>
