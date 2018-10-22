@@ -86,7 +86,7 @@
 --# assume BUTTON.GetPositioningComponent: method() --> CA_UIC
 --# assume BUTTON.Delete: method()
 --# assume BUTTON.ClearSound: method()
---# assume BUTTON.SetState: method(state: string)
+--# assume BUTTON.SetState: method(state: BUTTON_STATE)
 --# assume BUTTON.CurrentState: method() --> string
 --# assume BUTTON.IsSelected: method() --> boolean
 --# assume BUTTON.RegisterForClick: method(callback: function(context: WHATEVER?))
@@ -105,6 +105,7 @@
 --# assume TEXT_BUTTON.RegisterForClick: method(callback: function(context: WHATEVER?))
 --# assume TEXT_BUTTON.SetDisabled: method(disabled: boolean)
 --# assume TEXT_BUTTON.GetContentComponent: method() --> CA_UIC
+--# assume TEXT_BUTTON.SetState: method(state: BUTTON_STATE)
 --frame
 --# assume FRAME.MoveTo: method(xPos: number, yPos: number)
 --# assume FRAME.Move: method(xMove: number, yMove: number)
@@ -138,10 +139,12 @@
 --# assume IMAGE.Delete: method()
 --text
 --# assume TEXT.PositionRelativeTo: method(component: WHATEVER, xDiff: number, yDiff: number)
+--# assume TEXT.GetContentComponent: method() --> CA_UIC
 --# assume TEXT.SetText: method(str: string)
 --# assume TEXT.Bounds: method() --> (number, number)
 --# assume TEXT.Resize: method(x: number, y: number)
 --# assume TEXT.SetVisible: method(visible: boolean)
+--# assume TEXT.Delete: method()
 --container
 --# assume CONTAINER.AddComponent: method(component: WHATEVER)
 --# assume CONTAINER.GetContentComponent: method() --> CA_UIC
@@ -157,3 +160,5 @@
 --# assume LIST_VIEW.Bounds: method() --> (number, number)
 --# assume LIST_VIEW.Scale: method(factor: number)
 --# assume LIST_VIEW.Resize: method(x: number, y: number)
+--# assume LIST_VIEW.Delete: method()
+--# assume LIST_VIEW.PositionRelativeTo: method(component: WHATEVER, xDiff: number, yDiff: number)

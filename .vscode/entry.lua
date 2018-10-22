@@ -14,3 +14,5 @@ require("exterior_scripting/export_helpers__faction_replacement")
 
 require("mcm/ModCOnfigurationManager")
 require("mcm/export_helpers__mcm_ui")
+require("mcm/export_helpers__mcm_basic_settings")
+

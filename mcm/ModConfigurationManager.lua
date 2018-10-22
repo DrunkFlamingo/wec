@@ -37,6 +37,7 @@ GPSESSIONLOG()
 
 local mod_configuration_manager = {} --# assume mod_configuration_manager: MOD_CONFIGURATION_MANAGER
 
+--v function() --> MOD_CONFIGURATION_MANAGER
 function mod_configuration_manager.init()
     local self = {} 
     setmetatable(self, {
@@ -49,6 +50,7 @@ function mod_configuration_manager.init()
     self._selectedMod = nil --:MCM_MOD
 
     _G.mcm = self
+    return self
 end
 
 --v function(self: MOD_CONFIGURATION_MANAGER, text: any)
@@ -187,7 +189,7 @@ function mcm_mod.new(model, name, ui_name, ui_tooltip)
     self._variables = {} --:map<string, MCM_VAR> 
 
     self._UIName = ui_name or "unnamed mod"
-    self._UIToolTip = ui_tooltip or ""
+    self._UIToolTip = ui_tooltip or " "
 
     return self
 end
@@ -241,8 +243,8 @@ function mcm_var.new(mod, name, min, max, default, step, ui_name, ui_tooltip)
     self._minValue = min
     self._maxValue = max
     self._stepValue = step
-    self._UIName = ui_name
-    self._UIToolTip = ui_tooltip
+    self._UIName = ui_name or "Unnamed Variable"
+    self._UIToolTip = ui_tooltip or " "
 
     self._currentValue = default
     
@@ -398,8 +400,8 @@ function mcm_tweaker.new(mod, name, ui_title, ui_tooltip)
     })--# assume self: MCM_TWEAKER
     self._mod = mod
     self._name = name
-    self._UITitle = ui_title or "Un-named tweaker"
-    self._UIToolTip = ui_tooltip or ""
+    self._UIName = ui_title or "Un-named tweaker"
+    self._UIToolTip = ui_tooltip or " "
 
     self._options = {} --:map<string, MCM_OPTION>
     self._selectedOption = nil --:MCM_OPTION
@@ -415,9 +417,9 @@ function mcm_tweaker.null(mod)
         __tostring =  function() return "NULL_SCRIPT_INTERFACE" end
     })--# assume self: MCM_TWEAKER
     self._mod = mod
-    self._name = ""
-    self._UITitle = ""
-    self._UIToolTip = ""
+    self._name = " "
+    self._UITitle = " "
+    self._UIToolTip = " "
 
     self._options = {} 
     self._selectedOption = nil 
@@ -459,7 +461,7 @@ function mcm_option.new(tweaker, key, ui_name, ui_tooltip)
     self._tweaker = tweaker
     self._name = key
     self._UIName = ui_name or "Unnamed Option"
-    self._UIToolTip = ui_tooltip or ""
+    self._UIToolTip = ui_tooltip or " "
     self._callback = nil --: function(context: MOD_CONFIGURATION_MANAGER)
     return self
 end
@@ -751,5 +753,5 @@ function mod_configuration_manager.process_all_mods(self)
 end
 
 
-mod_configuration_manager.init()
+mod_configuration_manager.init():error_checker()
 core:add_static_object("mod_configuration_manager", _G.mcm, true)
