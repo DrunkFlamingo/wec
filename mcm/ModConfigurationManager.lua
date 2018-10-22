@@ -47,6 +47,7 @@ function mod_configuration_manager.init()
     self._selectedMod = nil --:MCM_MOD
     self._postProcessCallbacks = {} --:vector<function()>
     self._preProcessCallbacks  = {} --:vector<function()>
+    self._newGameOnlyCallbacks = {} --:vector<function()>
     self._warnLuaErrors = false --:boolean
 
     _G.mcm = self
@@ -781,19 +782,23 @@ end
 
 --v function(self: MOD_CONFIGURATION_MANAGER)
 function mod_configuration_manager.process_all_mods(self)
-    if cm:get_saved_value("mcm_finalized") == true then
-        self:restore_save_state()
-    end
     for i = 1, #self._preProcessCallbacks do
         self._preProcessCallbacks[i]()
     end
-
-    for name, mod in pairs(self:get_mods()) do
-        for tweaker_key, tweaker in pairs(mod:tweakers()) do
-            self:handle_tweaker(tweaker)
+    if cm:get_saved_value("mcm_finalized") == true then
+        self:restore_save_state()
+    else
+        for i = 1, #self._newGameOnlyCallbacks do
+            self._newGameOnlyCallbacks[i]()
         end
-        for variable_key, variable in pairs(mod:variables()) do
-            self:handle_variable(variable)
+
+        for name, mod in pairs(self:get_mods()) do
+            for tweaker_key, tweaker in pairs(mod:tweakers()) do
+                self:handle_tweaker(tweaker)
+            end
+            for variable_key, variable in pairs(mod:variables()) do
+                self:handle_variable(variable)
+            end
         end
     end
     for i = 1, #self:get_stack() do
@@ -803,6 +808,7 @@ function mod_configuration_manager.process_all_mods(self)
     for i = 1, #self._postProcessCallbacks do
         self._postProcessCallbacks[i]()
     end
+
 end
 
 --v function(self: MOD_CONFIGURATION_MANAGER, callback: function())
@@ -813,6 +819,11 @@ end
 --v function(self: MOD_CONFIGURATION_MANAGER, callback: function())
 function mod_configuration_manager.add_pre_process_callback(self, callback)
     table.insert(self._preProcessCallbacks, callback)
+end
+
+--v function(self: MOD_CONFIGURATION_MANAGER, callback: function())
+function mod_configuration_manager.add_new_game_only_callback(self, callback)
+    table.insert(self._newGameOnlyCallbacks, callback)
 end
 
 
