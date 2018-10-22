@@ -153,6 +153,7 @@
 --# assume CONTAINER.MoveTo: method(x: number, y: number)
 --# assume CONTAINER.Bounds: method() --> (number, number)
 --# assume CONTAINER.RecursiveRetrieveAllComponents: method() --> vector<WHATEVER>
+--# assume CONTAINER.Reposition: method()
 
 --listview
 --# assume LIST_VIEW.AddComponent: method(component: WHATEVER)
@@ -162,3 +163,5 @@
 --# assume LIST_VIEW.Resize: method(x: number, y: number)
 --# assume LIST_VIEW.Delete: method()
 --# assume LIST_VIEW.PositionRelativeTo: method(component: WHATEVER, xDiff: number, yDiff: number)
+--# assume LIST_VIEW.MoveTo: method(x: number, y:number)
+--# assume LIST_VIEW.Position: method() --> (number, number)

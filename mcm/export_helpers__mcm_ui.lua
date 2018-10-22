@@ -1,6 +1,6 @@
 mcm = _G.mcm
-local mod = mcm:register_mod("tests", "test mod", "toooool tip xd")
-local mod2 = mcm:register_mod("secondtest", "second test", "tooooooooollllltiiiiiiipppppp")
+local mod = mcm:register_mod("tests", "Empire of Man", "toooool tip xd")
+local mod2 = mcm:register_mod("secondtest", "Old World Rites", "tooooooooollllltiiiiiiipppppp")
 local multiple_choice = mod:add_tweaker("test_tweaker", "test tweaker", "fuck you thats what")
 local choice_1 = multiple_choice:add_option("key", "An option"):add_callback(function(context) end)
 local choice_2 = multiple_choice:add_option("Key2", "Another option")
@@ -9,46 +9,10 @@ local var = mod:add_variable("var", 0, 10, 5, 1, "A var")
 local MCMBASIC = "mcm_basic"
 local UIPANELNAME = "MCM_PANEL"
 
-
---v function(tweaker: MCM_TWEAKER, parent: FRAME, list: LIST_VIEW)
-local function CreateTweakerElement(tweaker, parent, list)
-    local key = tweaker:name()
-    local TweakerOptionHolder = Container.new(FlowLayout.HORIZONTAL)
-        local TweakerText = Text.new(key.."_ui_title", parent, "HEADER", tweaker:ui_name())
-        TweakerText:Resize(275, 40)
-        TweakerText:GetContentComponent():SetTooltipText(tweaker:ui_tooltip(), true)
-        TweakerOptionHolder:AddComponent(TweakerText)
-        --for each tweaker option, add a button
-        for option_name, option in pairs(tweaker._options) do
-            local OptionButton = TextButton.new(key.."_ui_button_"..option_name, parent, "TEXT", option:ui_name())
-            OptionButton:Resize(275, 40)
-            OptionButton:GetContentComponent():SetTooltipText(option:ui_tooltip())
-            --click registration
-            OptionButton:RegisterForClick(function()
-                local old_option = tweaker:selected_option():name()
-                local old_option_button = Util.getComponentWithName(key.."_ui_button_"..old_option)
-                if not not old_option_button then
-                    --# assume old_option_button: TEXT_BUTTON
-                    old_option_button:SetState("active")
-                end
-                OptionButton:SetState("selected")
-            end)
-            if tweaker:selected_option():name() == option_name then
-                OptionButton:SetState("selected")
-            end
-            TweakerOptionHolder:AddComponent(OptionButton)
-        end
-        
-    list:AddContainer(TweakerOptionHolder)
-end
-
---v function(variable: MCM_VAR, parent: FRAME) --> CONTAINER
-local function CreateVarELement(variable, parent)
-    local VarContainer = Container.new(FlowLayout.VERTICAL)
+--v function (MCMMainFrame: FRAME)
+local function PopulateOption(MCMMainFrame)
 
 
-
-    return VarContainer
 end
 
 --called multiple times during runtime
@@ -69,29 +33,83 @@ local function PopulateModOptions(MCMMainFrame)
     end
     local mod = mcm:get_current_mod()
 
-    local ModOptionListHeader = Text.new(UIPANELNAME.."_MOD_OPTIONS_LIST_HEADER", MCMMainFrame, "HEADER", mod._UIName)
+    local ModOptionListHeader = Text.new(UIPANELNAME.."_MOD_OPTIONS_LIST_HEADER", MCMMainFrame, "HEADER", mod:ui_name())
     ModOptionListHeader:Resize(400, 40)
     ModOptionListHeader:PositionRelativeTo(MCMMainFrame, fbX*0.04 + 350, fbY*0.04)
     local ModOptionListView = ListView.new(UIPANELNAME.."_MOD_OPTIONS_LISTVIEW", MCMMainFrame, "VERTICAL")
-    ModOptionListView:Resize(800, 800)
+    ModOptionListView:Resize(1000, 800)
     local ModOptionListBuffer = Container.new(FlowLayout.VERTICAL)
     ModOptionListBuffer:AddGap(10)
     ModOptionListView:AddContainer(ModOptionListBuffer)
     --if the mod has an enable, disable flag, then check that first!
-    if not not mod._tweakers["ENABLE"] then
-        CreateTweakerElement(mod._tweakers["ENABLE"], MCMMainFrame, ModOptionListView)
-    end
-    for key, tweaker in pairs(mod._tweakers) do
-        if key ~= "ENABLE" then
-            CreateTweakerElement(tweaker, MCMMainFrame, ModOptionListView)
+   -- if not not mod._tweakers["ENABLE"] then
+        --CreateTweakerElement(mod._tweakers["ENABLE"], MCMMainFrame, ModOptionListView)
+   -- end
+    for key, tweaker in pairs(mod:tweakers()) do
+       if not not tweaker:selected_option() then
+            local TweakerContainer = Container.new(FlowLayout.HORIZONTAL)
+            local TweakerText = Text.new(mod:name().."_"..key.."_tweaker_title", MCMMainFrame, "HEADER", tweaker:ui_name())
+            TweakerText:Resize(180, 40)
+            TweakerText:GetContentComponent():SetTooltipText(tweaker:ui_tooltip(), true)
+            TweakerContainer:AddComponent(TweakerText)
+            TweakerContainer:AddGap(10)
+            for option_name, option in pairs(tweaker:options()) do
+                local OptionButton = TextButton.new(mod:name().."_"..key.."_option_button_"..option_name, MCMMainFrame, "TEXT_TOGGLE", option:ui_name())
+                OptionButton:Resize(200, 40)
+                OptionButton:GetContentComponent():SetTooltipText(option:ui_tooltip(), true)
+                if option_name == tweaker:selected_option():name() then
+                    OptionButton:SetState("selected")
+                end
+                OptionButton:RegisterForClick(function()
+                    if tweaker:selected_option() == option then
+                        OptionButton:SetState("selected")
+                    else
+                        local old_option = tweaker:selected_option():name()
+                        local OtherButton = Util.getComponentWithName(mod:name().."_"..key.."_option_button_"..old_option)
+                        if not not OtherButton then
+                            --# assume OtherButton:BUTTON
+                            OtherButton:SetState("active")
+                        end
+                        tweaker:set_selected_option(option)
+                        OptionButton:SetState("selected")
+                    end
+                end)
+                TweakerContainer:AddComponent(OptionButton)
+            end
+            ModOptionListView:AddContainer(TweakerContainer)
+            TweakerContainer:Reposition()
         end
     end
-    --[[
-    for key, variable in pairs(mod._variables) do
-        ModOptionListView:AddComponent(CreateVarELement(variable, MCMMainFrame))
+    for key, variable in pairs(mod:variables()) do
+        local VariableContainer = Container.new(FlowLayout.HORIZONTAL)
+        local VariableText = Text.new(mod:name().."_"..key.."_variable_title", MCMMainFrame, "HEADER", variable:ui_name())
+        VariableText:Resize(200, 40)
+        local IncrementButton = Button.new(mod:name().."_"..key.."_variable_up", MCMMainFrame, "CIRCULAR", "ui/skins/default/icon_minimize.png");
+        IncrementButton:Resize(40, 40);
+        local ValueText = Text.new(mod:name().."_"..key.."_variable_value", MCMMainFrame, "HEADER", tostring(variable:current_value()))
+        ValueText:Resize(40, 40)
+        local DecrementButton = Button.new(mod:name().."_"..key.."_variable_down", MCMMainFrame, "CIRCULAR", "ui/skins/default/icon_maximize.png");
+        DecrementButton:Resize(40, 40);
+        IncrementButton:RegisterForClick(function()
+            variable:increment_value()
+            ValueText:SetText(tostring(variable:current_value()))
+        end)
+        DecrementButton:RegisterForClick(function()
+            variable:decrement_value()
+            ValueText:SetText(tostring(variable:current_value()))
+        end)
+        VariableContainer:AddComponent(VariableText)
+        VariableContainer:AddComponent(IncrementButton)
+        VariableContainer:AddGap(40)
+        VariableContainer:AddComponent(ValueText)
+        VariableContainer:AddGap(10)
+        VariableContainer:AddComponent(DecrementButton)
+        ModOptionListView:AddContainer(VariableContainer)
+        VariableContainer:Reposition()
     end
-    --]]
     ModOptionListView:PositionRelativeTo(ModOptionListHeader, -20, 50)
+    local reX, reY = ModOptionListView:Position()
+    ModOptionListView:MoveTo(reX, reY)
 end
 
 
@@ -114,22 +132,26 @@ local function PopulateList(MCMMainFrame)
     --load up the MCM default first
     do 
         local key = MCMBASIC
-        local mod = mcm._registeredMods[key]
-        local uiName = mod._UIName 
-        local uiToolTip = mod._UIToolTip
-        local modTextButton = TextButton.new(UIPANELNAME.."_MOD_HEADER_BUTTON_"..key, MCMMainFrame, "TEXT", uiName)
+        local mod = mcm:get_mod(key)
+        local modTextButton = TextButton.new(UIPANELNAME.."_MOD_HEADER_BUTTON_"..key, MCMMainFrame, "TEXT", mod:ui_name())
         modTextButton:Resize(300, 40)
-        modTextButton:GetContentComponent():SetTooltipText(uiToolTip, false)
+        modTextButton:GetContentComponent():SetTooltipText(mod:ui_tooltip(), false)
+        modTextButton:RegisterForClick(function()
+            mcm:make_mod_with_key_selected(key)
+            PopulateModOptions(MCMMainFrame)
+        end)
         ModHeaderListView:AddComponent(modTextButton)   
         mcm:make_mod_with_key_selected(MCMBASIC)  
     end
-    for key, mod in pairs(mcm._registeredMods) do
+    for key, mod in pairs(mcm:get_mods()) do
         if key ~= "mcm_basic" then
-            local uiName = mod._UIName 
-            local uiToolTip = mod._UIToolTip
-            local modTextButton = TextButton.new(UIPANELNAME.."_MOD_HEADER_BUTTON_"..key, MCMMainFrame, "TEXT", uiName)
+            local modTextButton = TextButton.new(UIPANELNAME.."_MOD_HEADER_BUTTON_"..key, MCMMainFrame, "TEXT", mod:ui_name())
             modTextButton:Resize(300, 40)
-            modTextButton:GetContentComponent():SetTooltipText(uiToolTip, false)
+            modTextButton:GetContentComponent():SetTooltipText(mod:ui_tooltip(), false)
+            modTextButton:RegisterForClick(function()
+                mcm:make_mod_with_key_selected(key)
+                PopulateModOptions(MCMMainFrame)
+            end)
             ModHeaderListView:AddComponent(modTextButton)       
         end 
     end

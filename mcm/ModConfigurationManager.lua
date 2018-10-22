@@ -626,6 +626,17 @@ function mcm_mod.variables(self)
     return self._variables
 end
 
+--v function(self: MCM_MOD) --> string
+function mcm_mod.ui_name(self)
+    return self._UIName
+end
+
+--v function(self: MCM_MOD) --> string
+function mcm_mod.ui_tooltip(self)
+    return self._UIToolTip
+end
+
+
 --v function(self: MCM_MOD, key: string) --> MCM_TWEAKER
 function mcm_mod.get_tweaker_with_key(self, key)
     if self:tweakers()[key] == nil then
