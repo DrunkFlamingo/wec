@@ -759,8 +759,31 @@ function mod_configuration_manager.handle_tweaker(self, tweaker)
 end
 
 --v function(self: MOD_CONFIGURATION_MANAGER)
-function mod_configuration_manager.process_all_mods(self)
+function mod_configuration_manager.restore_save_state(self)
+    for name, mod in pairs(self:get_mods()) do
+        for tweaker_key, tweaker in pairs(mod:tweakers()) do
+            local sv = cm:get_saved_value("mcm_tweaker_"..mod:name().."_"..tweaker:name().."_value")
+            if not not sv then
+                --# assume sv: string
+                tweaker:set_selected_option(tweaker:get_option_with_key(sv))
+            end
+        end
+        for variable_key, variable in pairs(mod:variables()) do
+            local sv = cm:get_saved_value("mcm_variable_"..mod:name().."_"..variable:name().."_value")
+            if not not sv then
+                --# assume sv: number
+                variable:set_current_value(sv)
+            end
+        end
+    end
+end
 
+
+--v function(self: MOD_CONFIGURATION_MANAGER)
+function mod_configuration_manager.process_all_mods(self)
+    if cm:get_saved_value("mcm_finalized") == true then
+        self:restore_save_state()
+    end
     for i = 1, #self._preProcessCallbacks do
         self._preProcessCallbacks[i]()
     end
