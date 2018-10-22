@@ -1,3 +1,6 @@
+require("mcm/ModCOnfigurationManager")
+require("mcm/export_helpers__mcm_ui")
+require("mcm/export_helpers__mcm_basic_settings")
 
 require("llr/wec_llr")
 --require("owr/wec_rites")
@@ -12,7 +15,4 @@ require("exterior_scripting/export_helpers__faction_replacement")
 --require("emil_qb/battle_script");
 
 
-require("mcm/ModCOnfigurationManager")
-require("mcm/export_helpers__mcm_ui")
-require("mcm/export_helpers__mcm_basic_settings")
 

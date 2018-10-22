@@ -21,7 +21,7 @@ isLogAllowed = true --:boolean
 
 --v function(text: string)
 function LLRLOG(text)
-    ftext = "LLR" --:string
+    ftext = "LLR" 
     --sometimes I use ftext as an arg of this function, but for simple mods like this one I don't need it.
 
     if not isLogAllowed then

@@ -1,4 +1,4 @@
-
+events = get_events()
 --v function(exemptions: vector<CA_CQI>, cqi: CA_CQI)
 local function kill_if_allowed(exemptions, cqi)
 
