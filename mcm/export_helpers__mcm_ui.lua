@@ -41,10 +41,6 @@ local function PopulateModOptions(MCMMainFrame)
     local ModOptionListBuffer = Container.new(FlowLayout.VERTICAL)
     ModOptionListBuffer:AddGap(10)
     ModOptionListView:AddContainer(ModOptionListBuffer)
-    --if the mod has an enable, disable flag, then check that first!
-   -- if not not mod._tweakers["ENABLE"] then
-        --CreateTweakerElement(mod._tweakers["ENABLE"], MCMMainFrame, ModOptionListView)
-   -- end
     for key, tweaker in pairs(mod:tweakers()) do
        if not not tweaker:selected_option() then
             local TweakerContainer = Container.new(FlowLayout.HORIZONTAL)
@@ -133,24 +129,44 @@ local function PopulateList(MCMMainFrame)
     do 
         local key = MCMBASIC
         local mod = mcm:get_mod(key)
-        local modTextButton = TextButton.new(UIPANELNAME.."_MOD_HEADER_BUTTON_"..key, MCMMainFrame, "TEXT", mod:ui_name())
+        local modTextButton = TextButton.new(UIPANELNAME.."_MOD_HEADER_BUTTON_"..key, MCMMainFrame, "TEXT_TOGGLE", mod:ui_name())
         modTextButton:Resize(300, 40)
         modTextButton:GetContentComponent():SetTooltipText(mod:ui_tooltip(), false)
+        modTextButton:SetState("selected")
         modTextButton:RegisterForClick(function()
-            mcm:make_mod_with_key_selected(key)
-            PopulateModOptions(MCMMainFrame)
+            local old_selected = mcm:get_current_mod():name()
+            if old_selected ~= key then
+                local OtherButton = Util.getComponentWithName(UIPANELNAME.."_MOD_HEADER_BUTTON_"..old_selected)
+                if not not OtherButton then
+                    --# assume OtherButton: BUTTON
+                    OtherButton:SetState("active")
+                end
+                mcm:make_mod_with_key_selected(key)
+                PopulateModOptions(MCMMainFrame)
+                modTextButton:SetState("selected")
+            end
         end)
         ModHeaderListView:AddComponent(modTextButton)   
         mcm:make_mod_with_key_selected(MCMBASIC)  
     end
     for key, mod in pairs(mcm:get_mods()) do
         if key ~= "mcm_basic" then
-            local modTextButton = TextButton.new(UIPANELNAME.."_MOD_HEADER_BUTTON_"..key, MCMMainFrame, "TEXT", mod:ui_name())
+            local modTextButton = TextButton.new(UIPANELNAME.."_MOD_HEADER_BUTTON_"..key, MCMMainFrame, "TEXT_TOGGLE", mod:ui_name())
             modTextButton:Resize(300, 40)
             modTextButton:GetContentComponent():SetTooltipText(mod:ui_tooltip(), false)
+            modTextButton:SetState("active")
             modTextButton:RegisterForClick(function()
-                mcm:make_mod_with_key_selected(key)
-                PopulateModOptions(MCMMainFrame)
+                local old_selected = mcm:get_current_mod():name()
+                if old_selected ~= key then
+                    local OtherButton = Util.getComponentWithName(UIPANELNAME.."_MOD_HEADER_BUTTON_"..old_selected)
+                    if not not OtherButton then
+                        --# assume OtherButton: BUTTON
+                        OtherButton:SetState("active")
+                    end
+                    mcm:make_mod_with_key_selected(key)
+                    PopulateModOptions(MCMMainFrame)
+                    modTextButton:SetState("selected")
+                end
             end)
             ModHeaderListView:AddComponent(modTextButton)       
         end 
@@ -163,10 +179,10 @@ end
 
 local function CreatePanel()
     local existingFrame = Util.getComponentWithName(UIPANELNAME)
-        if not not existingFrame then
-            --# assume existingFrame: FRAME
-            existingFrame:Delete()
-        end
+    if not not existingFrame then
+        --# assume existingFrame: FRAME
+        existingFrame:Delete()
+    end
     local buttonsDocker = find_uicomponent(core:get_ui_root(), "layout", "faction_buttons_docker")
     if cm:get_saved_value("mcm_finalized") == nil then
         local layout = find_uicomponent(core:get_ui_root(), "layout")
@@ -189,6 +205,7 @@ local function CreatePanel()
         CloseButton:RegisterForClick(function() 
             MCMMainFrame:Delete() 
             layout:SetVisible(true) 
+            mcm:process_all_mods()
         end)
         local frameWidth = MCMMainFrame:Width()
         local frameHeight = MCMMainFrame:Height()
@@ -200,7 +217,6 @@ local function CreatePanel()
     else
         mcm:log("MCM already triggered on this save file!")
     end
-    --MCMMainFrame:MoveTo()
 end;
 
 
@@ -208,7 +224,7 @@ core:add_listener(
     "MCMTrigger",
     "ComponentLClickUp",
     function(context)
-        return not not find_uicomponent(core:get_ui_root(), "layout")
+        return find_uicomponent(core:get_ui_root(), "layout"):Visible()
     end,
     function(context)
         CreatePanel();

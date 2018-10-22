@@ -48,6 +48,9 @@ function mod_configuration_manager.init()
     self._modConfigStack = {} --:vector<function(context: MOD_CONFIGURATION_MANAGER)>
     self._registeredMods = {} --:map<string, MCM_MOD>
     self._selectedMod = nil --:MCM_MOD
+    self._postProcessCallbacks = {} --:vector<function()>
+    self._preProcessCallbacks  = {} --:vector<function()>
+    self._warnLuaErrors = false --:boolean
 
     _G.mcm = self
     return self
@@ -79,6 +82,19 @@ function mod_configuration_manager.get_current_mod(self)
     return self._selectedMod
 end
 
+--v function(self: MOD_CONFIGURATION_MANAGER)
+function mod_configuration_manager.warn_of_error(self)
+    if self._warnLuaErrors then
+
+
+    end
+end
+
+--v function(self: MOD_CONFIGURATION_MANAGER)
+function mod_configuration_manager.set_should_warn(self)
+    self._warnLuaErrors = true
+end
+
 
 --logs lua errors to a file after this is called.
 --v [NO_CHECK] 
@@ -93,6 +109,7 @@ function mod_configuration_manager.error_checker(self)
             LOG("ERROR")
             LOG(tostring(result))
             LOG(debug.traceback());
+            self:warn_of_error()
         end
         return result;
     end
@@ -143,7 +160,6 @@ function mod_configuration_manager.error_checker(self)
         )
     end
     core.add_listener = myAddListener;
-
 end
 
 
@@ -339,9 +355,6 @@ end
 function mcm_var.step(self)
     return self._stepValue
 end
-
-
-
 
 --v function(self: MCM_VAR)
 function mcm_var.increment_value(self)
@@ -750,6 +763,11 @@ end
 
 --v function(self: MOD_CONFIGURATION_MANAGER)
 function mod_configuration_manager.process_all_mods(self)
+
+    for i = 1, #self._preProcessCallbacks do
+        self._preProcessCallbacks[i]()
+    end
+
     for name, mod in pairs(self:get_mods()) do
         for tweaker_key, tweaker in pairs(mod:tweakers()) do
             self:handle_tweaker(tweaker)
@@ -761,6 +779,20 @@ function mod_configuration_manager.process_all_mods(self)
     for i = 1, #self:get_stack() do
         self:do_callback_on_stack()
     end
+
+    for i = 1, #self._postProcessCallbacks do
+        self._postProcessCallbacks[i]()
+    end
+end
+
+--v function(self: MOD_CONFIGURATION_MANAGER, callback: function())
+function mod_configuration_manager.add_post_process_callback(self, callback)
+    table.insert(self._postProcessCallbacks, callback)
+end
+
+--v function(self: MOD_CONFIGURATION_MANAGER, callback: function())
+function mod_configuration_manager.add_pre_process_callback(self, callback)
+    table.insert(self._preProcessCallbacks, callback)
 end
 
 
