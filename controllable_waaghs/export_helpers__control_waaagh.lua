@@ -33,24 +33,26 @@ core:add_listener(
 
 --checking if the waaagh is still valid #1
 core:add_listener(
-    "CompControlUnitEventChecks",
+    "CompControlUnitDisbandedChecks",
     "UnitDisbanded",
     function(context)
         return cc:is_army_linked(context:unit():force_commander():cqi())
     end,
     function(context)
+        cc:log("CompControlUnitDisbandedChecks sending a char validity check!")
         local char = context:unit():force_commander() --:CA_CHAR
         cc:check_linked_char_validity(char)
     end,
     true
 )
 core:add_listener(
-    "CompControlUnitEventChecks",
+    "CompControlUnitMergedAndDestroyedChecks",
     "UnitMergedAndDestroyed",
     function(context)
         return cc:is_army_linked(context:unit():force_commander():cqi())
     end,
     function(context)
+        cc:log("CompControlUnitMergedAndDestroyedChecks sending a char validity check!")
         local char = context:unit():force_commander() --:CA_CHAR
         cc:check_linked_char_validity(char)
     end,
@@ -65,6 +67,7 @@ core:add_listener(
     end,
     function(context)
         local char = context:character()--:CA_CHAR
+        cc:log("CompControlCharacterEventChecks sending a char validity check!")
         cc:check_linked_char_validity(char)
     end,
     true
@@ -81,12 +84,14 @@ core:add_listener(
         local pb = context:pending_battle() --:CA_PENDING_BATTLE
         local character = context:character() --:CA_CHAR
         if cc:is_army_linked(character:cqi()) then
+            cc:log("CharactersLostBattle first part sending a char validity check!")
             cc:check_linked_char_validity(character)
         end
         local enemies = cm:pending_battle_cache_get_enemies_of_char(character)
         for i = 1, #enemies do
             local enemy = enemies[i]
             if cc:is_army_linked(enemy:cqi()) then
+                cc:log("CharactersLostBattle loop sending a char validity check!")
                 cc:check_linked_char_validity(enemy)
             end
         end
@@ -112,6 +117,7 @@ core:add_listener(
             local this_char_cqi, this_mf_cqi, current_faction_name = cm:pending_battle_cache_get_attacker(i);
             if cm:get_faction(current_faction_name):is_human() then
                 if cc:is_char_companion(this_char_cqi) then
+                    cc:log("CCBattleCompletedCheckForces sending a MF validity check!")
                     cc:check_companion_mf_validity(cm:model():military_force_for_command_queue_index(this_mf_cqi))
                 end
             end
@@ -120,6 +126,7 @@ core:add_listener(
             local this_char_cqi, this_mf_cqi, current_faction_name = cm:pending_battle_cache_get_defender(i);
             if cm:get_faction(current_faction_name):is_human() then
                 if cc:is_char_companion(this_char_cqi) then
+                    cc:log("CCBattleCompletedCheckForces sending a MF validity check!")
                     cc:check_companion_mf_validity(cm:model():military_force_for_command_queue_index(this_mf_cqi))
                 end
             end
@@ -137,6 +144,7 @@ core:add_listener(
     end,
     function(context)
         for mf_cqi, link_cqi in pairs(cc._companionForces) do
+            cc:log("CCFactionTurnStartCheckAll sending a MF validity check!")
             cc:check_companion_mf_validity(cm:model():military_force_for_command_queue_index(mf_cqi))
         end
     end,

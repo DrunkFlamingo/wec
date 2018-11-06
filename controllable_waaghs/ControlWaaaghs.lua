@@ -35,6 +35,11 @@ function companion_controller.init()
     return self
 end
 
+--v method(text: any)
+function companion_controller:log(text)
+    CCLOG(tostring(text))
+end
+
 
 --create a table of necessary save data
 --v function(self: COMPANION_CONTROLLER) --> map<string, CA_CQI>
@@ -349,13 +354,25 @@ end
 function companion_controller.check_linked_char_validity(self, owner_char)
     local linked_cqi = owner_char:cqi()
     local companion_char_cqi = self._armyLinks[linked_cqi]
+    local mf_to_kill = 
+    CCLOG("Doing a check on \n\tLinked CQI ["..tostring(linked_cqi).."]\n\tcompanion char CQI ["..tostring(companion_char_cqi).."]")
     --make sure the character who is supposed to own the waaagh does own it
-    if self._companionForces[cm:get_character_by_cqi(companion_char_cqi):military_force():command_queue_index()] == linked_cqi then
-        if cm:char_is_mobile_general_with_army(owner_char) and owner_char:military_force():unit_list():num_items() >= 17 and owner_char:military_force():morale() >= 80 then
-            --the generals still match, and the linked force is still valid!
-            return
+    if cm:get_character_by_cqi(companion_char_cqi):has_military_force() then
+        if cm:char_is_mobile_general_with_army(owner_char) then
+             if owner_char:military_force():unit_list():num_items() >= 17 and owner_char:military_force():morale() >= 80 then
+                --the generals still match, and the linked force is still valid!
+                CCLOG("Set remains valid!")
+                return
+            else
+                CCLOG("Check failed! The owner char no longer has more than 18 units and more than 80 fightiness!")
+            end
+        else
+            CCLOG("Check failed! The owner char no longer leads a millitary force!")
         end
+    else
+        CCLOG("Check failed! The Waagh leader lost his army!")
     end
+    
     --our validity check failed somewhere, kill it!
     self:kill_linked_force(linked_cqi)
 end
@@ -365,15 +382,18 @@ function companion_controller.check_companion_mf_validity(self, companion)
     local mf_cqi = companion:command_queue_index()
     local linked_cqi = self._companionForces[mf_cqi]
     local companion_char_cqi = self._armyLinks[linked_cqi]
+    CCLOG("Doing a check on \n\tLinked CQI ["..tostring(linked_cqi).."]\n\tcompanion char CQI ["..tostring(companion_char_cqi).."]\n\tCompanion Force CQI ["..tostring(mf_cqi).."]")
     --make sure the character who is supposed to own the waaagh does own it
     if companion:general_character():cqi() == companion_char_cqi then
         --make sure the character who owns the linked force is still valid
         local linked_char = cm:get_character_by_cqi(linked_cqi)
         if cm:char_is_mobile_general_with_army(linked_char) and linked_char:military_force():unit_list():num_items() >= 17 and linked_char:military_force():morale() >= 80 then
             --the generals still match, and the linked force is still valid!
+            CCLOG("Set remains valid!")
             return
         end
     end
+    CCLOG("Check failed!")
     --our validity check failed somewhere, kill it!
     self:kill_linked_force(linked_cqi)
 end
