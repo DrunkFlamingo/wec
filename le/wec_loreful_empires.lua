@@ -395,7 +395,6 @@ local major_factions = {
 	"wh_main_teb_estalia",
 	"wh_main_teb_tilea",
 	"wh2_main_emp_new_world_colonies",
-	"wh2_main_emp_pirates_of_sartosa",
 	"wh2_main_emp_sudenburg",
 	"wh_main_teb_bilbali",
 	"wh_main_teb_lichtenburg_confederacy",
@@ -405,6 +404,7 @@ local major_factions = {
 	"wh2_main_def_scourge_of_khaine",
 	"wh2_main_def_hag_graef",
 	"wh2_main_def_karond_kar",
+	"wh2_dlc11_def_the_blessed_dread",
 	--wood elves
 	"wh_dlc05_wef_torgovann",
 	"wh_dlc05_wef_wood_elves",
@@ -429,8 +429,13 @@ local major_factions = {
 	"wh2_main_skv_clan_skyre",
 	"wh2_main_skv_clan_moulder",
 	-- vampire counts
-	"wh2_main_vmp_vampire_coast",
 	"wh_main_vmp_mousillon",
+	-- pirates!
+	"wh2_dlc11_cst_pirates_of_sartosa",
+	"wh2_dlc11_cst_noctilus",
+	"wh2_dlc11_cst_vampire_coast",
+	"wh2_dlc11_cst_the_drowned",
+
 	--chaos
 	"wh_main_chs_chaos"
 	};

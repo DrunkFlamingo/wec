@@ -229,6 +229,27 @@ local throgg_quests = {
     { "wh_dlc08_anc_talisman_wintertooth_crown", "wh_dlc08_qb_nor_throgg_wintertooth_crown_stage_1", 9}
 }--: vector<{string, string, number, string?}>
 
+local harkon_quests = {
+    {"wh2_dlc11_anc_enchanted_item_slann_gold", "wh2_dlc11_cst_harkon_quest_for_slann_gold_stage_1", 15}
+}--: vector<{string, string, number, string?}>
+
+local noctilus_quests = {
+    {"wh2_dlc11_anc_enchanted_item_captain_roths_moondial", "wh2_dlc11_cst_noctilus_captain_roths_moondial_stage_1", 15}
+}--: vector<{string, string, number, string?}>
+
+local aranessa_quests = {
+    {"wh2_dlc11_anc_weapon_krakens_bane", "wh2_dlc11_cst_aranessa_krakens_bane_stage_1", 15}
+}--: vector<{string, string, number, string?}>
+
+local cylostra_quests = {
+    {"wh2_dlc11_anc_arcane_item_the_bordeleaux_flabellum", "wh2_dlc11_cst_cylostra_the_bordeleaux_flabellum_stage_1", 9}
+}--: vector<{string, string, number, string?}>
+
+local lokhir_quests = {
+    {"wh2_main_anc_armour_helm_of_the_kraken", "wh2_dlc11_lokhir_helm_of_the_kraken_stage_1", 11},
+    {"wh2_dlc11_anc_weapon_red_blades", "wh2_dlc11_def_lokhir_red_blades_stage_1", 15}
+}--: vector<{string, string, number, string?}>
+
 local vanilla_lords = {
     {faction = "wh2_main_skv_clan_mors",forename = "names_name_2147359300",surname = "names_name_2147360908",subtype ="wh2_main_skv_queek_headtaker", quests = queek_headtaker_quests },
     {faction = "wh2_main_skv_clan_pestilens",forename = "names_name_2147359289",surname = "names_name_2147359296",subtype ="wh2_main_skv_lord_skrolk", quests = skrolk_quests },
@@ -239,7 +260,7 @@ local vanilla_lords = {
     {faction = "wh2_main_def_cult_of_pleasure",forename = "names_name_2147359274",surname = "names_name_2147360508",subtype ="wh2_main_def_morathi", quests = morathi_quests },
     {faction = "wh2_main_def_naggarond",forename = "names_name_2147359265",surname = "names_name_2147360508",subtype ="wh2_main_def_malekith", quests = malekith_quests },
     {faction = "wh_main_vmp_vampire_counts",forename = "names_name_2147343886",surname = "names_name_2147343895",subtype ="vmp_mannfred_von_carstein", quests = mannfred_von_carstein_quests },
-    {faction = "wh_main_vmp_vampire_counts",forename = "names_name_2147345320",surname = "names_name_2147345313",subtype ="vmp_heinrich_kemmler", quests = heinrich_kemmler_quests },
+    {faction = "wh2_dlc11_vmp_the_barrow_legion",forename = "names_name_2147345320",surname = "names_name_2147345313",subtype ="vmp_heinrich_kemmler", quests = heinrich_kemmler_quests },
     {faction = "wh_main_vmp_schwartzhafen",forename = "names_name_2147345124",surname = "names_name_2147343895",subtype ="pro02_vmp_isabella_von_carstein", quests = isabella_quests },
     {faction = "wh_main_dwf_dwarfs",forename = "names_name_2147358917",surname = "names_name_2147358935",subtype ="pro01_dwf_grombrindal", quests = grombrindal_quests },
     {faction = "wh_main_grn_greenskins",forename = "names_name_2147343863",surname = "names_name_2147343867",subtype ="grn_grimgor_ironhide", quests = grimgor_ironhide_quests },
@@ -266,7 +287,12 @@ local vanilla_lords = {
     {faction = "wh_dlc08_nor_norsca", forename = "names_name_981430255", surname = "names_name_791685155", subtype = "wh_dlc08_nor_wulfrik", quests = wulfrik_quests },
     {subtype = "wh2_dlc10_def_crone_hellebron", forename = "names_name_608740515", surname = "", faction = "wh2_main_def_har_ganeth", quests = hellebron_quests},
     {faction = "wh2_main_hef_nagarythe", subtype = "wh2_dlc10_hef_alith_anar", forename = "names_name_1829581114", surname = "", quests = alith_anar_quests},
-    {faction = "wh_main_vmp_mousillon",forename = "names_name_2147359236",surname = "",subtype ="wh_dlc05_vmp_red_duke", quests = nil }
+    {faction = "wh_main_vmp_mousillon",forename = "names_name_2147359236",surname = "",subtype ="wh_dlc05_vmp_red_duke", quests = nil },
+    {faction = "wh2_dlc11_cst_noctilus", subtype = "wh2_dlc11_cst_noctilus", forename = "names_name_227765640", surname = "", quests = noctilus_quests},
+    {faction = "wh2_dlc11_cst_pirates_of_sartosa", subtype = "wh2_dlc11_cst_aranessa", forename = "names_name_1340289195", surname = "names_name_250811476", quests = aranessa_quests},
+    {faction = "wh2_dlc11_cst_vampire_coast", subtype = "wh2_dlc11_cst_harkon", forename = "names_name_242277685", surname = "names_name_1053168049", quests = harkon_quests},
+    {faction = "wh2_dlc11_cst_the_drowned", subtype = "wh2_dlc11_cst_cylostra", forename = "names_name_143098456", surname = "names_name_758220496", quests = cylostra_quests},
+    {faction = "wh2_dlc11_def_the_blessed_dread", subtype = "wh2_dlc11_def_lokhir", forename = "names_name_1748721115", surname = "names_name_830390907", quests = lokhir_quests}
 
 }--:vector<{faction: string, forename: string, surname: string, subtype: string, quests: vector<{string, string, number, string?}>}>
 
@@ -288,7 +314,7 @@ for i = 1, #vanilla_lords do --start looping through the information we just def
 end
 
 
-events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = function()
+cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context)
     LLRLOG("Triggering the Vanilla Lords Added Event")
     core:trigger_event("LegendaryLordVanillaLordsAdded")
 end

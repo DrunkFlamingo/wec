@@ -240,7 +240,7 @@ core:add_listener(
     end,
     true)
     
-events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = function()
+cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context)
     llr:activate()
 end
 

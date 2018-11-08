@@ -135,6 +135,7 @@
 --# assume CM.get_camera_position: method() --> (number, number, number, number)
 --# assume CM.fade_scene: method(unknown: number, unknown2: number)
 --callbacks
+--# assume CM.first_tick_callbacks: vector<(function(context: WHATEVER?))>
 --# assume CM.add_game_created_callback: method(callback: function)
 --# assume CM.callback: method(
 --#     callback: function(),
@@ -239,7 +240,7 @@
 --# assume CM.force_diplomacy:  method(faction: string, other_faction: string, record: string, offer: boolean, accept: boolean, enable_payments: boolean)
 --# assume CM.make_diplomacy_available: method(faction: string, other_faction: string)
 --# assume CM.force_make_peace: method(faction: string, other_faction: string)
---# assume CM.force_declare_war: method(declarer: string, declaree: string, attacker_allies: boolean, defender_allies: boolean)
+--# assume CM.force_declare_war: method(declarer: string, declaree: string, attacker_allies: boolean, defender_allies: boolean, command_queue: boolean?)
 --# assume CM.force_make_vassal: method(vassaliser: string, vassal: string)
 --# assume CM.force_make_trade_agreement: method(faction1: string, faction2: string)
 --# assume CM.faction_has_trade_agreement_with_faction: method( first_faction: CA_FACTION, second_faction: CA_FACTION)

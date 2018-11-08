@@ -41,6 +41,9 @@ require("controllable_waaghs/ControlWaaaghs")
 require("controllable_waaghs/export_helpers__control_waaagh")
 --]]
 
+---[[delete far away factions
+    require("delete_far_away_factions/delete_far_away")    
+--]]
 
 
 
