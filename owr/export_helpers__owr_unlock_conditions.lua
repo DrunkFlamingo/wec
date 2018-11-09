@@ -1299,9 +1299,9 @@ local function owr_rite_unlock_listeners()
 
     
     }--:vector<{subculture: string, rite_name: string, event_name: string, condition: function(context: WHATEVER, faction_name: string) --> boolean, faction_name: string?}>
-    
+    local was_new_game = false
     local human_factions = cm:get_human_factions();
-    
+    local ok, err = pcall(function() 
     for i = 1, #human_factions do
         for j = 1, #rite_templates do
             local current_rite_template = rite_templates[j];
@@ -1316,17 +1316,24 @@ local function owr_rite_unlock_listeners()
                 )
                 
                 rite:start(human_factions[i]);
-                if cm:is_new_game() then
+                if not cm:get_saved_value("owr_unlock_init") then
+                    was_new_game = true
                     local cqi = cm:get_faction(human_factions[i]):command_queue_index();
                     cm:set_ritual_unlocked(cqi, current_rite_template.rite_name, false);
                 end
-                
-                
             end;
         end;
     end;
+    if was_new_game then
+        cm:set_saved_value("owr_unlock_init", true)
+    end
+    end)
+    if not ok then
+        OWRLOG("ERRORLOLOLOL")
+        OWRLOG(tostring(err))
+    end
 end
 
-events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = function()
+cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context)
     owr_rite_unlock_listeners()
 end

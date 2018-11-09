@@ -334,7 +334,6 @@ local function spawn_chaos(region)
         DF_SPAWN_LOCATIONS[region:name()][1],
         DF_SPAWN_LOCATIONS[region:name()][2],
         true,
-        true,
         function(cqi)
             GOCLOG("Spawned a chaos army at ["..region:name().."] sucessfully with cqi ["..tostring(cqi).."]")
             cm:apply_effect_bundle_to_characters_force("wh_main_bundle_military_upkeep_free_force", cqi, 0, true);

@@ -24,7 +24,6 @@ local function df_spawn_cultists(faction_name)
     spawnregion,
     spawnx,
     spawny,
-    true,
     true);
     
     cm:callback( function()

@@ -174,7 +174,7 @@ core:add_listener(
 
 
 
-events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = function()
+cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context)
 	GRULOG("the grudges custom script launched");
 	cm:set_saved_value("df_grudges_dwf", true);
 	

@@ -207,8 +207,7 @@
 --#     region_key: string,
 --#     xPos: number,
 --#     yPos: number,
---#     un1: boolean,
---#     un2: boolean,
+--#     exclude_named_chars: boolean,
 --#     callback: (function(CA_CQI))?
 --# )
 --# assume CM.spawn_character_to_pool: method(
