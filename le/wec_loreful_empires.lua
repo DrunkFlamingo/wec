@@ -130,6 +130,9 @@ function loreful_empires_manager.new(starting_majors, starting_secondaries)
 	self._defensiveBattlesOnly = false --:boolean
 	self._nearbyPlayerRestriction = true--:boolean
 	self._enableScriptForAllies = false--:boolean
+	self._autoconfed_enabled = true --:boolean
+	self._autoconfed_list = {} --:map<string, boolean>
+
 
 	_G.lem = self
 	return self
@@ -307,7 +310,43 @@ function(context)
 end;
 
 
+--autocongeal feature
 
+--v function(self: LOREFUL_EMPIRES_MANAGER, allowed_sc: map<string, boolean>)
+function loreful_empires_manager.activate_autoconfed_with_list(self, allowed_sc)
+
+
+core:add_listener(
+	function(context)
+        return ((not context:faction():is_human()) and (not (context:faction():name() == "rebels")) and (context:faction():has_home_region()) and (not not allowed_sc[context:faction():subculture()]) )
+    end,
+	function(context)
+	
+        local faction_map = {} --:map<CA_FACTION, boolean>
+        -- first, check our adjacent regions for a list of factions. 
+        local region_list = context:faction():region_list() --:CA_REGION_LIST
+        for i = 0, region_list:num_items() - 1 do
+            local region = region_list:item_at(i)
+            local adj_list = region:adjacent_region_list()
+            for j = 0, adj_list:num_items() - 1 do
+                local adj = adj_list:item_at(j)
+                if region:owning_faction():name() ~= adj:owning_faction():name() then
+                    if region:owning_faction():subculture() == adj:owning_faction():subculture() then
+                        faction_map[adj:owning_faction()] = true 
+                    end
+                end
+            end
+        end
+
+        --can we take any of these fuckers?
+		for current_faction, _ in pairs(faction_map) do
+			
+		end
+    end,
+    true
+)
+
+end
 
 
 function wec_loreful_empires()
