@@ -58,7 +58,7 @@ require("patreon_requests/StuckHeroFix")
 --require("recruiter_controls")
 
 
---require("exterior_scripting/export_helpers__faction_replacement")
+require("exterior_scripting/export_helpers__alberic_boat_disease")
 --require("le/wec_loreful_empires")
 
 --require("emil_qb/battle_script");

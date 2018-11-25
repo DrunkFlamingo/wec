@@ -305,7 +305,6 @@ function companion_controller.switch_out_waaagh(self, cqi)
         army_location.x,
         army_location.y,
         true, 
-        true,
         function(cqi)
             self._armyLinks[army_to_link:cqi()] = cqi
             self._linkedArmies[army_to_link:cqi()] = true
@@ -417,3 +416,6 @@ cm:add_loading_game_callback(function(context)
     cc:load_links(cm:load_named_value("wec_cc_linked_armies", {}, context))
     cc:load_forces(cm:load_named_value("wec_cc_comp_forces", {}, context))
 end)
+
+autoconfed_allowance_table =
+    { }
