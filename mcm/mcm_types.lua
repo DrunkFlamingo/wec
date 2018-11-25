@@ -8,6 +8,7 @@
 --MOD CONFIGURATION MANAGER
 --# assume MCM.register_mod: method(key: string, ui_name: string, ui_tooltip: string) --> MCM_MOD
 --# assume MCM.get_mod: method(key: string) --> MCM_MOD
+--# assume MCM.started_with_mod: method(key: string) --> boolean
 --# assume MCM.add_pre_process_callback: method(callback: function())
     --// happens before any MCM value callbacks. Happens regardless of whether the game is new or loaded. 
 --# assume MCM.add_post_process_callback: method(callback: function())

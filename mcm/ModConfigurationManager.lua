@@ -783,6 +783,12 @@ function mod_configuration_manager.restore_save_state(self)
     end
 end
 
+--v function(self: MOD_CONFIGURATION_MANAGER, name: string) --> boolean
+function mod_configuration_manager.started_with_mod(self, name)
+    local val = cm:get_saved_value("mcm_started_with_mod_"..name)
+    return not not val
+end
+
 
 --v function(self: MOD_CONFIGURATION_MANAGER)
 function mod_configuration_manager.process_all_mods(self)
@@ -796,6 +802,9 @@ function mod_configuration_manager.process_all_mods(self)
     end
     self:log("Processing Settings")
     for name, mod in pairs(self:get_mods()) do
+        if not mcm_finalized then
+            cm:set_saved_value("mcm_started_with_mod_"..name, true)
+        end
         for tweaker_key, tweaker in pairs(mod:tweakers()) do
             self:handle_tweaker(tweaker)
         end
