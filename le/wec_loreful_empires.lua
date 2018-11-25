@@ -6,7 +6,7 @@ LElogVerbosity = 2 --:number
 
 
 function LELOGRESET()
-    if not isLogAllowed then
+    if not __write_output_to_logfile then
         return;
     end
     
@@ -23,7 +23,7 @@ end
 function LELOG(text)
 	ftext = "LESCRIPT"
 
-    if not isLogAllowed then
+    if not __write_output_to_logfile then
       return;
     end
 
@@ -130,6 +130,9 @@ function loreful_empires_manager.new(starting_majors, starting_secondaries)
 	self._defensiveBattlesOnly = false --:boolean
 	self._nearbyPlayerRestriction = true--:boolean
 	self._enableScriptForAllies = false--:boolean
+	self._autoconfed_enabled = true --:boolean
+	self._autoconfed_list = {} --:map<string, boolean>
+
 
 	_G.lem = self
 	return self
@@ -255,21 +258,6 @@ function loreful_empires_manager.influence_battle(self, context)
 				end
 			elseif attacker_is_major == true and defender_is_major == true then
 				LELOG("DFME:Major Attacker v Major Defender");
-
-				--If two major factions clash and one of them is Karl, Karl gets a slight bonus
-				if attacking_faction:name()=="wh_main_emp_empire" then
-					if self:defensive_battles_only() == false then
-						LELOG("DFME:Modified autoresolve slightly for wh_main_emp_empire");
-						cm:modify_next_autoresolve_battle(0.8, 0.2, 0, 2, false);
-					else
-						LELOG("DFME:No autoresolve modification");
-					end
-				elseif defending_faction:name()=="wh_main_emp_empire" then
-					LELOG("DFME:Modified autoresolve slightly for wh_main_emp_empire");
-					cm:modify_next_autoresolve_battle(0.2, 0.8, 2, 0, false);
-				else
-					LELOG("DFME:No autoresolve modification");
-				end
 			elseif attacker_is_major == false and defender_is_major == false then
 				LELOG("DFME:Minor Attacker v Minor Defender\nNo autoresolve modification");
 			end
@@ -281,14 +269,14 @@ end;
 
 --v function(self: LOREFUL_EMPIRES_MANAGER)
 function loreful_empires_manager.activate(self)
-core:add_listener(
-	"GuarenteedEmpires",
-	"PendingBattle",
-	true,
-	function(context) self:influence_battle(context) end,
-	true);
-LELOG("listener init");
-core:trigger_event("LorefulEmpiresActivated")
+	core:add_listener(
+		"GuarenteedEmpires",
+		"PendingBattle",
+		true,
+		function(context) self:influence_battle(context) end,
+		true);
+	LELOG("listener init");
+	core:trigger_event("LorefulEmpiresActivated")
 end;
 
 
@@ -322,7 +310,43 @@ function(context)
 end;
 
 
+--autocongeal feature
 
+--v function(self: LOREFUL_EMPIRES_MANAGER, allowed_sc: map<string, boolean>)
+function loreful_empires_manager.activate_autoconfed_with_list(self, allowed_sc)
+
+
+core:add_listener(
+	function(context)
+        return ((not context:faction():is_human()) and (not (context:faction():name() == "rebels")) and (context:faction():has_home_region()) and (not not allowed_sc[context:faction():subculture()]) )
+    end,
+	function(context)
+	
+        local faction_map = {} --:map<CA_FACTION, boolean>
+        -- first, check our adjacent regions for a list of factions. 
+        local region_list = context:faction():region_list() --:CA_REGION_LIST
+        for i = 0, region_list:num_items() - 1 do
+            local region = region_list:item_at(i)
+            local adj_list = region:adjacent_region_list()
+            for j = 0, adj_list:num_items() - 1 do
+                local adj = adj_list:item_at(j)
+                if region:owning_faction():name() ~= adj:owning_faction():name() then
+                    if region:owning_faction():subculture() == adj:owning_faction():subculture() then
+                        faction_map[adj:owning_faction()] = true 
+                    end
+                end
+            end
+        end
+
+        --can we take any of these fuckers?
+		for current_faction, _ in pairs(faction_map) do
+			
+		end
+    end,
+    true
+)
+
+end
 
 
 function wec_loreful_empires()
@@ -410,7 +434,6 @@ local major_factions = {
 	"wh_main_teb_estalia",
 	"wh_main_teb_tilea",
 	"wh2_main_emp_new_world_colonies",
-	"wh2_main_emp_pirates_of_sartosa",
 	"wh2_main_emp_sudenburg",
 	"wh_main_teb_bilbali",
 	"wh_main_teb_lichtenburg_confederacy",
@@ -420,6 +443,7 @@ local major_factions = {
 	"wh2_main_def_scourge_of_khaine",
 	"wh2_main_def_hag_graef",
 	"wh2_main_def_karond_kar",
+	"wh2_dlc11_def_the_blessed_dread",
 	--wood elves
 	"wh_dlc05_wef_torgovann",
 	"wh_dlc05_wef_wood_elves",
@@ -444,8 +468,13 @@ local major_factions = {
 	"wh2_main_skv_clan_skyre",
 	"wh2_main_skv_clan_moulder",
 	-- vampire counts
-	"wh2_main_vmp_vampire_coast",
 	"wh_main_vmp_mousillon",
+	-- pirates!
+	"wh2_dlc11_cst_pirates_of_sartosa",
+	"wh2_dlc11_cst_noctilus",
+	"wh2_dlc11_cst_vampire_coast",
+	"wh2_dlc11_cst_the_drowned",
+
 	--chaos
 	"wh_main_chs_chaos"
 	};
@@ -467,6 +496,7 @@ function loreful_empires_manager.remove_faction_from_major(self, faction_key)
 	if not is_string(faction_key) then
 		LE_ERROR("API USAGE ERROR: faction key must be a string!")
 		script_error("LOREFUL EMPIRES API: Incorrect argument Type: Use the logging pack to see more details!")
+		return
 	end
 
 	if not self:is_faction_major(faction_key) then
@@ -488,6 +518,7 @@ function loreful_empires_manager.remove_faction_from_secondary(self, faction_key
 	if not is_string(faction_key) then
 		LE_ERROR("API USAGE ERROR: faction key must be a string!")
 		script_error("LOREFUL EMPIRES API: Incorrect argument Type: Use the logging pack to see more details!")
+		return
 	end
 	if not self:is_faction_secondary(faction_key) then
 		LELOG("API: Called remove_faction_from_secondary for ["..faction_key.."], but this faction is not on the secondary list!")
@@ -508,6 +539,7 @@ function loreful_empires_manager.add_faction_to_major(self, faction_key)
 	if not is_string(faction_key) then
 		LE_ERROR("API USAGE ERROR: faction key must be a string!")
 		script_error("LOREFUL EMPIRES API: Incorrect argument Type: Use the logging pack to see more details!")
+		return
 	end
 	if self:is_faction_major(faction_key) then
 		LELOG("API: Called add_faction_to_major for ["..faction_key.."], but this faction is already on the major list!")
@@ -526,6 +558,7 @@ function loreful_empires_manager.add_faction_to_secondary(self, faction_key)
 	if not is_string(faction_key) then
 		LE_ERROR("API USAGE ERROR: faction key must be a string!")
 		script_error("LOREFUL EMPIRES API: Incorrect argument Type: Use the logging pack to see more details!")
+		return
 	end
 	if self:is_faction_secondary(faction_key) then
 		LELOG("API: This faction is already on the secondary list!")
@@ -544,6 +577,7 @@ function loreful_empires_manager.set_defensive_battles_only(self, option)
 	if not is_boolean(option) then
 		LE_ERROR("API USAGE ERROR: option must be a boolean!")
 		script_error("LOREFUL EMPIRES API: Incorrect argument Type: Use the logging pack to see more details!")
+		return
 	end
 	self._defensiveBattlesOnly = option
 	LELOG("API: Set Defensive battles only to ["..tostring(option).."]")
@@ -554,6 +588,7 @@ function loreful_empires_manager.set_enable_script_for_allies(self, option)
 	if not is_boolean(option) then
 		LE_ERROR("API USAGE ERROR: option must be a boolean!")
 		script_error("LOREFUL EMPIRES API: Incorrect argument Type: Use the logging pack to see more details!")
+		return
 	end
 	self._enableScriptForAllies = option
 	LELOG("API: Set Enable Script For Allies to ["..tostring(option).."]")
@@ -565,6 +600,7 @@ function loreful_empires_manager.set_nearby_player_restriction(self, option)
 	if not is_boolean(option) then
 		LE_ERROR("API USAGE ERROR: option must be a boolean!")
 		script_error("LOREFUL EMPIRES API: Incorrect argument Type: Use the logging pack to see more details!")
+		return
 	end
 	self._nearbyPlayerRestriction = option
 	LELOG("API: Set nearby player restriction to ["..tostring(option).."]")

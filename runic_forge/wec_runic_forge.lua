@@ -8,7 +8,7 @@ RF_LOG_ALLOWED = true;
 
 
 function RF_REFRESH_LOG()
-if not RF_LOG_ALLOWED then
+if not __write_output_to_logfile then
 	return;
 end
 
@@ -26,7 +26,7 @@ function RFLOG(text)
 ftext = "RF" 
 --sometimes I use ftext as an arg of this function, but for simple mods like this one I don't need it.
 
-if not RF_LOG_ALLOWED then
+if not __write_output_to_logfile then
 	return; --if our bool isn't set true, we don't want to spam the end user with logs. 
 end
 
