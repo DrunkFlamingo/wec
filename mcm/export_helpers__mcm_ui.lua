@@ -1,10 +1,10 @@
 mcm = _G.mcm
-local mod = mcm:register_mod("tests", "Empire of Man", "toooool tip xd")
+--[[local mod = mcm:register_mod("tests", "Empire of Man", "toooool tip xd")
 local mod2 = mcm:register_mod("secondtest", "Old World Rites", "tooooooooollllltiiiiiiipppppp")
 local multiple_choice = mod:add_tweaker("test_tweaker", "test tweaker", "fuck you thats what")
 local choice_1 = multiple_choice:add_option("key", "An option"):add_callback(function(context) end)
 local choice_2 = multiple_choice:add_option("Key2", "Another option")
-local var = mod:add_variable("var", 0, 10, 5, 1, "A var")
+local var = mod:add_variable("var", 0, 10, 5, 1, "A var")]]
 
 local MCMBASIC = "mcm_basic"
 local UIPANELNAME = "MCM_PANEL"
@@ -184,13 +184,36 @@ local function CreatePanel()
         existingFrame:Delete()
     end
     local buttonsDocker = find_uicomponent(core:get_ui_root(), "layout", "faction_buttons_docker")
-    if cm:get_saved_value("mcm_finalized") == nil then
+    
+    core:add_listener(
+        "MCMHider",
+        "PanelOpenedCampaign",
+        function(context)
+            if UIComponent(context.component):Id() ~= "MCM_PANEL" then 
+                return true 
+            else 
+                return false 
+            end
+        end,
+        function(context)
+            local uic = UIComponent(context.component)
+            mcm:cache_UIC(uic)
+            uic:SetVisible(false)
+        end,
+        true
+        );
+        cm:callback(function()
         local layout = find_uicomponent(core:get_ui_root(), "layout")
         layout:SetVisible(false)
         CampaignUI.ClearSelection()
         local MCMMainFrame = Frame.new(UIPANELNAME)
 
-
+        local advice_exists = false
+        local advisor = find_uicomponent(core:get_ui_root(), "advice_interface")
+        if not not advisor then
+            advice_exists = true
+            advisor:SetVisible(false)
+        end
 
         local sX, sY = core:get_screen_resolution()
         MCMMainFrame:Resize(sX * 0.98, sY * 0.88)
@@ -203,9 +226,14 @@ local function CreatePanel()
         --create close button
         local CloseButton = Button.new(UIPANELNAME.."_CLOSE_BUTTON", MCMMainFrame, "CIRCULAR", "ui/skins/default/icon_check.png")
         CloseButton:Resize(56, 56)
-        CloseButton:RegisterForClick(function() 
+        CloseButton:RegisterForClick(function()
+            if advice_exists then 
+                advisor:SetVisible(true) 
+            end
             MCMMainFrame:Delete() 
-            layout:SetVisible(true) 
+            mcm:clear_UIC()
+            core:remove_listener("MCMHider")
+            layout:SetVisible(true)
             mcm:process_all_mods()
         end)
         local frameWidth = MCMMainFrame:Width()
@@ -215,20 +243,24 @@ local function CreatePanel()
         CloseButton:PositionRelativeTo(frame, frameWidth/2 - buttonWidth/2, frameHeight - buttonHeight*2)
         PopulateList(MCMMainFrame)
         PopulateModOptions(MCMMainFrame)
-    else
-        mcm:log("MCM already triggered on this save file!")
-    end
+        end, 1.0)
 end;
 
-
-core:add_listener(
-    "MCMTrigger",
-    "ComponentLClickUp",
-    function(context)
-        return find_uicomponent(core:get_ui_root(), "layout"):Visible()
-    end,
-    function(context)
-        CreatePanel();
-    end,
-    false
-);
+if cm:get_saved_value("mcm_finalized") == nil then
+    core:add_listener(
+        "MCMTrigger",
+        "ScriptEventCampaignCutsceneCompleted",
+        function(context)
+            return true
+        end,
+        function(context)
+            CreatePanel();
+        end,
+        false
+    );
+else
+    mcm:log("MCM already triggered on this save file!")
+    cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function()
+        mcm:process_all_mods()
+    end
+end

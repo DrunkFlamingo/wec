@@ -48,6 +48,7 @@ function mod_configuration_manager.init()
     self._preProcessCallbacks  = {} --:vector<function()>
     self._newGameOnlyCallbacks = {} --:vector<function()>
     self._warnLuaErrors = false --:boolean
+    self._cachedUIC = {} --:vector<CA_UIC>
 
     _G.mcm = self
     return self
@@ -77,6 +78,25 @@ function mod_configuration_manager.get_current_mod(self)
         return null_responce
     end
     return self._selectedMod
+end
+
+--v function(self: MOD_CONFIGURATION_MANAGER, uic: CA_UIC)
+function mod_configuration_manager.cache_UIC(self, uic)
+    if not is_uicomponent(uic) then
+        self:log("ERROR: callec cache_UIC() but the UIC sent isn't a UIC?")
+        return
+    else
+        table.insert(self._cachedUIC, uic)
+    end
+end
+
+--v function(self: MOD_CONFIGURATION_MANAGER)
+function mod_configuration_manager.clear_UIC(self)
+    local cachedUIC = self._cachedUIC
+    for i = 1, #cachedUIC do
+        local uic = cachedUIC[i]
+        uic:SetVisible(true)
+    end
 end
 
 --v function(self: MOD_CONFIGURATION_MANAGER)
@@ -723,6 +743,7 @@ end
 
 --v function(self: MOD_CONFIGURATION_MANAGER, variable: MCM_VAR) 
 function mod_configuration_manager.handle_variable(self, variable)
+    self:log("handling variable ["..variable:name().."] with key [mcm_variable_"..variable:mod():name().."_"..variable:name().."_value] at value ["..tostring(variable:current_value()).."]")
     cm:set_saved_value("mcm_variable_"..variable:mod():name().."_"..variable:name().."_value", variable:current_value())
     if variable:has_callback() then
         variable:callback()
@@ -732,15 +753,18 @@ end
         
 --v function(self: MOD_CONFIGURATION_MANAGER, tweaker: MCM_TWEAKER)
 function mod_configuration_manager.handle_tweaker(self, tweaker)
+    self:log("handling variable ["..tweaker:name().."] with key [mcm_tweaker_"..tweaker:mod():name().."_"..tweaker:name().."_value] with option ["..tostring(tweaker:selected_option():name()).."]")
     cm:set_saved_value("mcm_tweaker_"..tweaker:mod():name().."_"..tweaker:name().."_value", tweaker:selected_option():name())
     if tweaker:selected_option():has_callback() then
         tweaker:selected_option():callback()
     end
     core:trigger_event("mcm_tweaker_"..tweaker:mod():name().."_"..tweaker:name().."_event", tostring(tweaker:selected_option():name()))
+    self:log("Triggering event [mcm_tweaker_"..tweaker:mod():name().."_"..tweaker:name().."_event] with value ["..tostring(tweaker:selected_option():name()).."]")
 end
 
 --v function(self: MOD_CONFIGURATION_MANAGER)
 function mod_configuration_manager.restore_save_state(self)
+    self:log("Restoring the Saved State!")
     for name, mod in pairs(self:get_mods()) do
         for tweaker_key, tweaker in pairs(mod:tweakers()) do
             local sv = cm:get_saved_value("mcm_tweaker_"..mod:name().."_"..tweaker:name().."_value")
@@ -764,12 +788,13 @@ end
 function mod_configuration_manager.process_all_mods(self)
     local mcm_finalized = cm:get_saved_value("mcm_finalized") or false
     for i = 1, #self._preProcessCallbacks do
+        self:log("Running pre process callbacks")
         self._preProcessCallbacks[i]()
     end
     if mcm_finalized then
         self:restore_save_state()
     end
-
+    self:log("Processing Settings")
     for name, mod in pairs(self:get_mods()) do
         for tweaker_key, tweaker in pairs(mod:tweakers()) do
             self:handle_tweaker(tweaker)
@@ -779,14 +804,16 @@ function mod_configuration_manager.process_all_mods(self)
         end
     end
     if not mcm_finalized then
+        self:log("Running new game callbacks")
         for i = 1, #self._newGameOnlyCallbacks do
             self._newGameOnlyCallbacks[i]()
         end
     end
-
+    self:log("Running post process callbacks")
     for i = 1, #self._postProcessCallbacks do
         self._postProcessCallbacks[i]()
     end
+    self:log("MCM Completed")
     cm:set_saved_value("mcm_finalized", true)
 end
 

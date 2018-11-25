@@ -90,10 +90,11 @@ local my_callback = function()
 end
 --if we don't have MCM, just throw it on a CA event, since we set a default value, this code will work without MCM active!
 if not mcm then 
-    local events = get_events()
-    events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = my_callback
+    cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = my_callback
 else --if we do have MCM, add our callback!
-    mcm:add_post_process_callback(my_callback)
+    mcm:add_new_game_only_callback(my_callback)
+    --if you want this to happen every time the game launches, and not just when it starts the first time, then change this command to
+    -- mcm:add_post_process_callback(my_callback)
 end
 
 --METHOD 2: Using a listener for a single setting
@@ -118,6 +119,8 @@ core:add_listener(
     function(context)
         --code to enable my feature
     end,
-    true)
+    false)
+    --if you want this to happen only the first time the game launches, wrap this in a save value check.
+
 --this code is 100% safe because without MCM, the listener will just do nothing!
 
