@@ -1,3 +1,6 @@
+require("mcm/ModCOnfigurationManager")
+require("mcm/export_helpers__mcm_ui")
+require("mcm/export_helpers__mcm_basic_settings")
 _G.sfo = false --:boolean
 
 ---[[ Legendary Lord Respecs
@@ -62,4 +65,6 @@ require("exterior_scripting/export_helpers__alberic_boat_disease")
 --require("le/wec_loreful_empires")
 
 --require("emil_qb/battle_script");
+
+
 

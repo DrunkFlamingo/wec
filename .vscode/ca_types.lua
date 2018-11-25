@@ -528,6 +528,7 @@
 --# assume CORE.add_ui_created_callback: method(function())
 --# assume CORE.get_screen_resolution: method() --> (number, number)
 --# assume CORE.trigger_event: method(event_name: string, any...)
+--# assume CORE.add_static_object: method(name: string, value: any, override: boolean?)
 
 -- POOLED RESOURCE
 --# assume CA_POOLED.value: method() --> number

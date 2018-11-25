@@ -26,6 +26,6 @@
 
 --# assume global class MOD_CONFIGURATION_MANAGER
 --# assume global class MCM_MOD
---# assume global class MCM_SETTING
+--# assume global class MCM_TWEAKER
 --# assume global class MCM_VAR
---# assume global class MCM_CHOICE
+--# assume global class MCM_OPTION
