@@ -80,11 +80,11 @@ local function PopulateModOptions(MCMMainFrame)
         local VariableContainer = Container.new(FlowLayout.HORIZONTAL)
         local VariableText = Text.new(mod:name().."_"..key.."_variable_title", MCMMainFrame, "HEADER", variable:ui_name())
         VariableText:Resize(200, 40)
-        local IncrementButton = Button.new(mod:name().."_"..key.."_variable_up", MCMMainFrame, "CIRCULAR", "ui/skins/default/icon_minimize.png");
+        local IncrementButton = Button.new(mod:name().."_"..key.."_variable_up", MCMMainFrame, "CIRCULAR", "ui/skins/default/icon_maximize.png");
         IncrementButton:Resize(40, 40);
         local ValueText = Text.new(mod:name().."_"..key.."_variable_value", MCMMainFrame, "HEADER", tostring(variable:current_value()))
         ValueText:Resize(40, 40)
-        local DecrementButton = Button.new(mod:name().."_"..key.."_variable_down", MCMMainFrame, "CIRCULAR", "ui/skins/default/icon_maximize.png");
+        local DecrementButton = Button.new(mod:name().."_"..key.."_variable_down", MCMMainFrame, "CIRCULAR", "ui/skins/default/icon_minimize.png");
         DecrementButton:Resize(40, 40);
         IncrementButton:RegisterForClick(function()
             variable:increment_value()
@@ -95,11 +95,11 @@ local function PopulateModOptions(MCMMainFrame)
             ValueText:SetText(tostring(variable:current_value()))
         end)
         VariableContainer:AddComponent(VariableText)
-        VariableContainer:AddComponent(IncrementButton)
+        VariableContainer:AddComponent(DecrementButton)
         VariableContainer:AddGap(40)
         VariableContainer:AddComponent(ValueText)
         VariableContainer:AddGap(10)
-        VariableContainer:AddComponent(DecrementButton)
+        VariableContainer:AddComponent(IncrementButton)
         ModOptionListView:AddContainer(VariableContainer)
         VariableContainer:Reposition()
     end
@@ -251,7 +251,7 @@ if cm:get_saved_value("mcm_finalized") == nil then
         "MCMTrigger",
         "ScriptEventCampaignCutsceneCompleted",
         function(context)
-            return true
+            return cm:model():turn_number() <= 1
         end,
         function(context)
             CreatePanel();
