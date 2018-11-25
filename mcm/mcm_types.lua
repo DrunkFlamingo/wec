@@ -91,7 +91,11 @@ local my_callback = function()
 end
 --if we don't have MCM, just throw it on a CA event, since we set a default value, this code will work without MCM active!
 if not mcm then 
-    cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = my_callback
+    cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function()
+        if cm:is_new_game() then
+            my_callback()
+        end
+    end
 else --if we do have MCM, add our callback!
     mcm:add_new_game_only_callback(my_callback)
     --if you want this to happen every time the game launches, and not just when it starts the first time, then change this command to

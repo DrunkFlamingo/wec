@@ -447,3 +447,13 @@ core:add_listener(
     true
 )
 --]]
+
+local mcm = _G.mcm
+if not not mcm then
+    local cog = mcm:register_mod("gates_of_chaos", "Gates of Chaos", "Spawns Chaos armies from settlements razed by the Warriors of Chaos")
+    local beastmen = cog:add_tweaker("beastmen", "Beastmen Herdstones", "Allow Beastmen Tribes to spawn from herdstones.")
+    beastmen:add_option("disabled", "Disabled", "Do not spawn beastmen armies from Herdstones")
+    beastmen:add_option("enabled", "Enabled", "Spawn Beastmen armies from herdstones")
+    cog:add_variable("spawn_rate", 2, 90, 10, 4, "Spawn Chance", "Chance to spawn an army")
+    cog:add_variable("max_army_size", 2, 20, 14, 1, "Army Maximum Size", "Maximum potential size of a spawned army")
+end
