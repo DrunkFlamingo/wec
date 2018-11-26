@@ -223,6 +223,9 @@
 --# assume CM.save_named_value: method(name: string, value: any, context: WHATEVER?)
 --# assume CM.load_named_value: method(name: string, default: any, context: WHATEVER?) --> WHATEVER
 --# assume CM.disable_saving_game: method(opt: boolean)
+--serialisation
+--# assume CM.load_values_from_string: method(datastring: string) --> table
+--# assume CM.process_table_save: method(savetable: table, prev_string: string?) --> string
 --effect bundle commands
 --# assume CM.apply_effect_bundle_to_region: method(bundle: string, region: string, turns: number)
 --# assume CM.remove_effect_bundle_from_region: method(bundle: string, region: string)
