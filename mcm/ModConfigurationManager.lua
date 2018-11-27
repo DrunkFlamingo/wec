@@ -884,14 +884,14 @@ function mod_configuration_manager.sync_for_mp(self)
                 local value = tweaker:selected_option():name()
                 if value then
                     self:log("\t\tExporting Tweaker ["..tweaker_key.."] with value ["..value.."]")
-                    sync_data[name.."_T"][tweaker_key] = value
+                    sync_data[name.."_T!"][tweaker_key] = value
                 else
                     self:log("\t\tWARNING: Exporting Tweaker ["..tweaker_key.."] failed. No value is found for this tweaker.")
                 end
             end
             for variable_key, variable in pairs(mod:variables()) do
                 self:log("\t\tExporting Variable ["..variable_key.."] with value ["..variable:current_value().."]")
-                sync_data[name.."_V"][variable_key] = variable:current_value()
+                sync_data[name.."_V!"][variable_key] = variable:current_value()
             end
         end
         local snyc_string = cm:process_table_save(sync_data)
