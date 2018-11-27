@@ -283,8 +283,18 @@ local function CreatePanel()
                     layout:SetVisible(true)
                     --sync choices
                     local sync_string = string.gsub(context:trigger(), "mcm|sync|", "")
-                    local sync_data = cm:load_values_from_string(sync_string)
-                    --# assume sync_data: map<string, map<string, string>>
+                    local sync_data 
+                    if sync_string:len() > 1 then
+                        local tab_func = loadstring("return {"..sync_string.."}")
+                        if is_function(tab_func) then
+                            --# assume tab_func: function() --> map<string, map<string, string>>
+                            sync_data = tab_func()
+                        end
+                    end
+                    if sync_data == nil then
+                        mcm:log("ERROR: Data Could not be synced for MP Game!")
+                        return
+                    end
                     for mixed_key, data_pairs in pairs(sync_data) do
                         if string.find(mixed_key, "_T!") then
                             local true_key = string.gsub(mixed_key, "_T!", "")
