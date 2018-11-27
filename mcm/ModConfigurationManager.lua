@@ -334,7 +334,16 @@ function mcm_var.at_min(self)
     return self._currentValue == self:minimum()
 end
 
-
+--v function(self: MCM_VAR, value: number) --> boolean
+function mcm_var.is_value_valid(self, value)
+    if value > self:maximum() then
+        return false
+    elseif value < self:minimum() then
+        return false
+    else
+        return true
+    end
+end
 
 --v function(self: MCM_VAR, value: number)
 function mcm_var.set_current_value(self, value)
@@ -415,6 +424,7 @@ function mcm_tweaker.new(mod, name, ui_title, ui_tooltip)
     self._UIToolTip = ui_tooltip or " "
 
     self._options = {} --:map<string, MCM_OPTION>
+    self._numOptions = 0 --:number
     self._selectedOption = nil --:MCM_OPTION
 
     return self
@@ -434,6 +444,7 @@ function mcm_tweaker.null(mod)
 
     self._options = {} 
     self._selectedOption = nil 
+    self._numOptions = 0
 
     return self
 end
@@ -558,6 +569,14 @@ function mcm_tweaker.set_selected_option(self, option)
     self._selectedOption = option
 end
 
+--v function(self: MCM_TWEAKER, option_key: string)
+function mcm_tweaker.set_selected_option_with_key(self, option_key)
+    if self._options[option_key] == nil then
+        return
+    end
+    self._selectedOption = self._options[option_key]
+end
+
 
 --v function(self: MCM_TWEAKER) --> MCM_OPTION
 function mcm_tweaker.selected_option(self)
@@ -579,7 +598,15 @@ function mcm_tweaker.get_option_with_key(self, key)
     return self:options()[key]
 end
 
+--v function(self: MCM_TWEAKER, option_key: string) --> boolean
+function mcm_tweaker.has_option(self, option_key)
+    return not not self._options[option_key]
+end
 
+--v function(self: MCM_TWEAKER) --> number
+function mcm_tweaker.num_options(self)
+    return self._numOptions
+end
 
 
 --v function(self: MCM_TWEAKER, key: string, ui_name: string?, ui_tooltip: string?) --> MCM_OPTION
@@ -592,9 +619,13 @@ function mcm_tweaker.add_option(self, key, ui_name, ui_tooltip)
         self:log("WARNING: attempted to create an option with key ["..key.."] for tweaker ["..self:name().."] in mod ["..self:mod():name().."], but an option with that key already exists! Returning the existing option instead")
         return self:options()[key]
     end
-
+    if self._numOptions == 9 then
+        self:log("ERROR: attempted to create a new option for tweaker ["..self:name().."] in mod ["..self:mod():name().."] but that tweaker already has 9 options!")
+        return mcm_option.null(self)
+    end
     local new_option = mcm_option.new(self, key, ui_name, ui_tooltip)
     self:options()[key] = new_option
+    self._numOptions = self._numOptions + 1
     self:log("Created Option with key ["..key.."] for tweaker ["..self:name().."] in mod ["..self:mod():name().."]")
     if self:selected_option() == nil then
         self:set_selected_option(new_option)
@@ -647,6 +678,15 @@ function mcm_mod.ui_tooltip(self)
     return self._UIToolTip
 end
 
+--v function(self: MCM_MOD, key: string) --> boolean
+function mcm_mod.has_tweaker(self, key)
+    return not not self:tweakers()[key]
+end
+
+--v function(self: MCM_MOD, key: string) --> boolean
+function mcm_mod.has_variable(self, key)
+    return not not self:variables()[key]
+end
 
 --v function(self: MCM_MOD, key: string) --> MCM_TWEAKER
 function mcm_mod.get_tweaker_with_key(self, key)
@@ -739,6 +779,10 @@ function mod_configuration_manager.get_mod(self, key)
     return self:get_mods()[key]
 end
 
+--v function(self: MOD_CONFIGURATION_MANAGER, key: string) --> boolean
+function mod_configuration_manager.has_mod(self, key)
+    return not not self._registeredMods[key]
+end
 
 
 --v function(self: MOD_CONFIGURATION_MANAGER, variable: MCM_VAR) 
@@ -824,6 +868,38 @@ function mod_configuration_manager.process_all_mods(self)
     end
     self:log("MCM Completed")
     cm:set_saved_value("mcm_finalized", true)
+end
+
+--v function(self: MOD_CONFIGURATION_MANAGER)
+function mod_configuration_manager.sync_for_mp(self)
+    local mcm_finalized = cm:get_saved_value("mcm_finalized") or false
+    if cm:is_multiplayer() and not mcm_finalized then
+        self:log("Beginning MP Settings Snychronization!")
+        local sync_data = {} --:map<string, map<string, WHATEVER>>
+        for name, mod in pairs(self:get_mods()) do
+            self:log("\tPrparing mod with key ["..name.."] for export")
+            sync_data[name.."_T!"] = {}
+            sync_data[name.."_V!"] = {}
+            for tweaker_key, tweaker in pairs(mod:tweakers()) do
+                local value = tweaker:selected_option():name()
+                if value then
+                    self:log("\t\tExporting Tweaker ["..tweaker_key.."] with value ["..value.."]")
+                    sync_data[name.."_T!"][tweaker_key] = value
+                else
+                    self:log("\t\tWARNING: Exporting Tweaker ["..tweaker_key.."] failed. No value is found for this tweaker.")
+                end
+            end
+            for variable_key, variable in pairs(mod:variables()) do
+                self:log("\t\tExporting Variable ["..variable_key.."] with value ["..variable:current_value().."]")
+                sync_data[name.."_V!"][variable_key] = variable:current_value()
+            end
+        end
+        local snyc_string = cm:process_table_save(sync_data)
+        CampaignUI.TriggerCampaignScriptEvent(cm:get_faction(cm:get_local_faction(true)):command_queue_index(), "mcm|sync|"..snyc_string)
+        self:log("Sync data sent!")
+    else
+        self:log("MCM already finalized, or it is a singleplayer game: No MP Sync is being preformed")
+    end
 end
 
 --v function(self: MOD_CONFIGURATION_MANAGER, callback: function())

@@ -1,37 +1,79 @@
 DF_CHAOS_PORTAL_BUILDING = {
-"wh_main_dwf_grn_settlement_major_chaosruin",
-"wh_main_dwf_grn_settlement_major_chaosruin_coast",
-"wh_main_dwf_grn_settlement_minor_chaosruin",
-"wh_main_dwf_grn_settlement_minor_chaosruin_coast",
-"wh_main_HUMAN_settlement_major_chaosruin",
-"wh_main_HUMAN_settlement_major_chaosruin_coast",
-"wh_main_HUMAN_settlement_minor_chaosruin",
-"wh_main_HUMAN_settlement_minor_chaosruin_coast",
-"wh_main_HUMAN_outpostnorsca_major_chaosruin",
-"wh_main_HUMAN_outpostnorsca_major_chaosruin_coast",
-"wh_main_HUMAN_outpostnorsca_minor_chaosruin",
-"wh_main_HUMAN_outpostnorsca_minor_chaosruin_coast",
-"wh_main_special_settlement_altdorf_chaosruin",
-"wh_main_special_settlement_black_crag_chaosruin",
-"wh_main_special_settlement_castle_drakenhof_chaosruin",
-"wh_main_special_settlement_eight_peaks_chaosruin",
-"wh_main_special_settlement_karaz_a_karak_chaosruin",
-"wh_main_special_settlement_kislev_chaosruin",
-"wh_main_special_settlement_miragliano_chaosruin",
-"wh2_main_special_fortress_gate_eagle_chaos_ruins",
-"wh2_main_special_fortress_gate_griffon_chaos_ruins",
-"wh2_main_special_fortress_gate_phoenix_chaos_ruins",
-"wh2_main_special_fortress_gate_unicorn_chaos_ruins",
-}--:vector<string>
+    "wh_main_dwf_grn_settlement_major_chaosruin",
+    "wh_main_dwf_grn_settlement_major_chaosruin_coast",
+    "wh_main_dwf_grn_settlement_minor_chaosruin",
+    "wh_main_dwf_grn_settlement_minor_chaosruin_coast",
+    "wh_main_HUMAN_settlement_major_chaosruin",
+    "wh_main_HUMAN_settlement_major_chaosruin_coast",
+    "wh_main_HUMAN_settlement_minor_chaosruin",
+    "wh_main_HUMAN_settlement_minor_chaosruin_coast",
+    "wh_main_HUMAN_outpostnorsca_major_chaosruin",
+    "wh_main_HUMAN_outpostnorsca_major_chaosruin_coast",
+    "wh_main_HUMAN_outpostnorsca_minor_chaosruin",
+    "wh_main_HUMAN_outpostnorsca_minor_chaosruin_coast",
+    "wh_main_special_settlement_altdorf_chaosruin",
+    "wh_main_special_settlement_black_crag_chaosruin",
+    "wh_main_special_settlement_castle_drakenhof_chaosruin",
+    "wh_main_special_settlement_eight_peaks_chaosruin",
+    "wh_main_special_settlement_karaz_a_karak_chaosruin",
+    "wh_main_special_settlement_kislev_chaosruin",
+    "wh_main_special_settlement_miragliano_chaosruin",
+    "wh2_main_special_fortress_gate_eagle_chaos_ruins",
+    "wh2_main_special_fortress_gate_griffon_chaos_ruins",
+    "wh2_main_special_fortress_gate_phoenix_chaos_ruins",
+    "wh2_main_special_fortress_gate_unicorn_chaos_ruins"
+    }--:vector<string>
 
-DF_CHAOS_SPAWN_CHANCE = 10
-DF_BASE_COOLDOWN = 4
+DF_HERDSTONE_BUILDINGS = {
+    "wh_dlc03_GRN-DWF_settlement_major_beastmenruin_coast",
+    "wh_dlc03_GRN-DWF_settlement_major_beastmenruin_coast",
+    "wh_dlc03_GRN-DWF_settlement_major_beastmenruin",
+    "wh_dlc03_GRN-DWF_settlement_major_beastmenruin",
+    "wh_dlc03_GRN-DWF_settlement_minor_beastmenruin_coast",
+    "wh_dlc03_GRN-DWF_settlement_minor_beastmenruin_coast",
+    "wh_dlc03_GRN-DWF_settlement_minor_beastmenruin",
+    "wh_dlc03_GRN-DWF_settlement_minor_beastmenruin",
+    "wh_dlc03_HUMAN_settlement_major_beastmenruin_coast",
+    "wh_dlc03_HUMAN_settlement_major_beastmenruin_coast",
+    "wh_dlc03_HUMAN_settlement_major_beastmenruin",
+    "wh_dlc03_HUMAN_settlement_major_beastmenruin",
+    "wh_dlc03_HUMAN_settlement_minor_beastmenruin_coast",
+    "wh_dlc03_HUMAN_settlement_minor_beastmenruin_coast",
+    "wh_dlc03_HUMAN_settlement_minor_beastmenruin",
+    "wh_dlc03_HUMAN_settlement_minor_beastmenruin",
+    "wh_dlc03_HUMAN_outpostnorsca_major_beastmenruin",
+    "wh_dlc03_HUMAN_outpostnorsca_major_beastmenruin",
+    "wh_dlc03_HUMAN_outpostnorsca_major_beastmenruin_coast",
+    "wh_dlc03_HUMAN_outpostnorsca_major_beastmenruin_coast",
+    "wh_dlc03_HUMAN_outpostnorsca_minor_beastmenruin",
+    "wh_dlc03_HUMAN_outpostnorsca_minor_beastmenruin",
+    "wh_dlc03_HUMAN_outpostnorsca_minor_beastmenruin_coast",
+    "wh_dlc03_HUMAN_outpostnorsca_minor_beastmenruin_coast"
+    }--:vector<string>
+
+
+local goc_settings = {} 
+goc_settings.DF_CHAOS_PORTAL_BUILDING = DF_CHAOS_PORTAL_BUILDING
+goc_settings.DF_CHAOS_SPAWN_CHANCE = 10 --:number
+goc_settings.DF_BASE_COOLDOWN = 4 --:number
+goc_settings.DF_CHAOS_ARMY_SIZES = {9, 11, 13} --:vector<number>
+goc_settings.BEASTMEN = false --:boolean
 
 DF_CHAOS_ARMY_LIST =  {"wh_dlc01_chs_inf_forsaken_0", "wh_main_chs_mon_chaos_warhounds_0", "wh_main_chs_mon_chaos_spawn", "wh_main_chs_mon_chaos_spawn",
 "wh_dlc06_chs_feral_manticore", "wh_dlc01_chs_inf_chaos_warriors_2", "wh_dlc01_chs_inf_chaos_warriors_2", "wh_main_chs_mon_chaos_spawn", "wh_main_chs_mon_chaos_spawn",
 "wh_dlc01_chs_inf_forsaken_0", "wh_main_chs_mon_chaos_warhounds_0", "wh_main_chs_mon_chaos_spawn", "wh_main_chs_mon_chaos_spawn"
 } --:vector<string>
-DF_CHAOS_ARMY_SIZES = {9, 11, 13} --:vector<number>
+
+DF_HERD_ARMY_LIST = {"wh_dlc03_bst_inf_centigors_0", "wh_dlc03_bst_inf_minotaurs_0", "wh_dlc03_bst_mon_chaos_spawn_0", "wh_dlc03_bst_inf_gor_herd_0", "wh_dlc03_bst_inf_gor_herd_0",
+"wh_dlc03_bst_inf_bestigor_herd_0", "wh_dlc03_bst_inf_ungor_spearmen_0", "wh_dlc03_bst_inf_gor_herd_1", "wh_dlc03_bst_inf_gor_herd_1", "wh_dlc03_bst_inf_ungor_raiders_0", "wh_dlc03_bst_inf_ungor_raiders_0"} --:vector<string>
+
+DF_HERD_ARMY_FACTION = {"wh_dlc03_bst_beastmen",
+"wh_dlc03_bst_redhorn",
+"wh_dlc03_bst_jagged_horn",
+"wh2_main_bst_blooded_axe",
+"wh2_main_bst_manblight",
+"wh2_main_bst_ripper_horn",
+"wh2_main_bst_shadowgor"} --:vector<string>
 DF_CHAOS_ARMY_FACTION = "wh2_main_chs_chaos_incursion_lzd" --:string
 
 DF_SPAWN_LOCATIONS = {
@@ -302,12 +344,12 @@ end;
 
 --v function(region: CA_REGION) --> boolean
 function region_has_portal(region)
-    if DF_SPAWN_LOCATIONS[region:name()] == nil then
-        GOCLOG("Region with portal ["..region:name().."] doesn't have a set up spawn location!")
-        return false
-    end
-    for i = 1, #DF_CHAOS_PORTAL_BUILDING do
-        if region:building_exists(DF_CHAOS_PORTAL_BUILDING[i]) then
+    for i = 1, #goc_settings.DF_CHAOS_PORTAL_BUILDING do
+        if region:building_exists(goc_settings.DF_CHAOS_PORTAL_BUILDING[i]) then
+            if DF_SPAWN_LOCATIONS[region:name()] == nil then
+                GOCLOG("Region with portal ["..region:name().."] doesn't have a set up spawn location!")
+                return false
+            end
             GOCLOG("Region has portal returning true for region ["..region:name().."] ")
             return true
         end
@@ -315,14 +357,92 @@ function region_has_portal(region)
     return false
 end
 
+--v function(region: CA_REGION) --> boolean
+function region_has_herdstone(region)
+    for i = 1, #DF_HERDSTONE_BUILDINGS do
+        if region:building_exists(DF_HERDSTONE_BUILDINGS[i]) then
+            if DF_SPAWN_LOCATIONS[region:name()] == nil then
+                GOCLOG("Region with herdstone ["..region:name().."] doesn't have a set up spawn location!")
+                return false
+            end
+            GOCLOG("Region has herdstone returning true for region ["..region:name().."] ")
+            return true
+        end
+    end
+    return false
+end
 
 
+--v function(region: CA_REGION)
+local function spawn_beastmen(region)
+
+    local unit_string = DF_HERD_ARMY_LIST[cm:random_number(#DF_HERD_ARMY_LIST)]
+    for i = 1, goc_settings.DF_CHAOS_ARMY_SIZES[cm:random_number(#goc_settings.DF_CHAOS_ARMY_SIZES)] do
+        local new_string = unit_string..","..DF_HERD_ARMY_LIST[cm:random_number(#DF_HERD_ARMY_LIST)]
+        unit_string = new_string
+    end
+    GOCLOG("Assembled the spawn string as ["..unit_string.."] ")
+    cm:create_force(
+        DF_HERD_ARMY_FACTION[cm:random_number(#DF_HERD_ARMY_FACTION)],
+        unit_string,
+        region:name(),
+        DF_SPAWN_LOCATIONS[region:name()][1],
+        DF_SPAWN_LOCATIONS[region:name()][2],
+        true,
+        function(cqi)
+            GOCLOG("Spawned a beastmen army at ["..region:name().."] sucessfully with cqi ["..tostring(cqi).."]")
+            cm:apply_effect_bundle_to_characters_force("wh_main_bundle_military_upkeep_free_force", cqi, 0, true);
+        end)
+    
+        cm:set_saved_value("chaos_gates_cooldown_"..region:province_name(), 18)
+        if cm:is_multiplayer() then --in multiplayer games we tick twice every single round. Double the cooldown
+            cm:set_saved_value("chaos_gates_cooldown_"..region:province_name(), 36)
+        end
+end
+
+
+--v function (region: CA_REGION)
+local function beastmen_herds(region)
+    if cm:get_saved_value("chaos_gates_cooldown_"..region:province_name()) == nil then
+        cm:set_saved_value("chaos_gates_cooldown_"..region:province_name(), goc_settings.DF_BASE_COOLDOWN)
+    end
+    local cooldown = cm:get_saved_value("chaos_gates_cooldown_"..region:province_name())
+    if cooldown > 1 then
+        GOCLOG("region ["..region:name().."] is not off cooldown! It has ["..cooldown.."] turns remaining!")
+        cm:set_saved_value("chaos_gates_cooldown_"..region:province_name(), cooldown - 1)
+        return
+    end
+
+    if cm:is_multiplayer() then
+        if CheckIfPlayerIsNearFaction(GetPlayerFactions(), region) == false and IsValidSpawnPoint(region:settlement():logical_position_x() + 2, region:settlement():logical_position_y() + 2) then
+            if cm:random_number(100) <= goc_settings.DF_CHAOS_SPAWN_CHANCE/2 then
+                GOCLOG("Chance check passed, spawning beastmen")
+                spawn_beastmen(region)
+            else
+                GOCLOG("Chance check failed, maybe next time!")
+            end
+        end
+        return
+    end
+
+
+
+    if cm:random_number(100) <= goc_settings.DF_CHAOS_SPAWN_CHANCE then
+        GOCLOG("Chance check passed, spawning beastmen")
+        if CheckIfPlayerIsNearFaction(GetPlayerFactions(), region) == false and IsValidSpawnPoint(region:settlement():logical_position_x() + 1, region:settlement():logical_position_y() + 1) then
+            spawn_beastmen(region)
+        end
+    else
+        GOCLOG("Chance check failed, maybe next time!")
+    end
+
+end
 
 --v function(region: CA_REGION)
 local function spawn_chaos(region)
 
     local unit_string = DF_CHAOS_ARMY_LIST[cm:random_number(#DF_CHAOS_ARMY_LIST)]
-    for i = 1, DF_CHAOS_ARMY_SIZES[cm:random_number(#DF_CHAOS_ARMY_SIZES)] do
+    for i = 1, goc_settings.DF_CHAOS_ARMY_SIZES[cm:random_number(#goc_settings.DF_CHAOS_ARMY_SIZES)] do
         local new_string = unit_string..","..DF_CHAOS_ARMY_LIST[cm:random_number(#DF_CHAOS_ARMY_LIST)]
         unit_string = new_string
     end
@@ -354,7 +474,7 @@ end
 --v function (region: CA_REGION)
 local function chaos_gates(region)
     if cm:get_saved_value("chaos_gates_cooldown_"..region:province_name()) == nil then
-        cm:set_saved_value("chaos_gates_cooldown_"..region:province_name(), DF_BASE_COOLDOWN)
+        cm:set_saved_value("chaos_gates_cooldown_"..region:province_name(), goc_settings.DF_BASE_COOLDOWN)
     end
     local cooldown = cm:get_saved_value("chaos_gates_cooldown_"..region:province_name())
     if cooldown > 1 then
@@ -365,7 +485,7 @@ local function chaos_gates(region)
 
     if cm:is_multiplayer() then
         if CheckIfPlayerIsNearFaction(GetPlayerFactions(), region) == false and IsValidSpawnPoint(region:settlement():logical_position_x() + 2, region:settlement():logical_position_y() + 2) then
-            if cm:random_number(100) <= DF_CHAOS_SPAWN_CHANCE/2 then
+            if cm:random_number(100) <= goc_settings.DF_CHAOS_SPAWN_CHANCE/2 then
                 GOCLOG("Chance check passed, spawning chaos")
                 spawn_chaos(region)
             else
@@ -377,7 +497,7 @@ local function chaos_gates(region)
 
 
 
-    if cm:random_number(100) <= DF_CHAOS_SPAWN_CHANCE then
+    if cm:random_number(100) <= goc_settings.DF_CHAOS_SPAWN_CHANCE then
         GOCLOG("Chance check passed, spawning chaos")
         if CheckIfPlayerIsNearFaction(GetPlayerFactions(), region) == false and IsValidSpawnPoint(region:settlement():logical_position_x() + 1, region:settlement():logical_position_y() + 1) then
             spawn_chaos(region)
@@ -387,8 +507,6 @@ local function chaos_gates(region)
     end
 
 end
-
-
 
 
 
@@ -447,3 +565,120 @@ core:add_listener(
     true
 )
 --]]
+
+local mcm = _G.mcm
+if not not mcm then
+    local cog = mcm:register_mod("gates_of_chaos", "Gates of Chaos", "Spawns Chaos armies from settlements razed by the Warriors of Chaos")
+    local beastmen = cog:add_tweaker("beastmen", "Beastmen Herdstones", "Allow Beastmen Tribes to spawn from herdstones.")
+    beastmen:add_option("disabled", "Disabled", "Do not spawn beastmen armies from Herdstones")
+    beastmen:add_option("enabled", "Enabled", "Spawn Beastmen armies from herdstones"):add_callback(function(context)
+        core:add_listener(
+            "ChaosGatesBeastmenTurnStart",
+            "FactionTurnStart",
+            function(context)
+                return context:faction():is_human()
+            end,
+            function(context)
+                local region_list = cm:model():world():region_manager():region_list()
+                for i = 0, region_list:num_items() - 1 do
+                    local region = region_list:item_at(i)
+                    if not region:settlement():is_null_interface() then
+                        if region_has_herdstone(region) then
+                            beastmen_herds(region)
+                        end
+                    end
+                end
+            end,
+            true)
+            GOCLOG("MCM Added beastmen ruin spawns!")
+    end)
+    local norscaruins = cog:add_tweaker("norscaruins", "Norscan Ruins", "Allow Chaos Warriors to spawn from Norscan Ruins that have been dedicated to the ruinous powers.")
+    norscaruins:add_option("disabled", "Disabled", "Do not spawn armies from Chaos God Monoliths")
+    norscaruins:add_option("enabled", "Enabled", "Spawn armies from Chaos God Monoliths"):add_callback(function(context)
+        local new_buildings = {
+                "wh_main_NORSCA_settlement_major_coast_norscaruin_khorne",
+                "wh_main_NORSCA_settlement_major_coast_norscaruin_nurgle",
+                "wh_main_NORSCA_settlement_major_coast_norscaruin_slaanesh",
+                "wh_main_NORSCA_settlement_major_coast_norscaruin_tzeentch",
+                "wh_main_NORSCA_settlement_major_norscaruin_khorne",
+                "wh_main_NORSCA_settlement_major_norscaruin_nurgle",
+                "wh_main_NORSCA_settlement_major_norscaruin_slaanesh",
+                "wh_main_NORSCA_settlement_major_norscaruin_tzeentch",
+                "wh_main_NORSCA_settlement_minor_coast_norscaruin_khorne",
+                "wh_main_NORSCA_settlement_minor_coast_norscaruin_nurgle",
+                "wh_main_NORSCA_settlement_minor_coast_norscaruin_slaanesh",
+                "wh_main_NORSCA_settlement_minor_coast_norscaruin_tzeentch",
+                "wh_main_NORSCA_settlement_minor_norscaruin_khorne",
+                "wh_main_NORSCA_settlement_minor_norscaruin_nurgle",
+                "wh_main_NORSCA_settlement_minor_norscaruin_slaanesh",
+                "wh_main_NORSCA_settlement_minor_norscaruin_tzeentch",
+                "wh_main_oak_of_ages_norscaruin_khorne",
+                "wh_main_oak_of_ages_norscaruin_nurgle",
+                "wh_main_oak_of_ages_norscaruin_slaanesh",
+                "wh_main_oak_of_ages_norscaruin_tzeentch",
+                "wh_main_sch_settlement_major_coast_norscaruin_khorne",
+                "wh_main_sch_settlement_major_coast_norscaruin_nurgle",
+                "wh_main_sch_settlement_major_coast_norscaruin_slaanesh",
+                "wh_main_sch_settlement_major_coast_norscaruin_tzeentch",
+                "wh_main_sch_settlement_major_norscaruin_khorne",
+                "wh_main_sch_settlement_major_norscaruin_nurgle",
+                "wh_main_sch_settlement_major_norscaruin_slaanesh",
+                "wh_main_sch_settlement_major_norscaruin_tzeentch",
+                "wh_main_sch_settlement_minor_coast_norscaruin_khorne",
+                "wh_main_sch_settlement_minor_coast_norscaruin_nurgle",
+                "wh_main_sch_settlement_minor_coast_norscaruin_slaanesh",
+                "wh_main_sch_settlement_minor_coast_norscaruin_tzeentch",
+                "wh_main_sch_settlement_minor_norscaruin_khorne",
+                "wh_main_sch_settlement_minor_norscaruin_nurgle",
+                "wh_main_sch_settlement_minor_norscaruin_slaanesh",
+                "wh_main_sch_settlement_minor_norscaruin_tzeentch",
+                "wh_main_sch_special_settlement_altdorf_norscaruin_khorne",
+                "wh_main_sch_special_settlement_altdorf_norscaruin_nurgle",
+                "wh_main_sch_special_settlement_altdorf_norscaruin_slaanesh",
+                "wh_main_sch_special_settlement_altdorf_norscaruin_tzeentch",
+                "wh_main_sch_special_settlement_black_crag_norscaruin_khorne",
+                "wh_main_sch_special_settlement_black_crag_norscaruin_nurgle",
+                "wh_main_sch_special_settlement_black_crag_norscaruin_slaanesh",
+                "wh_main_sch_special_settlement_black_crag_norscaruin_tzeentch",
+                "wh_main_sch_special_settlement_castle_drakenhof_norscaruin_khorne",
+                "wh_main_sch_special_settlement_castle_drakenhof_norscaruin_nurgle",
+                "wh_main_sch_special_settlement_castle_drakenhof_norscaruin_slaanesh",
+                "wh_main_sch_special_settlement_castle_drakenhof_norscaruin_tzeentch",
+                "wh_main_sch_special_settlement_couronne_norscaruin_khorne",
+                "wh_main_sch_special_settlement_couronne_norscaruin_nurgle",
+                "wh_main_sch_special_settlement_couronne_norscaruin_slaanesh",
+                "wh_main_sch_special_settlement_couronne_norscaruin_tzeentch",
+                "wh_main_sch_special_settlement_eight_peaks_norscaruin_khorne",
+                "wh_main_sch_special_settlement_eight_peaks_norscaruin_nurgle",
+                "wh_main_sch_special_settlement_eight_peaks_norscaruin_slaanesh",
+                "wh_main_sch_special_settlement_eight_peaks_norscaruin_tzeentch",
+                "wh_main_sch_special_settlement_karaz_a_karak_norscaruin_khorne",
+                "wh_main_sch_special_settlement_karaz_a_karak_norscaruin_nurgle",
+                "wh_main_sch_special_settlement_karaz_a_karak_norscaruin_slaanesh",
+                "wh_main_sch_special_settlement_karaz_a_karak_norscaruin_tzeentch",
+                "wh_main_sch_special_settlement_kislev_norscaruin_khorne",
+                "wh_main_sch_special_settlement_kislev_norscaruin_nurgle",
+                "wh_main_sch_special_settlement_kislev_norscaruin_slaanesh",
+                "wh_main_sch_special_settlement_kislev_norscaruin_tzeentch",
+                "wh_main_sch_special_settlement_miragliano_norscaruin_khorne",
+                "wh_main_sch_special_settlement_miragliano_norscaruin_nurgle",
+                "wh_main_sch_special_settlement_miragliano_norscaruin_slaanesh",
+                "wh_main_sch_special_settlement_miragliano_norscaruin_tzeentch"
+        } --:vector<string>
+        for i = 1, #new_buildings do
+            table.insert(goc_settings.DF_CHAOS_PORTAL_BUILDING, new_buildings[i])
+        end
+        GOCLOG("MCM Added norscan ruin spawns!")
+    end)
+    cog:add_variable("spawn_rate", 2, 90, 10, 4, "Spawn Chance", "Chance to spawn an army"):add_callback(function(context)
+        goc_settings.DF_CHAOS_SPAWN_CHANCE = context:get_mod("gates_of_chaos"):get_variable_with_key("spawn_rate"):current_value()
+        GOCLOG("MCM Modified Spawn Rate to ["..goc_settings.DF_CHAOS_SPAWN_CHANCE.."]!")
+    end)
+    cog:add_variable("max_army_size", 5, 20, 14, 1, "Army Maximum Size", "Maximum potential size of a spawned army"):add_callback(function(context)
+        local max = context:get_mod("gates_of_chaos"):get_variable_with_key("max_army_size"):current_value() - 1
+        local mid = max - 2 
+        local low = mid - 2
+        goc_settings.DF_CHAOS_ARMY_SIZES = {low, mid, max}
+        GOCLOG("MCM Modified Army Size to ["..max.."],["..mid.."],["..low.."]!")
+    end)
+end
