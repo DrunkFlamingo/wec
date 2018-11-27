@@ -1,4 +1,3 @@
-
 --# assume global class MCM
 --# assume global class MCM_MOD
 --# assume global class MCM_VAR
@@ -35,6 +34,9 @@
     --// This value equals the option key of the selected option
     --// variables additionally trigger an event called "mcm_variable_<mod_key>_<variable_key>_event".
     --// The value is easily accessible within this event through tonumber(context.string)
+--# assume MCM_MOD.get_variable_with_key: method(key: string) --> MCM_VAR
+--# assume MCM_MOD.get_tweaker_with_key: method(key: string) --> MCM_TWEAKER
+--# assume MCM_MOD.model: method() --> MCM
 
 --TWEAKER OBJECT
 --# assume MCM_TWEAKER.name: method() -->string

@@ -9,11 +9,6 @@ local var = mod:add_variable("var", 0, 10, 5, 1, "A var")]]
 local MCMBASIC = "mcm_basic"
 local UIPANELNAME = "MCM_PANEL"
 
---v function (MCMMainFrame: FRAME)
-local function PopulateOption(MCMMainFrame)
-
-
-end
 
 --called multiple times during runtime
 --v function(MCMMainFrame: FRAME)
@@ -37,7 +32,7 @@ local function PopulateModOptions(MCMMainFrame)
     ModOptionListHeader:Resize(400, 40)
     ModOptionListHeader:PositionRelativeTo(MCMMainFrame, fbX*0.04 + 350, fbY*0.04)
     local ModOptionListView = ListView.new(UIPANELNAME.."_MOD_OPTIONS_LISTVIEW", MCMMainFrame, "VERTICAL")
-    ModOptionListView:Resize(1400, 800)
+    ModOptionListView:Resize(1300, 800)
     local ModOptionListBuffer = Container.new(FlowLayout.VERTICAL)
     ModOptionListBuffer:AddGap(10)
     ModOptionListView:AddContainer(ModOptionListBuffer)
@@ -47,7 +42,7 @@ local function PopulateModOptions(MCMMainFrame)
             local TweakerContainer = Container.new(FlowLayout.HORIZONTAL)
             local TweakerRowTwo  --:CONTAINER
             local TweakerRowThree --: CONTAINER
-            local has_row_two = (num_slots >= 4)
+            local has_row_two = (num_slots >= 4 or num_slots)
             local has_row_three = (num_slots >= 7)
             if has_row_two then
                 TweakerRowTwo = Container.new(FlowLayout.HORIZONTAL)
@@ -64,6 +59,9 @@ local function PopulateModOptions(MCMMainFrame)
             TweakerContainer:AddComponent(TweakerText)
             TweakerContainer:AddGap(10)
             local processed = 0 
+            if num_slots == 4 then
+                processed = 1
+            end
             for option_name, option in pairs(tweaker:options()) do
                 local OptionButton = TextButton.new(mod:name().."_"..key.."_option_button_"..option_name, MCMMainFrame, "TEXT_TOGGLE", option:ui_name())
                 OptionButton:Resize(300, 45)
