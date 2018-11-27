@@ -119,9 +119,12 @@ local function PopulateModOptions(MCMMainFrame)
         local IncrementButton = TextButton.new(mod:name().."_"..key.."_variable_up", MCMMainFrame, "TEXT", "+");
         IncrementButton:GetContentComponent():SetTooltipText("Increment this variable.", true)
         IncrementButton:Resize(230, 45);
+        local valueTextContainer = Container.new(FlowLayout.VERTICAL)
         local ValueText = Text.new(mod:name().."_"..key.."_variable_value", MCMMainFrame, "HEADER", tostring(variable:current_value()))
         ValueText:Resize(100, 45)
         ValueText:GetContentComponent():SetTooltipText("Current Value", true)
+        valueTextContainer:AddGap(10)
+        valueTextContainer:AddComponent(ValueText)
         local DecrementButton = TextButton.new(mod:name().."_"..key.."_variable_down", MCMMainFrame, "TEXT", "-");
         DecrementButton:GetContentComponent():SetTooltipText("Decrement this variable.", true)
         DecrementButton:Resize(230, 45);
@@ -137,7 +140,7 @@ local function PopulateModOptions(MCMMainFrame)
         VariableContainer:AddGap(10) 
         VariableContainer:AddComponent(DecrementButton) --230
         VariableContainer:AddGap(45) --275
-        VariableContainer:AddComponent(ValueText) --375
+        VariableContainer:AddComponent(valueTextContainer) --375
         VariableContainer:AddGap(5) --380
         VariableContainer:AddComponent(IncrementButton) --610
         ModOptionListView:AddContainer(VariableContainer)
