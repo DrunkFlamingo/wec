@@ -189,7 +189,7 @@ local mcm_mod = {} --# assume mcm_mod: MCM_MOD
 
 
 
---v function(model: MOD_CONFIGURATION_MANAGER, name: string, ui_name: string?, ui_tooltip: string?) --> MCM_MOD
+--v function(model: MOD_CONFIGURATION_MANAGER, name: string, ui_name: string, ui_tooltip: string) --> MCM_MOD
 function mcm_mod.new(model, name, ui_name, ui_tooltip)
     local self = {}
     setmetatable(self, {
@@ -244,7 +244,7 @@ end
 
 local mcm_var = {}--# assume mcm_var: MCM_VAR
 
---v function(mod: MCM_MOD, name: string, min: number, max: number, default: number, step: number, ui_name: string?, ui_tooltip: string?) --> MCM_VAR
+--v function(mod: MCM_MOD, name: string, min: number, max: number, default: number, step: number, ui_name: string, ui_tooltip: string) --> MCM_VAR
 function mcm_var.new(mod, name, min, max, default, step, ui_name, ui_tooltip)
     local self = {}
     setmetatable(self, {
@@ -411,7 +411,7 @@ end
 
 local mcm_tweaker = {} --# assume mcm_tweaker: MCM_TWEAKER
 
---v function(mod: MCM_MOD, name: string, ui_title: string?, ui_tooltip: string?) --> MCM_TWEAKER
+--v function(mod: MCM_MOD, name: string, ui_title: string, ui_tooltip: string) --> MCM_TWEAKER
 function mcm_tweaker.new(mod, name, ui_title, ui_tooltip)
     local self = {}
     setmetatable(self, {
@@ -473,7 +473,7 @@ end
 ------------------------------------------------------------------------------------------------------------------------
 local mcm_option = {} --# assume mcm_option: MCM_OPTION
 
---v function(tweaker: MCM_TWEAKER, key: string, ui_name: string?, ui_tooltip: string?) --> MCM_OPTION
+--v function(tweaker: MCM_TWEAKER, key: string, ui_name: string, ui_tooltip: string) --> MCM_OPTION
 function mcm_option.new(tweaker, key, ui_name, ui_tooltip)
     local self = {}
     setmetatable(self, {
@@ -609,7 +609,7 @@ function mcm_tweaker.num_options(self)
 end
 
 
---v function(self: MCM_TWEAKER, key: string, ui_name: string?, ui_tooltip: string?) --> MCM_OPTION
+--v function(self: MCM_TWEAKER, key: string, ui_name: string, ui_tooltip: string) --> MCM_OPTION
 function mcm_tweaker.add_option(self, key, ui_name, ui_tooltip)
     if not (is_string(key) and  (is_string(ui_name) or not ui_name) and (is_string(ui_tooltip) or not ui_tooltip)) then
         self:log("ERROR: attempted to create a new option for tweaker ["..self:name().."] in mod ["..self:mod():name().."], but a provided key, ui_name or ui_tooltip was not a string!")
@@ -708,7 +708,7 @@ end
 
 
 
---v function(self: MCM_MOD, key: string, ui_name: string?, ui_tooltip: string?) --> MCM_TWEAKER
+--v function(self: MCM_MOD, key: string, ui_name: string, ui_tooltip: string) --> MCM_TWEAKER
 function mcm_mod.add_tweaker(self, key, ui_name, ui_tooltip)
     if not (is_string(key) and  (is_string(ui_name) or not ui_name) and (is_string(ui_tooltip) or not ui_tooltip)) then
         self:log("ERROR: attempted to create a new tweaker for mod ["..self:name().."], but a provided key, ui_name or ui_tooltip was not a string!")
@@ -725,7 +725,7 @@ function mcm_mod.add_tweaker(self, key, ui_name, ui_tooltip)
     return self:tweakers()[key]
 end
 
---v function(self: MCM_MOD, key: string, min: number, max: number, default: number, step: number, ui_name: string?, ui_tooltip: string?) --> MCM_VAR
+--v function(self: MCM_MOD, key: string, min: number, max: number, default: number, step: number, ui_name: string, ui_tooltip: string) --> MCM_VAR
 function mcm_mod.add_variable(self, key, min, max, default, step, ui_name, ui_tooltip)
     if (ui_name and not is_string(ui_name)) or (ui_tooltip and not is_string(ui_tooltip)) or (not is_string(key)) then
         self:log("ERROR: attempted to create a new variable for mod ["..self:name().."], but a provided key, ui_name or ui_tooltip was not a string!")
@@ -754,7 +754,7 @@ end
 
 
 
---v function(self: MOD_CONFIGURATION_MANAGER, key: string, ui_name: string?, ui_tooltip: string?) --> MCM_MOD
+--v function(self: MOD_CONFIGURATION_MANAGER, key: string, ui_name: string, ui_tooltip: string) --> MCM_MOD
 function mod_configuration_manager.register_mod(self, key, ui_name, ui_tooltip)
     if not (is_string(key) and (is_string(ui_name) or not ui_name) and (is_string(ui_tooltip) or not ui_tooltip))then 
         self:log("ERROR: attempted to create a new mod, but a provided key, ui_text, or ui_tooltip is not a string!")
