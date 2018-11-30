@@ -112,6 +112,25 @@ function mod_configuration_manager.set_should_warn(self)
     self._warnLuaErrors = true
 end
 
+--v function(obj: any) --> boolean
+function mod_configuration_manager.is_mod(obj)
+    return tostring(obj) == "MCM_MOD"
+end
+
+--v function(obj: any) --> boolean
+function mod_configuration_manager.is_tweaker(obj)
+    return tostring(obj) == "MCM_TWEAKER"
+end
+
+--v function(obj: any) --> boolean
+function mod_configuration_manager.is_variable(obj)
+    return tostring(obj) == "MCM_VAR"
+end
+
+--v function(obj: any) --> boolean
+function mod_configuration_manager.is_tweaker_option(obj)
+    return tostring(obj) == "MCM_OPTION"
+end
 
 --logs lua errors to a file after this is called.
 --v [NO_CHECK] 
@@ -257,6 +276,7 @@ function mcm_var.new(mod, name, min, max, default, step, ui_name, ui_tooltip)
     self._minValue = min
     self._maxValue = max
     self._stepValue = step
+    self._defaultValue = default
     self._UIName = ui_name or "Unnamed Variable"
     self._UIToolTip = ui_tooltip or " "
 
@@ -307,7 +327,10 @@ function mcm_var.log(self, text)
     self:mod():log(text)
 end
     
-
+--v function(self: MCM_VAR) --> number
+function mcm_var.default_value(self)
+    return self._defaultValue
+end
 
 --v function(self: MCM_VAR) --> number
 function mcm_var.current_value(self)
@@ -481,6 +504,7 @@ function mcm_option.new(tweaker, key, ui_name, ui_tooltip)
         __tostring = function() return "MCM_OPTION" end
     }) --# assume self: MCM_OPTION
     self._tweaker = tweaker
+    self._wasDefault = false --:boolean
     self._name = key
     self._UIName = ui_name or "Unnamed Option"
     self._UIToolTip = ui_tooltip or " "
@@ -500,6 +524,7 @@ function mcm_option.null(tweaker)
     self._UIName = ""
     self._UIToolTip = ""
     self._callback = nil 
+    self._wasDefault = false
     return self
 end
 
@@ -532,6 +557,21 @@ end
 --v function(self: MCM_OPTION) --> boolean
 function mcm_option.has_callback(self)
     return not not self._callback
+end
+
+--v function(self: MCM_OPTION)
+function mcm_option.flag_default(self)
+    self._wasDefault = true
+end
+
+--v function(self: MCM_OPTION) --> boolean
+function mcm_option.is_default(self)
+    return self._wasDefault
+end
+
+--v function(self: MCM_OPTION) 
+function mcm_option.no_longer_default(self)
+    self._wasDefault = false
 end
 
 --v function(self: MCM_OPTION, callback: function(context: MOD_CONFIGURATION_MANAGER))
@@ -619,7 +659,7 @@ function mcm_tweaker.add_option(self, key, ui_name, ui_tooltip)
         self:log("WARNING: attempted to create an option with key ["..key.."] for tweaker ["..self:name().."] in mod ["..self:mod():name().."], but an option with that key already exists! Returning the existing option instead")
         return self:options()[key]
     end
-    if self._numOptions == 9 then
+    if self._numOptions == 8 then
         self:log("ERROR: attempted to create a new option for tweaker ["..self:name().."] in mod ["..self:mod():name().."] but that tweaker already has 9 options!")
         return mcm_option.null(self)
     end
@@ -629,9 +669,23 @@ function mcm_tweaker.add_option(self, key, ui_name, ui_tooltip)
     self:log("Created Option with key ["..key.."] for tweaker ["..self:name().."] in mod ["..self:mod():name().."]")
     if self:selected_option() == nil then
         self:set_selected_option(new_option)
+        new_option:flag_default()
         self:log("Created Option is the first option for this tweaker, setting it to be the default!")
     end
     return self:options()[key]
+end
+
+--v function(self: MCM_TWEAKER, key: string)
+function mcm_tweaker.make_option_default(self, key)
+    if not self:has_option(key) then
+        self:log("Failed to make option ["..key.."] default, it was not found on this tweaker!")
+        return
+    end
+    local opt = self:get_option_with_key(key)
+    opt:flag_default()
+    local old = self:selected_option()
+    old:no_longer_default()
+    self:set_selected_option(opt)
 end
 
 --v function(self: MCM_TWEAKER, text: string)
@@ -746,6 +800,29 @@ function mcm_mod.add_variable(self, key, min, max, default, step, ui_name, ui_to
 end
 
 
+--v function(self: MCM_MOD, setting: MCM_TWEAKER | MCM_VAR) --> boolean 
+function mcm_mod.reset_setting_to_default(self, setting)
+    if self:model().is_tweaker(setting) then
+        --# assume setting: MCM_TWEAKER
+        self:log("Resetting a tweaker with name ["..setting:name().."] to default")
+        for key, option in pairs(setting:options()) do
+            if option:is_default() then
+                setting:set_selected_option(option)
+                return true
+            end
+        end
+        self:log("Warning! Asked for a reset to default but could not find an option which has a default flag!")
+        return false
+    elseif self:model().is_variable(setting) then
+        --# assume setting: MCM_VAR
+        self:log("Resetting a variable with name ["..setting:name().."] to default")
+        setting:set_current_value(setting:default_value())
+        return true
+    else
+        self:log("Error! Asked to reset a setting to default by the given object of type ["..type(setting).."], which tostrings to ["..tostring(setting).."], could not be recognized")
+        return false
+    end
+end
 
 --v function(self: MOD_CONFIGURATION_MANAGER) --> map<string, MCM_MOD>
 function mod_configuration_manager.get_mods(self)
@@ -916,6 +993,7 @@ end
 function mod_configuration_manager.add_new_game_only_callback(self, callback)
     table.insert(self._newGameOnlyCallbacks, callback)
 end
+
 
 
 mod_configuration_manager.init():error_checker()

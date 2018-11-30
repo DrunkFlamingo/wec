@@ -106,6 +106,9 @@
 --# assume TEXT_BUTTON.SetDisabled: method(disabled: boolean)
 --# assume TEXT_BUTTON.GetContentComponent: method() --> CA_UIC
 --# assume TEXT_BUTTON.SetState: method(state: BUTTON_STATE)
+--# assume TEXT_BUTTON.Width: method() --> number
+--# assume TEXT_BUTTON.Height: method() --> number
+--# assume TEXT_BUTTON.Delete: method()
 --frame
 --# assume FRAME.MoveTo: method(xPos: number, yPos: number)
 --# assume FRAME.Move: method(xMove: number, yMove: number)
@@ -127,6 +130,7 @@
 --# assume FRAME.SetTitle: method(title: string)
 --# assume FRAME.AddCloseButton: method(callback: function, cross: WHATEVER?)
 --# assume FRAME.GetContentPanel: method() --> CA_UIC
+--# assume FRAME.uic: CA_UIC
 
 --image
 --# assume IMAGE.Resize: method(width: number, height: number)
@@ -145,6 +149,11 @@
 --# assume TEXT.Resize: method(x: number, y: number)
 --# assume TEXT.SetVisible: method(visible: boolean)
 --# assume TEXT.Delete: method()
+--# assume TEXT.Position: method() --> (number, number)
+--# assume TEXT.MoveTo: method(xPos: number, yPos: number)
+--# assume TEXT.Width: method() --> number
+--# assume TEXT.Height: method() --> number
+
 --container
 --# assume CONTAINER.AddComponent: method(component: WHATEVER)
 --# assume CONTAINER.GetContentComponent: method() --> CA_UIC

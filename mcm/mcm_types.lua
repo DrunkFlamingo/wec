@@ -35,8 +35,12 @@
     --// variables additionally trigger an event called "mcm_variable_<mod_key>_<variable_key>_event".
     --// The value is easily accessible within this event through tonumber(context.string)
 --# assume MCM_MOD.get_variable_with_key: method(key: string) --> MCM_VAR
+    --// returns a null script interface when failure occurs. 
 --# assume MCM_MOD.get_tweaker_with_key: method(key: string) --> MCM_TWEAKER
+    --// returns a null script interface when failure occurs. 
 --# assume MCM_MOD.model: method() --> MCM
+--# assume MCM_MOD.has_tweaker: method(key: string) --> boolean
+--# assume MCM_MOD.has_variable: method(key: string) --> boolean
 
 --TWEAKER OBJECT
 --# assume MCM_TWEAKER.name: method() -->string
@@ -44,6 +48,8 @@
 --# assume MCM_TWEAKER.get_option_with_key: method(key: string) --> MCM_OPTION
 --# assume MCM_TWEAKER.add_option: method(key: string, ui_name: string, ui_tooltip: string) --> MCM_OPTION
     --// the first option added to any tweaker is the default value.
+--# assume MCM_TWEAKER.has_option: method(key: string) --> boolean
+--# assume MCM_TWEAKER.make_option_default: method(key: string) 
 
 --OPTION OBJECT
 --# assume MCM_OPTION.name: method() -->string
