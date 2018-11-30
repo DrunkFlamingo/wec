@@ -125,8 +125,14 @@ function loreful_empires_manager.new(starting_majors, starting_secondaries)
 	setmetatable(self, {
 		__index = loreful_empires_manager
 	}) --# assume self: LOREFUL_EMPIRES_MANAGER
-	self._majorFactions = starting_majors
-	self._secondaryFactions = starting_secondaries
+	self._majorFactions = {} --:map<string, boolean>
+	for i = 1, #starting_majors do
+		self._majorFactions[starting_majors[i]] = true
+	end
+	self._secondaryFactions = {} --:map<string, boolean>
+	for i = 1, #starting_secondaries do
+		self._secondaryFactions[starting_secondaries[i]] = true
+	end
 	self._enabled = true --:boolean
 	self._defensiveBattlesOnly = false --:boolean
 	self._factionLeadersOnly = false --:boolean
@@ -145,32 +151,30 @@ end
 
 --v function(self: LOREFUL_EMPIRES_MANAGER) --> vector<string>
 function loreful_empires_manager.get_major_list(self)
-	return self._majorFactions
+	local list = {} --:vector<string>
+	for key, value in pairs(self._majorFactions) do
+		table.insert(list, key)
+	end
+	return list
 end
 
 --v function(self: LOREFUL_EMPIRES_MANAGER) --> vector<string>
 function loreful_empires_manager.get_secondary_list(self)
-	return self._secondaryFactions
+	local list = {} --:vector<string>
+	for key, value in pairs(self._secondaryFactions) do
+		table.insert(list, key)
+	end
+	return list
 end
 
 --v function(self: LOREFUL_EMPIRES_MANAGER, faction: string) --> boolean
 function loreful_empires_manager.is_faction_major(self, faction)
-	for f = 1, #self:get_major_list() do
-		if self:get_major_list()[f] == faction then
-			return true;
-		end;
-	end;
-	return false;
+	return not not self._majorFactions[faction]
 end;
 
 --v function(self: LOREFUL_EMPIRES_MANAGER, faction: string) --> boolean
 function loreful_empires_manager.is_faction_secondary(self, faction)
-	for f = 1, #self:get_secondary_list() do
-		if self:get_secondary_list()[f] == faction then
-			return true;
-		end
-	end
-	return false;
+	return not not self._secondaryFactions[faction]
 end;
 
 
@@ -414,10 +418,14 @@ function loreful_empires_manager.activate_autoconfed_with_list(self, allowed_sc)
 		"AutoconfedFactionTurnStart",
 		"FactionTurnStart",
 		function(context)
-			return ((not context:faction():is_human()) and (not (context:faction():name() == "rebels")) and (context:faction():has_home_region()) and (not not allowed_sc[context:faction():subculture()]) )
+			local not_rebels = (not (context:faction():name() == "rebels"))
+			local not_human = (not context:faction():is_human())
+			local landed = (context:faction():has_home_region())
+			local allowed = (not not allowed_sc[context:faction():subculture()])
+			LELOG("Autoconfed: faction turn start ["..context:faction():name().."], checks ["..tostring(not_rebels).."] ["..tostring(not_human).."] ["..tostring(landed).."] ["..tostring(allowed).."]")
+			return (not_human and not_rebels and landed and allowed)
 		end,
 		function(context)
-
 			local our_faction = context:faction() --:CA_FACTION
 			local sv = cm:get_saved_value("le_autoconfed_"..our_faction:name())
 			if not not sv then
@@ -429,6 +437,8 @@ function loreful_empires_manager.activate_autoconfed_with_list(self, allowed_sc)
 				else
 					LELOG("Autoconfed: Faction ["..our_faction:name().."] is being checked.")
 				end
+			else
+				LELOG("Autoconfed: Faction ["..our_faction:name().."] is being checked.")
 			end
 			local faction_map = {} --:map<CA_FACTION, boolean>
 			-- first, check our adjacent regions for a list of factions. 
@@ -462,144 +472,6 @@ function loreful_empires_manager.activate_autoconfed_with_list(self, allowed_sc)
 end
 
 
-function wec_loreful_empires()
-	cm:set_saved_value("df_guaranteed_empires_port", true);
-	
-	out("Battle Influencer is running");
-	
-
---factions on this list gain an advantage when fighting against factions not on this list
-local major_factions = {
-	--bretonnians
-	"wh_main_brt_bretonnia",
-	"wh_main_brt_carcassonne",
-	--dwarfs
-	"wh_main_dwf_dwarfs",
-	"wh_main_dwf_karak_izor",
-	--empire
-	"wh_main_emp_empire",
-	"wh_main_emp_middenland",
-	--greenskins
-	"wh_main_grn_crooked_moon",
-	"wh_main_grn_greenskins",
-	"wh_main_grn_orcs_of_the_bloody_hand",
-	-- vampire counts
-	"wh_main_vmp_schwartzhafen",
-	"wh_main_vmp_vampire_counts",
-	--skaven
-	"wh2_dlc09_skv_clan_rictus",
-	"wh2_main_skv_clan_mors",
-	"wh2_main_skv_clan_pestilens",
-	--tomb kings
-	"wh2_dlc09_tmb_exiles_of_nehek",
-	"wh2_dlc09_tmb_followers_of_nagash",
-	"wh2_dlc09_tmb_khemri",
-	"wh2_dlc09_tmb_lybaras",
-	--dark elves
-	"wh2_main_def_naggarond",
-	"wh2_main_def_har_ganeth",
-	"wh2_main_def_cult_of_pleasure",
-	--high elves
-	"wh2_main_hef_order_of_loremasters",
-	"wh2_main_hef_eataine",
-	"wh2_main_hef_nagarythe",
-	"wh2_main_hef_avelorn",
-	--lizardmen
-	"wh2_main_lzd_last_defenders",
-	"wh2_main_lzd_hexoatl",
-	"wh2_main_lzd_itza",
-	--norsca
-	"wh_dlc08_nor_wintertooth"
-	};
-	
-	--these factions do not get an advantage but can never have an advantage granted against them.
-	local secondary_factions = {
-	--kislev
-	"wh_main_ksl_kislev",
-	--dwarves
-	"wh_main_dwf_karak_kadrin",
-	"wh2_main_dwf_karak_zorn",
-	"wh_main_dwf_kraka_drak",
-	"wh_main_dwf_barak_varr",
-	"wh_main_dwf_karak_azul",
-	--empire
-	"wh_main_emp_averland",
-	"wh_main_emp_marienburg",
-	"wh_main_emp_cult_of_ulric",
-	"wh_main_emp_cult_of_sigmar",
-	--greenskins
-	"wh_main_grn_red_eye",
-	"wh_main_grn_red_fangs",
-	"wh_main_grn_necksnappers_waaagh",
-	"wh_main_grn_orcs_of_the_bloody_hand_waaagh",
-	"wh_main_grn_red_eye_waaagh",
-	"wh_main_grn_red_fangs_waaagh",
-	"wh_main_grn_greenskins_waaagh",
-	"wh_main_grn_skullsmasherz_waaagh",
-	"wh_main_grn_scabby_eye_waaagh",
-	"wh_main_grn_teef_snatchaz_waaagh",
-	"wh_main_grn_crooked_moon_waaagh",
-	"wh_main_grn_broken_nose_waaagh",
-	"wh_main_grn_black_venom_waaagh",
-	"wh_main_grn_bloody_spearz_waaagh",
-	--teb
-	"wh_main_teb_border_princes",
-	"wh_main_teb_estalia",
-	"wh_main_teb_tilea",
-	"wh2_main_emp_new_world_colonies",
-	"wh2_main_emp_sudenburg",
-	"wh_main_teb_bilbali",
-	"wh_main_teb_lichtenburg_confederacy",
-	"wh_main_teb_magritta",
-	"wh_main_teb_tobaro",
-	--dark elves
-	"wh2_main_def_scourge_of_khaine",
-	"wh2_main_def_hag_graef",
-	"wh2_main_def_karond_kar",
-	"wh2_dlc11_def_the_blessed_dread",
-	--wood elves
-	"wh_dlc05_wef_torgovann",
-	"wh_dlc05_wef_wood_elves",
-	"wh_dlc05_wef_wydrioth",
-	"wh_dlc05_wef_argwylon",
-	--high elves
-	
-	"wh2_main_hef_caledor",
-	"wh2_main_hef_chrace",
-	"wh2_main_hef_saphery",
-	"wh2_main_hef_tiranoc",
-	"wh2_main_hef_cothique",
-	"wh2_main_hef_ellyrion",
-	"wh2_main_hef_yvresse",
-	--lizardmen
-	"wh2_main_lzd_xlanhuapec",
-	--norsca
-	"wh2_main_nor_skeggi",
-	"wh_dlc08_nor_norsca",
-	--skaven
-	"wh2_main_skv_clan_eshin",
-	"wh2_main_skv_clan_skyre",
-	"wh2_main_skv_clan_moulder",
-	-- vampire counts
-	"wh_main_vmp_mousillon",
-	-- pirates!
-	"wh2_dlc11_cst_pirates_of_sartosa",
-	"wh2_dlc11_cst_noctilus",
-	"wh2_dlc11_cst_vampire_coast",
-	"wh2_dlc11_cst_the_drowned",
-
-	--chaos
-	"wh_main_chs_chaos"
-	};
-	
-	local lem = loreful_empires_manager.new(major_factions, secondary_factions)
-	lem:activate()
-	
-	
-
-end;
-
-
 
 --API
 
@@ -611,19 +483,7 @@ function loreful_empires_manager.remove_faction_from_major(self, faction_key)
 		script_error("LOREFUL EMPIRES API: Incorrect argument Type: Use the logging pack to see more details!")
 		return
 	end
-
-	if not self:is_faction_major(faction_key) then
-		LELOG("API: Called remove_faction_from_major for ["..faction_key.."], but this faction is not on the major list!")
-		return
-	end
-	for i = 1, #self:get_major_list() do
-		local current_faction = self:get_major_list()[i]
-		if current_faction == faction_key then
-			table.remove(self:get_major_list(), i)
-			LELOG("Successfully removed ["..faction_key.."] from the major list!")
-			break
-		end
-	end
+	self._majorFactions[faction_key] = nil
 end
 
 --v function(self: LOREFUL_EMPIRES_MANAGER, faction_key: string)
@@ -633,18 +493,7 @@ function loreful_empires_manager.remove_faction_from_secondary(self, faction_key
 		script_error("LOREFUL EMPIRES API: Incorrect argument Type: Use the logging pack to see more details!")
 		return
 	end
-	if not self:is_faction_secondary(faction_key) then
-		LELOG("API: Called remove_faction_from_secondary for ["..faction_key.."], but this faction is not on the secondary list!")
-		return
-	end
-	for i = 1, #self:get_secondary_list() do
-		local current_faction = self:get_secondary_list()[i]
-		if current_faction == faction_key then
-			table.remove(self:get_secondary_list(), i)
-			LELOG("Successfully removed ["..faction_key.."] from the secondary list!")
-			break
-		end
-	end
+	self._secondaryFactions[faction_key] = nil
 end
 
 --v function(self: LOREFUL_EMPIRES_MANAGER, faction_key: string)
@@ -654,15 +503,11 @@ function loreful_empires_manager.add_faction_to_major(self, faction_key)
 		script_error("LOREFUL EMPIRES API: Incorrect argument Type: Use the logging pack to see more details!")
 		return
 	end
-	if self:is_faction_major(faction_key) then
-		LELOG("API: Called add_faction_to_major for ["..faction_key.."], but this faction is already on the major list!")
-		return
-	end
 	if self:is_faction_secondary(faction_key) then
 		LELOG("API: faction being added to major is currently secondary, removing it.")
 		self:remove_faction_from_secondary(faction_key)
 	end
-	table.insert(self:get_major_list(), faction_key)
+	self._majorFactions[faction_key] = true
 	LELOG("API: Added ["..faction_key.."] to the major list! ")
 end
 
@@ -673,15 +518,11 @@ function loreful_empires_manager.add_faction_to_secondary(self, faction_key)
 		script_error("LOREFUL EMPIRES API: Incorrect argument Type: Use the logging pack to see more details!")
 		return
 	end
-	if self:is_faction_secondary(faction_key) then
-		LELOG("API: This faction is already on the secondary list!")
-		return
-	end
 	if self:is_faction_major(faction_key) then
 		LELOG("API: faction being added to secondary is currently major, removing it.")
 		self:remove_faction_from_major(faction_key)
 	end
-	table.insert(self:get_secondary_list(), faction_key)
+	self._secondaryFactions[faction_key] = true
 	LELOG("API: Added ["..faction_key.."] to the secondary list!")
 end
 
@@ -763,58 +604,193 @@ function loreful_empires_manager.set_autoconfed_cooldown(self, option)
 	LELOG("API: Set autoconfederate cooldown to ["..tostring(option).."]")
 end
 
---mcm integration
-local mcm = _G.mcm
-if not not mcm then
-	local lem = _G.lem
-	local settings = mcm:register_mod("loreful_empires", "Loreful Empires", "Major faction autoresolve bonuses for lore factions")
-	local enable = settings:add_tweaker("enable_mod", "Enable Mod", "Enables or disables autoresolve influencing for this mod.")
-	enable:add_option("enabled", "Enable", "Enable this mod.")
-	enable:add_option("disabled", "Disable", "Disable this mod."):add_callback(function(context) 
-		lem._enabled = false
-	end)
-	local autoconfed = settings:add_tweaker("confed", "Major AI Auto-confederate", "When enabled, major factions will confederate any minor factions they have a high enough relationship with automatically.")
-	autoconfed:add_option("disabled", "Disable", "Do not turn on this feature")
-	autoconfed:add_option("enabled", "Enable", "Turn on this feature"):add_callback(function(context)
-		lem:set_enable_autoconfederate(true)
-		local list = {
-			wh_main_sc_brt_bretonnia = true,
-			wh_main_sc_dwf_dwarfs = true,
-			wh_main_sc_emp_empire = true,
-			wh2_main_sc_def_dark_elves = true,
-			wh2_main_sc_hef_high_elves = true,
-			wh2_main_sc_lzd_lizardmen = true
-		}--:map<string, boolean>
 
-		lem:activate_autoconfed_with_list(list)
-	end)
-	settings:add_variable("confed_cd", 1, 25, 10, 1, "Auto-confederate Cooldown", "The period of time between each confederation that can be automatically triggered for a faction"):add_callback(function(context)
-		lem:set_autoconfed_cooldown(settings:get_variable_with_key("confed_cd"):current_value() - 1)
-	end)
-	local defensive_restriction = settings:add_tweaker("defensive_restriction", "Defensive Battles Only", "Makes the mod only support defensive battles.")
-	defensive_restriction:add_option("defensive_restriction_off", "All battles", "This mod will impact offensive battles.")
-	defensive_restriction:add_option("defensive_restriction_on", "Defensive Battles", "Disable this mod for attackers."):add_callback(function(context) 
-		lem:set_defensive_battles_only(true)
-	end)
-	local leader_restriction = settings:add_tweaker("leader_restriction", "Faction Leaders only", "Makes this mod only influence when a legendary lord is involved.")
-	leader_restriction:add_option("leader_restriction_off", "All Characters", "This mod will impact battles for any character.")
-	leader_restriction:add_option("leader_restriction_on", "Faction Leaders Only", "Disable this mod for non-faction leaders."):add_callback(function(context) 
-		lem:set_faction_leaders_only(true)
-	end)
-	local enable_for_allies = settings:add_tweaker("allies", "Ignore allies", "Makes this mod ignore battles where a player's ally is involved")
-	enable_for_allies:add_option("allies_off", "Ignore Allies", "This mod will not impact battles which involve one of your allies.")
-	enable_for_allies:add_option("allies_on", "Function for Allies", "This mod will impact battles regardless of alliance to a player."):add_callback(function(context) 
-		lem:set_enable_script_for_allies(true)
-	end)
-	local secondary_factions = settings:add_tweaker("secondary_factions", "Secondary Factions", "Secondary factions are factions who are not given bonuses to their expansion, but who are important to lore and are thus protected from their enemies being given bonuses.")
-	secondary_factions:add_option("secondary_factions_on", "Enabled (Recommended)", "This mod will not impact battles involving secondary factions")
-	secondary_factions:add_option("secondary_factions_off", "Disabled", "This mod will not protect secondary factions"):add_callback(function(context) 
-		lem:set_protect_secondary_factions(false)
-	end)
-	secondary_factions:add_option("secondary_factions_major", "Treat as major", "This mod will add the secondary factions list to the major factions list"):add_callback(function(context)
-		lem:set_protect_secondary_factions(false)
-		for i = 1, #lem:get_secondary_list() do
-			lem:add_faction_to_major(lem:get_secondary_list()[i])
-		end
-	end)
-end
+
+function wec_loreful_empires()
+	cm:set_saved_value("df_guaranteed_empires_port", true);
+	
+	out("Battle Influencer is running");
+	
+
+	--factions on this list gain an advantage when fighting against factions not on this list
+	local major_factions = {
+		--bretonnians
+		"wh_main_brt_bretonnia",
+		"wh_main_brt_carcassonne",
+		--dwarfs
+		"wh_main_dwf_dwarfs",
+		"wh_main_dwf_karak_izor",
+		--empire
+		"wh_main_emp_empire",
+		"wh_main_emp_middenland",
+		--greenskins
+		"wh_main_grn_crooked_moon",
+		"wh_main_grn_greenskins",
+		"wh_main_grn_orcs_of_the_bloody_hand",
+		-- vampire counts
+		"wh_main_vmp_schwartzhafen",
+		"wh_main_vmp_vampire_counts",
+		--skaven
+		"wh2_dlc09_skv_clan_rictus",
+		"wh2_main_skv_clan_mors",
+		"wh2_main_skv_clan_pestilens",
+		--tomb kings
+		"wh2_dlc09_tmb_exiles_of_nehek",
+		"wh2_dlc09_tmb_followers_of_nagash",
+		"wh2_dlc09_tmb_khemri",
+		"wh2_dlc09_tmb_lybaras",
+		--dark elves
+		"wh2_main_def_naggarond",
+		"wh2_main_def_har_ganeth",
+		"wh2_main_def_cult_of_pleasure",
+		--high elves
+		"wh2_main_hef_order_of_loremasters",
+		"wh2_main_hef_eataine",
+		"wh2_main_hef_nagarythe",
+		"wh2_main_hef_avelorn",
+		--lizardmen
+		"wh2_main_lzd_last_defenders",
+		"wh2_main_lzd_hexoatl",
+		"wh2_main_lzd_itza",
+		--norsca
+		"wh_dlc08_nor_wintertooth"
+		};
+		
+		--these factions do not get an advantage but can never have an advantage granted against them.
+		local secondary_factions = {
+		--kislev
+		"wh_main_ksl_kislev",
+		--dwarves
+		"wh_main_dwf_karak_kadrin",
+		"wh2_main_dwf_karak_zorn",
+		"wh_main_dwf_kraka_drak",
+		"wh_main_dwf_barak_varr",
+		"wh_main_dwf_karak_azul",
+		--empire
+		"wh_main_emp_averland",
+		"wh_main_emp_marienburg",
+		"wh_main_emp_cult_of_ulric",
+		"wh_main_emp_cult_of_sigmar",
+		--greenskins
+		"wh_main_grn_red_eye",
+		"wh_main_grn_red_fangs",
+		"wh_main_grn_necksnappers_waaagh",
+		"wh_main_grn_orcs_of_the_bloody_hand_waaagh",
+		"wh_main_grn_red_eye_waaagh",
+		"wh_main_grn_red_fangs_waaagh",
+		"wh_main_grn_greenskins_waaagh",
+		"wh_main_grn_skullsmasherz_waaagh",
+		"wh_main_grn_scabby_eye_waaagh",
+		"wh_main_grn_teef_snatchaz_waaagh",
+		"wh_main_grn_crooked_moon_waaagh",
+		"wh_main_grn_broken_nose_waaagh",
+		"wh_main_grn_black_venom_waaagh",
+		"wh_main_grn_bloody_spearz_waaagh",
+		--teb
+		"wh_main_teb_border_princes",
+		"wh_main_teb_estalia",
+		"wh_main_teb_tilea",
+		"wh2_main_emp_new_world_colonies",
+		"wh2_main_emp_sudenburg",
+		"wh_main_teb_bilbali",
+		"wh_main_teb_lichtenburg_confederacy",
+		"wh_main_teb_magritta",
+		"wh_main_teb_tobaro",
+		--dark elves
+		"wh2_main_def_scourge_of_khaine",
+		"wh2_main_def_hag_graef",
+		"wh2_main_def_karond_kar",
+		"wh2_dlc11_def_the_blessed_dread",
+		--wood elves
+		"wh_dlc05_wef_torgovann",
+		"wh_dlc05_wef_wood_elves",
+		"wh_dlc05_wef_wydrioth",
+		"wh_dlc05_wef_argwylon",
+		--high elves
+		
+		"wh2_main_hef_caledor",
+		"wh2_main_hef_chrace",
+		"wh2_main_hef_saphery",
+		"wh2_main_hef_tiranoc",
+		"wh2_main_hef_cothique",
+		"wh2_main_hef_ellyrion",
+		"wh2_main_hef_yvresse",
+		--lizardmen
+		"wh2_main_lzd_xlanhuapec",
+		--norsca
+		"wh2_main_nor_skeggi",
+		"wh_dlc08_nor_norsca",
+		--skaven
+		"wh2_main_skv_clan_eshin",
+		"wh2_main_skv_clan_skyre",
+		"wh2_main_skv_clan_moulder",
+		-- vampire counts
+		"wh_main_vmp_mousillon",
+		-- pirates!
+		"wh2_dlc11_cst_pirates_of_sartosa",
+		"wh2_dlc11_cst_noctilus",
+		"wh2_dlc11_cst_vampire_coast",
+		"wh2_dlc11_cst_the_drowned",
+
+		--chaos
+		"wh_main_chs_chaos"
+		};
+	
+	local lem = loreful_empires_manager.new(major_factions, secondary_factions)
+	lem:activate()
+		--mcm integration
+	local mcm = _G.mcm
+	if not not mcm then
+		local settings = mcm:register_mod("loreful_empires", "Loreful Empires", "Major faction autoresolve bonuses for lore factions")
+		local enable = settings:add_tweaker("enable_mod", "Enable Mod", "Enables or disables autoresolve influencing for this mod.")
+		enable:add_option("enabled", "Enable", "Enable this mod.")
+		enable:add_option("disabled", "Disable", "Disable this mod."):add_callback(function(context) 
+			lem._enabled = false
+		end)
+		local autoconfed = settings:add_tweaker("confed", "Major AI Auto-confederate", "When enabled, major factions will confederate any minor factions they have a high enough relationship with automatically.")
+		autoconfed:add_option("disabled", "Disable", "Do not turn on this feature")
+		autoconfed:add_option("enabled", "Enable", "Turn on this feature"):add_callback(function(context)
+			lem:set_enable_autoconfederate(true)
+			local list = {
+				wh_main_sc_brt_bretonnia = true,
+				wh_main_sc_dwf_dwarfs = true,
+				wh_main_sc_emp_empire = true,
+				wh2_main_sc_def_dark_elves = true,
+				wh2_main_sc_hef_high_elves = true,
+				wh2_main_sc_lzd_lizardmen = true
+			}--:map<string, boolean>
+
+			lem:activate_autoconfed_with_list(list)
+		end)
+		settings:add_variable("confed_cd", 1, 25, 10, 1, "Auto-confederate Cooldown", "The period of time between each confederation that can be automatically triggered for a faction"):add_callback(function(context)
+			lem:set_autoconfed_cooldown(settings:get_variable_with_key("confed_cd"):current_value() - 1)
+		end)
+		local defensive_restriction = settings:add_tweaker("defensive_restriction", "Defensive Battles Only", "Makes the mod only support defensive battles.")
+		defensive_restriction:add_option("defensive_restriction_off", "All battles", "This mod will impact offensive battles.")
+		defensive_restriction:add_option("defensive_restriction_on", "Defensive Battles", "Disable this mod for attackers."):add_callback(function(context) 
+			lem:set_defensive_battles_only(true)
+		end)
+		local leader_restriction = settings:add_tweaker("leader_restriction", "Faction Leaders only", "Makes this mod only influence when a legendary lord is involved.")
+		leader_restriction:add_option("leader_restriction_off", "All Characters", "This mod will impact battles for any character.")
+		leader_restriction:add_option("leader_restriction_on", "Faction Leaders Only", "Disable this mod for non-faction leaders."):add_callback(function(context) 
+			lem:set_faction_leaders_only(true)
+		end)
+		local enable_for_allies = settings:add_tweaker("allies", "Ignore allies", "Makes this mod ignore battles where a player's ally is involved")
+		enable_for_allies:add_option("allies_off", "Ignore Allies", "This mod will not impact battles which involve one of your allies.")
+		enable_for_allies:add_option("allies_on", "Function for Allies", "This mod will impact battles regardless of alliance to a player."):add_callback(function(context) 
+			lem:set_enable_script_for_allies(true)
+		end)
+		local secondary_factions = settings:add_tweaker("secondary_factions", "Secondary Factions", "Secondary factions are factions who are not given bonuses to their expansion, but who are important to lore and are thus protected from their enemies being given bonuses.")
+		secondary_factions:add_option("secondary_factions_on", "Enabled (Recommended)", "This mod will not impact battles involving secondary factions")
+		secondary_factions:add_option("secondary_factions_off", "Disabled", "This mod will not protect secondary factions"):add_callback(function(context) 
+			lem:set_protect_secondary_factions(false)
+		end)
+		secondary_factions:add_option("secondary_factions_major", "Treat as major", "This mod will add the secondary factions list to the major factions list"):add_callback(function(context)
+			lem:set_protect_secondary_factions(false)
+			local secondaries = lem:get_secondary_list()
+			for i = 1, #secondaries do
+				lem:add_faction_to_major(secondaries[i])
+			end
+		end)
+	end
+end;
