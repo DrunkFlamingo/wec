@@ -127,11 +127,15 @@ function loreful_empires_manager.new(starting_majors, starting_secondaries)
 	}) --# assume self: LOREFUL_EMPIRES_MANAGER
 	self._majorFactions = starting_majors
 	self._secondaryFactions = starting_secondaries
+	self._enabled = true --:boolean
 	self._defensiveBattlesOnly = false --:boolean
+	self._factionLeadersOnly = false --:boolean
+	self._secondaryProtection = true --:boolean
 	self._nearbyPlayerRestriction = true--:boolean
 	self._enableScriptForAllies = false--:boolean
-	self._autoconfed_enabled = true --:boolean
+	self._autoconfed_enabled = false --:boolean
 	self._autoconfed_list = {} --:map<string, boolean>
+	self._autoconfed_cooldown = 9 --:number
 
 
 	_G.lem = self
@@ -185,84 +189,176 @@ function loreful_empires_manager.nearby_player_restriction(self)
 	return self._nearbyPlayerRestriction
 end
 
+--v function(self: LOREFUL_EMPIRES_MANAGER) --> boolean
+function loreful_empires_manager.autoconfederate_enabled(self)
+	return self._autoconfed_enabled
+end
+
+--v function(self: LOREFUL_EMPIRES_MANAGER) --> boolean
+function loreful_empires_manager.protect_secondary(self)
+	return self._secondaryProtection
+end
+
+--v function(self: LOREFUL_EMPIRES_MANAGER) --> number
+function loreful_empires_manager.autoconfed_cooldown(self)
+	return self._autoconfed_cooldown
+end
+
+--v function(self: LOREFUL_EMPIRES_MANAGER) --> boolean
+function loreful_empires_manager.faction_leaders_only(self)
+	return self._factionLeadersOnly
+end
+
 
 --v function(self: LOREFUL_EMPIRES_MANAGER, context: WHATEVER)
 function loreful_empires_manager.influence_battle(self, context)
-	local attacking_faction = context:pending_battle():attacker():faction() --:CA_FACTION
-	local defending_faction = context:pending_battle():defender():faction() --:CA_FACTION
+	if self._enabled == false then
+		return 
+	end
+	local pb = context:pending_battle() --:CA_PENDING_BATTLE
+	local attacking_faction = pb:attacker():faction() --:CA_FACTION
+	local defending_faction = pb:defender():faction() --:CA_FACTION
 	local attacker_is_major = self:is_faction_major(attacking_faction:name())
 	local defender_is_major = self:is_faction_major(defending_faction:name());
 	local attacker_is_secondary = self:is_faction_secondary(attacking_faction:name());
 	local defender_is_secondary = self:is_faction_secondary(defending_faction:name());
+	local attacker_is_leader = pb:attacker():is_faction_leader()
+	local defender_is_leader = pb:defender():is_faction_leader()
 	local player_factions = GetPlayerFactions()
-	LELOG("DFME:\n#### BATTLE ####\n"..attacking_faction:name().." v "..defending_faction:name());
+	LELOG("Battle Influencer:\n#### BATTLE ####\n"..attacking_faction:name().." v "..defending_faction:name());
 
 	if attacking_faction:is_human() == false and defending_faction:is_human() == false then
-		if defender_is_secondary == false and attacker_is_secondary == false then 
+		if (defender_is_secondary == false and attacker_is_secondary == false) or self:protect_secondary() == false then 
 			if attacker_is_major == true and defender_is_major == false then
-				LELOG("DFME:Major Attacker v Minor Defender");
+				if (not self:faction_leaders_only()) or attacker_is_leader == true then
+					LELOG("Battle Influencer:Major Attacker v Minor Defender");
 
-				if self:defensive_battles_only() == false then
+					if self:defensive_battles_only() == false then
+						--If the minor faction is the player's military ally, we don't give bonuses to the major faction
+						local ally_involved = CheckIfFactionIsPlayersAlly(player_factions, defending_faction);
+						
+						if self:enable_script_for_allies() == true then
+							ally_involved = false;
+						else
+							LELOG("Battle Influencer:Ally Involved: "..tostring(ally_involved));
+						end
+
+						if ally_involved == false then
+							--If any of the player's armies/navies is close to the battle, the major faction won't receive the bonuses
+							local player_nearby = false;
+							if self:nearby_player_restriction() == true then
+								player_nearby = CheckIfPlayerIsNearFaction(player_factions, context:pending_battle():defender():military_force());
+							end
+							LELOG("Battle Influencer:Player Nearby: "..tostring(player_nearby));
+
+							if player_nearby == false then
+								--Arguments: attacker win chance, defender win chance, attacker losses modifier, defender losses modifier
+								LELOG("Battle Influencer:Modified autoresolve for "..context:pending_battle():attacker():faction():name());
+								cm:win_next_autoresolve_battle(context:pending_battle():attacker():faction():name());
+								cm:modify_next_autoresolve_battle(1, 0, 1, 20, true);
+							end
+						end
+					else
+						LELOG("Battle Influencer:No autoresolve modification because the script is disabled for offensive battles.");
+					end
+				else
+					LELOG("Battle Influencer:Major Faction is not being led by their FL, and the tweaker is set!")
+				end
+			elseif attacker_is_major == false and defender_is_major == true then
+				if (not self:faction_leaders_only()) or defender_is_leader == true then
+					LELOG("Battle Influencer:Minor Attacker v Major Defender");
+
 					--If the minor faction is the player's military ally, we don't give bonuses to the major faction
 					local ally_involved = CheckIfFactionIsPlayersAlly(player_factions, defending_faction);
-					
+						
 					if self:enable_script_for_allies() == true then
 						ally_involved = false;
 					else
-						LELOG("DFME:Ally Involved: "..tostring(ally_involved));
+						LELOG("Battle Influencer:Ally Involved: "..tostring(ally_involved));
 					end
 
 					if ally_involved == false then
-						--If any of the player's armies/navies is close to the battle, the major faction won't receive the bonuses
+						--If any of the player's forces is close to the battle, the major faction won't receive the bonuses
 						local player_nearby = false;
 						if self:nearby_player_restriction() == true then
-							player_nearby = CheckIfPlayerIsNearFaction(player_factions, context:pending_battle():defender():military_force());
+							player_nearby = CheckIfPlayerIsNearFaction(player_factions, context:pending_battle():attacker():military_force());
 						end
-						LELOG("DFME:Player Nearby: "..tostring(player_nearby));
+						LELOG("Battle Influencer:Player Nearby: "..tostring(player_nearby));
 
 						if player_nearby == false then
-							--Arguments: attacker win chance, defender win chance, attacker losses modifier, defender losses modifier
-							LELOG("DFME:Modified autoresolve for "..context:pending_battle():attacker():faction():name());
-							cm:win_next_autoresolve_battle(context:pending_battle():attacker():faction():name());
-							cm:modify_next_autoresolve_battle(1, 0, 1, 20, true);
-						end
-					end
-				else
-					LELOG("DFME:No autoresolve modification");
-				end
-			elseif attacker_is_major == false and defender_is_major == true then
-				LELOG("DFME:Minor Attacker v Major Defender");
-
-				--If the minor faction is the player's military ally, we don't give bonuses to the major faction
-				local ally_involved = CheckIfFactionIsPlayersAlly(player_factions, defending_faction);
-					
-				if self:enable_script_for_allies() == true then
-					ally_involved = false;
-				else
-					LELOG("DFME:Ally Involved: "..tostring(ally_involved));
-				end
-
-				if ally_involved == false then
-					--If any of the player's forces is close to the battle, the major faction won't receive the bonuses
-					local player_nearby = false;
-					if self:nearby_player_restriction() == true then
-						player_nearby = CheckIfPlayerIsNearFaction(player_factions, context:pending_battle():attacker():military_force());
-					end
-					LELOG("DFME:Player Nearby: "..tostring(player_nearby));
-
-					if player_nearby == false then
-						LELOG("DFME:Modified autoresolve for "..context:pending_battle():defender():faction():name());
+							LELOG("Battle Influencer:Modified autoresolve for "..context:pending_battle():defender():faction():name());
 							cm:win_next_autoresolve_battle(context:pending_battle():defender():faction():name());
-						cm:modify_next_autoresolve_battle(0, 1, 20, 1, true);
-					end;
+							cm:modify_next_autoresolve_battle(0, 1, 20, 1, true);
+						end;
+					end
+				else
+					LELOG("Battle Influencer:Major Faction is not being led by their FL, and the tweaker is set!")
 				end
 			elseif attacker_is_major == true and defender_is_major == true then
-				LELOG("DFME:Major Attacker v Major Defender");
+				if self:faction_leaders_only() and defender_is_leader == false then
+					LELOG("Battle Influencer:Major Attacker v Major Defender; Defender failed leadership requirement");
+					if self:defensive_battles_only() == false then
+						--If the minor faction is the player's military ally, we don't give bonuses to the major faction
+						local ally_involved = CheckIfFactionIsPlayersAlly(player_factions, defending_faction);
+						
+						if self:enable_script_for_allies() == true then
+							ally_involved = false;
+						else
+							LELOG("Battle Influencer:Ally Involved: "..tostring(ally_involved));
+						end
+
+						if ally_involved == false then
+							--If any of the player's armies/navies is close to the battle, the major faction won't receive the bonuses
+							local player_nearby = false;
+							if self:nearby_player_restriction() == true then
+								player_nearby = CheckIfPlayerIsNearFaction(player_factions, context:pending_battle():defender():military_force());
+							end
+							LELOG("Battle Influencer:Player Nearby: "..tostring(player_nearby));
+
+							if player_nearby == false then
+								--Arguments: attacker win chance, defender win chance, attacker losses modifier, defender losses modifier
+								LELOG("Battle Influencer:Modified autoresolve for "..context:pending_battle():attacker():faction():name());
+								cm:win_next_autoresolve_battle(context:pending_battle():attacker():faction():name());
+								cm:modify_next_autoresolve_battle(1, 0, 1, 20, true);
+							end
+						end
+					else
+						LELOG("Battle Influencer:No autoresolve modification because the script is disabled for offensive battles.");
+					end
+				elseif self:faction_leaders_only() and attacker_is_leader == false then
+					LELOG("Battle Influencer:Major Attacker v Major Defender; Attacker failed leadership requirement");
+					
+					--If the minor faction is the player's military ally, we don't give bonuses to the major faction
+					local ally_involved = CheckIfFactionIsPlayersAlly(player_factions, defending_faction);
+						
+					if self:enable_script_for_allies() == true then
+						ally_involved = false;
+					else
+						LELOG("Battle Influencer:Ally Involved: "..tostring(ally_involved));
+					end
+
+					if ally_involved == false then
+						--If any of the player's forces is close to the battle, the major faction won't receive the bonuses
+						local player_nearby = false;
+						if self:nearby_player_restriction() == true then
+							player_nearby = CheckIfPlayerIsNearFaction(player_factions, context:pending_battle():attacker():military_force());
+						end
+						LELOG("Battle Influencer:Player Nearby: "..tostring(player_nearby));
+
+						if player_nearby == false then
+							LELOG("Battle Influencer:Modified autoresolve for "..context:pending_battle():defender():faction():name());
+							cm:win_next_autoresolve_battle(context:pending_battle():defender():faction():name());
+							cm:modify_next_autoresolve_battle(0, 1, 20, 1, true);
+						end;
+					end
+				else
+					LELOG("Battle Influencer:Major Attacker v Major Defender");
+				end
 			elseif attacker_is_major == false and defender_is_major == false then
-				LELOG("DFME:Minor Attacker v Minor Defender\nNo autoresolve modification");
+				LELOG("Battle Influencer:Minor Attacker v Minor Defender\nNo autoresolve modification");
 			end
 		else 
-			LELOG("DFME:Secondary Defender \nNo autoresolve modification");
+			LELOG("Battle Influencer:Secondary Involved \nNo autoresolve modification");
 		end
 	end
 end;
@@ -297,62 +393,79 @@ function(context)
 		local result = context:character():model():pending_battle():defender_battle_result();
 
 		if result == "close_victory" or result == "decisive_victory" or result == "heroic_victory" or result == "pyrrhic_victory" then
-			LELOG("DFME:-- Result --\n"..context:character():faction():name().." Won! ("..result..")");
+			LELOG("Battle Influencer:-- Result --\n"..context:character():faction():name().." Won! ("..result..")");
 		end;
 	elseif context:character():model():pending_battle():has_attacker() and context:character():model():pending_battle():attacker():cqi() == context:character():cqi() then
 		-- The character is the Attacker
 		local result = context:character():model():pending_battle():attacker_battle_result();
 
 		if result == "close_victory" or result == "decisive_victory" or result == "heroic_victory" or result == "pyrrhic_victory" then
-			LELOG("DFME:-- Result --\n"..context:character():faction():name().." Won! ("..result..")");
+			LELOG("Battle Influencer:-- Result --\n"..context:character():faction():name().." Won! ("..result..")");
 		end;
 	end;
 end;
 
 
 --autocongeal feature
-
+--need to also enable the feature flag
 --v function(self: LOREFUL_EMPIRES_MANAGER, allowed_sc: map<string, boolean>)
 function loreful_empires_manager.activate_autoconfed_with_list(self, allowed_sc)
+	core:add_listener(
+		"AutoconfedFactionTurnStart",
+		"FactionTurnStart",
+		function(context)
+			return ((not context:faction():is_human()) and (not (context:faction():name() == "rebels")) and (context:faction():has_home_region()) and (not not allowed_sc[context:faction():subculture()]) )
+		end,
+		function(context)
 
+			local our_faction = context:faction() --:CA_FACTION
+			local sv = cm:get_saved_value("le_autoconfed_"..our_faction:name())
+			if not not sv then
+				if sv > 0 then
+					sv = sv - 1
+					cm:set_saved_value("le_autoconfed_"..our_faction:name(), sv)
+					LELOG("Autoconfed: Faction ["..our_faction:name().."] is on cooldown for ["..tostring(sv).."] more turns")
+					return
+				else
+					LELOG("Autoconfed: Faction ["..our_faction:name().."] is being checked.")
+				end
+			end
+			local faction_map = {} --:map<CA_FACTION, boolean>
+			-- first, check our adjacent regions for a list of factions. 
+			local region_list = context:faction():region_list() --:CA_REGION_LIST
+			for i = 0, region_list:num_items() - 1 do
+				local region = region_list:item_at(i)
+				local adj_list = region:adjacent_region_list()
+				for j = 0, adj_list:num_items() - 1 do
+					local adj = adj_list:item_at(j)
+					if region:owning_faction():name() ~= adj:owning_faction():name() then
+						if (region:owning_faction():subculture() == adj:owning_faction():subculture()) then
+							if not (adj:owning_faction():is_human()) then
+								faction_map[adj:owning_faction()] = true 
+							end
+						end
+					end
+				end
+			end
 
-core:add_listener(
-	function(context)
-        return ((not context:faction():is_human()) and (not (context:faction():name() == "rebels")) and (context:faction():has_home_region()) and (not not allowed_sc[context:faction():subculture()]) )
-    end,
-	function(context)
-	
-        local faction_map = {} --:map<CA_FACTION, boolean>
-        -- first, check our adjacent regions for a list of factions. 
-        local region_list = context:faction():region_list() --:CA_REGION_LIST
-        for i = 0, region_list:num_items() - 1 do
-            local region = region_list:item_at(i)
-            local adj_list = region:adjacent_region_list()
-            for j = 0, adj_list:num_items() - 1 do
-                local adj = adj_list:item_at(j)
-                if region:owning_faction():name() ~= adj:owning_faction():name() then
-                    if region:owning_faction():subculture() == adj:owning_faction():subculture() then
-                        faction_map[adj:owning_faction()] = true 
-                    end
-                end
-            end
-        end
-
-        --can we take any of these fuckers?
-		for current_faction, _ in pairs(faction_map) do
-			
-		end
-    end,
-    true
-)
-
+			--can we take any of these fuckers?
+			for current_faction, _ in pairs(faction_map) do
+				if (our_faction:diplomatic_standing_with(current_faction:name()) >= 50) and self:autoconfederate_enabled() == true then
+					if self:is_faction_major(our_faction:name()) and (not (self:is_faction_major(current_faction:name()) or self:is_faction_secondary(current_faction:name()))) then
+						cm:force_confederation(our_faction:name(), current_faction:name())
+						cm:set_saved_value("le_autoconfed_"..our_faction:name(), self:autoconfed_cooldown())
+						LELOG("Autoconfed: Confederating ["..our_faction:name().."] and ["..current_faction:name().."]")
+					end
+				end
+			end
+		end, true)
 end
 
 
 function wec_loreful_empires()
 	cm:set_saved_value("df_guaranteed_empires_port", true);
 	
-	out("DFME is running");
+	out("Battle Influencer is running");
 	
 
 --factions on this list gain an advantage when fighting against factions not on this list
@@ -606,3 +719,102 @@ function loreful_empires_manager.set_nearby_player_restriction(self, option)
 	LELOG("API: Set nearby player restriction to ["..tostring(option).."]")
 end
 	
+--v function(self: LOREFUL_EMPIRES_MANAGER, option: boolean)
+function loreful_empires_manager.set_enable_autoconfederate(self, option)
+	if not is_boolean(option) then
+		LE_ERROR("API USAGE ERROR: option must be a boolean!")
+		script_error("LOREFUL EMPIRES API: Incorrect argument Type: Use the logging pack to see more details!")
+		return
+	end
+	self._autoconfed_enabled = option
+	LELOG("API: Set autoconfederation to ["..tostring(option).."]")
+end
+
+--v function(self: LOREFUL_EMPIRES_MANAGER, option: boolean)
+function loreful_empires_manager.set_protect_secondary_factions(self, option)
+	if not is_boolean(option) then
+		LE_ERROR("API USAGE ERROR: option must be a boolean!")
+		script_error("LOREFUL EMPIRES API: Incorrect argument Type: Use the logging pack to see more details!")
+		return
+	end
+	self._secondaryProtection = option
+	LELOG("API: Set secondary faction protection to ["..tostring(option).."]")
+end
+
+--v function(self: LOREFUL_EMPIRES_MANAGER, option: boolean)
+function loreful_empires_manager.set_faction_leaders_only(self, option)
+	if not is_boolean(option) then
+		LE_ERROR("API USAGE ERROR: option must be a boolean!")
+		script_error("LOREFUL EMPIRES API: Incorrect argument Type: Use the logging pack to see more details!")
+		return
+	end
+	self._factionLeadersOnly = option
+	LELOG("API: Set faction leader only to ["..tostring(option).."]")
+end
+
+--v function(self: LOREFUL_EMPIRES_MANAGER, option: number)
+function loreful_empires_manager.set_autoconfed_cooldown(self, option)
+	if not is_number(option) then
+		LE_ERROR("API USAGE ERROR: cooldown must be a number!")
+		script_error("LOREFUL EMPIRES API: Incorrect argument Type: Use the logging pack to see more details!")
+		return
+	end
+	self._autoconfed_cooldown = option
+	LELOG("API: Set autoconfederate cooldown to ["..tostring(option).."]")
+end
+
+--mcm integration
+local mcm = _G.mcm
+if not not mcm then
+	local lem = _G.lem
+	local settings = mcm:register_mod("loreful_empires", "Loreful Empires", "Major faction autoresolve bonuses for lore factions")
+	local enable = settings:add_tweaker("enable_mod", "Enable Mod", "Enables or disables autoresolve influencing for this mod.")
+	enable:add_option("enabled", "Enable", "Enable this mod.")
+	enable:add_option("disabled", "Disable", "Disable this mod."):add_callback(function(context) 
+		lem._enabled = false
+	end)
+	local autoconfed = settings:add_tweaker("confed", "Major AI Auto-confederate", "When enabled, major factions will confederate any minor factions they have a high enough relationship with automatically.")
+	autoconfed:add_option("disabled", "Disable", "Do not turn on this feature")
+	autoconfed:add_option("enabled", "Enable", "Turn on this feature"):add_callback(function(context)
+		lem:set_enable_autoconfederate(true)
+		local list = {
+			wh_main_sc_brt_bretonnia = true,
+			wh_main_sc_dwf_dwarfs = true,
+			wh_main_sc_emp_empire = true,
+			wh2_main_sc_def_dark_elves = true,
+			wh2_main_sc_hef_high_elves = true,
+			wh2_main_sc_lzd_lizardmen = true
+		}--:map<string, boolean>
+
+		lem:activate_autoconfed_with_list(list)
+	end)
+	settings:add_variable("confed_cd", 1, 25, 10, 1, "Auto-confederate Cooldown", "The period of time between each confederation that can be automatically triggered for a faction"):add_callback(function(context)
+		lem:set_autoconfed_cooldown(settings:get_variable_with_key("confed_cd"):current_value() - 1)
+	end)
+	local defensive_restriction = settings:add_tweaker("defensive_restriction", "Defensive Battles Only", "Makes the mod only support defensive battles.")
+	defensive_restriction:add_option("defensive_restriction_off", "All battles", "This mod will impact offensive battles.")
+	defensive_restriction:add_option("defensive_restriction_on", "Defensive Battles", "Disable this mod for attackers."):add_callback(function(context) 
+		lem:set_defensive_battles_only(true)
+	end)
+	local leader_restriction = settings:add_tweaker("leader_restriction", "Faction Leaders only", "Makes this mod only influence when a legendary lord is involved.")
+	leader_restriction:add_option("leader_restriction_off", "All Characters", "This mod will impact battles for any character.")
+	leader_restriction:add_option("leader_restriction_on", "Faction Leaders Only", "Disable this mod for non-faction leaders."):add_callback(function(context) 
+		lem:set_faction_leaders_only(true)
+	end)
+	local enable_for_allies = settings:add_tweaker("allies", "Ignore allies", "Makes this mod ignore battles where a player's ally is involved")
+	enable_for_allies:add_option("allies_off", "Ignore Allies", "This mod will not impact battles which involve one of your allies.")
+	enable_for_allies:add_option("allies_on", "Function for Allies", "This mod will impact battles regardless of alliance to a player."):add_callback(function(context) 
+		lem:set_enable_script_for_allies(true)
+	end)
+	local secondary_factions = settings:add_tweaker("secondary_factions", "Secondary Factions", "Secondary factions are factions who are not given bonuses to their expansion, but who are important to lore and are thus protected from their enemies being given bonuses.")
+	secondary_factions:add_option("secondary_factions_on", "Enabled (Recommended)", "This mod will not impact battles involving secondary factions")
+	secondary_factions:add_option("secondary_factions_off", "Disabled", "This mod will not protect secondary factions"):add_callback(function(context) 
+		lem:set_protect_secondary_factions(false)
+	end)
+	secondary_factions:add_option("secondary_factions_major", "Treat as major", "This mod will add the secondary factions list to the major factions list"):add_callback(function(context)
+		lem:set_protect_secondary_factions(false)
+		for i = 1, #lem:get_secondary_list() do
+			lem:add_faction_to_major(lem:get_secondary_list()[i])
+		end
+	end)
+end
