@@ -874,7 +874,7 @@ end
         
 --v function(self: MOD_CONFIGURATION_MANAGER, tweaker: MCM_TWEAKER)
 function mod_configuration_manager.handle_tweaker(self, tweaker)
-    self:log("handling variable ["..tweaker:name().."] with key [mcm_tweaker_"..tweaker:mod():name().."_"..tweaker:name().."_value] with option ["..tostring(tweaker:selected_option():name()).."]")
+    self:log("handling tweaker ["..tweaker:name().."] with key [mcm_tweaker_"..tweaker:mod():name().."_"..tweaker:name().."_value] with option ["..tostring(tweaker:selected_option():name()).."]")
     cm:set_saved_value("mcm_tweaker_"..tweaker:mod():name().."_"..tweaker:name().."_value", tweaker:selected_option():name())
     if tweaker:selected_option():has_callback() then
         tweaker:selected_option():callback()

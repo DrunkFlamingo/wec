@@ -80,18 +80,12 @@ local function PopulateModOptions(MCMMainFrame)
         ButtonNo:PositionRelativeTo(ButtonYes, 0, 60)
     end
     local existingList = Util.getComponentWithName(UIPANELNAME.."_MOD_OPTIONS_LISTVIEW")
-    local existingHeader = Util.getComponentWithName(UIPANELNAME.."_MOD_OPTIONS_LIST_HEADER")
     if not not existingList then
         --# assume existingList: LIST_VIEW
-        --# assume existingHeader: TEXT
         existingList:Delete()
-        existingHeader:Delete()
     end
     local mod = mcm:get_current_mod()
-
-    local ModOptionListHeader = Text.new(UIPANELNAME.."_MOD_OPTIONS_LIST_HEADER", MCMMainFrame, "HEADER", mod:ui_name())
-    ModOptionListHeader:Resize(400, 40)
-    ModOptionListHeader:PositionRelativeTo(MCMMainFrame, fbX*0.04 + 350, fbY*0.04)
+    MCMMainFrame:SetTitle("Mod Configuration Tool: "..mod:ui_name())
     local ModOptionListView = ListView.new(UIPANELNAME.."_MOD_OPTIONS_LISTVIEW", MCMMainFrame, "VERTICAL")
     ModOptionListView:Resize(1300, 600)
     local ModOptionListBuffer = Container.new(FlowLayout.VERTICAL)
@@ -252,7 +246,7 @@ local function PopulateModOptions(MCMMainFrame)
         ModOptionListView:AddContainer(VariableTopContainer)
         ModOptionListView:AddContainer(VariableBotContainer)
     end
-    ModOptionListView:PositionRelativeTo(ModOptionListHeader, -20, 35)
+    ModOptionListView:PositionRelativeTo(MCMMainFrame, fbX*0.04 + 350, fbY*0.04)
     local reX, reY = ModOptionListView:Position()
     ModOptionListView:MoveTo(reX, reY)
 end
@@ -390,6 +384,11 @@ local function CreatePanel()
                         advisor:SetVisible(true) 
                     end
                     MCMMainFrame:Delete() 
+                    local closebutton = Util.getComponentWithName(UIPANELNAME.."_CLOSE_BUTTON")
+                    if not not closebutton then
+                        --# assume closebutton: BUTTON
+                        closebutton:Delete()
+                    end
                     mcm:clear_UIC()
                     core:remove_listener("MCMHider")
                     layout:SetVisible(true)
@@ -452,14 +451,11 @@ local function CreatePanel()
             CloseButton:SetVisible(false)
             local existingMods = Util.getComponentWithName(UIPANELNAME.."_MOD_LIST_HEADER_TEXT")
             local existingList = Util.getComponentWithName(UIPANELNAME.."_MOD_OPTIONS_LISTVIEW")
-            local existingHeader = Util.getComponentWithName(UIPANELNAME.."_MOD_OPTIONS_LIST_HEADER")
-            if (not not existingMods) and (not not existingList) and (not not existingHeader) then
+            if (not not existingMods) and (not not existingList) then
                 --# assume existingMods: LIST_VIEW
                 --# assume existingList: LIST_VIEW
-                --# assume existingHeader: TEXT
                 existingMods:Delete()
                 existingList:Delete()
-                existingHeader:Delete()
                 local loading = Text.new(UIPANELNAME.."_CLOSEDOWN_LOAD", MCMMainFrame, "HEADER", "Loading!")
                 loading:Resize(500, 200)
                 Util.centreComponentOnComponent(loading, MCMMainFrame)
