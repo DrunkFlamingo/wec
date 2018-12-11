@@ -177,6 +177,7 @@
 --# assume CM.zero_action_points: method(charName: string)
 --# assume CM.add_agent_experience: method(charName: string, experience: number)
 --# assume CM.force_add_skill: method(lookup: string, skill_key: string)
+--# assume CM.force_reset_skills: method(lookup: string)
 --# assume CM.force_add_and_equip_ancillary: method(lookup: string, ancillary: string)
 --More character commands
 --# assume CM.award_experience_level: method(char_lookup_str: string, level: int)

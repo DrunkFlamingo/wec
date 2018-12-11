@@ -4,9 +4,7 @@ require("mcm/export_helpers__mcm_basic_settings")
 _G.sfo = false --:boolean
 
 ---[[ Legendary Lord Respecs
-require("llr/LegendaryLordRespecs")
 require("llr/export_helpers__llr_core")
-require("llr/export_helpers__llr_vanilla_lords")
 --]]
 
 ---[[ Old World Rites
@@ -48,7 +46,9 @@ require("controllable_waaghs/export_helpers__control_waaagh")
     require("delete_far_away_factions/delete_far_away")    
 --]]
 
-
+---[[tp spawns
+--require("teleport_spawns/teleport_spawns")
+--]]
 
 
 require("patreon_requests/StuckHeroFix")
@@ -62,7 +62,7 @@ require("patreon_requests/StuckHeroFix")
 
 
 require("exterior_scripting/export_helpers__alberic_boat_disease")
---require("le/wec_loreful_empires")
+require("le/wec_loreful_empires")
 
 --require("emil_qb/battle_script");
 

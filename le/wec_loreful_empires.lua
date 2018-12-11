@@ -386,7 +386,7 @@ end;
 
 
 
-
+local events = get_events()
 events.CharacterCompletedBattle[#events.CharacterCompletedBattle+1] =
 function(context)
 	if LElogVerbosity < 2 then 

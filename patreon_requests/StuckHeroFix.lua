@@ -16,7 +16,7 @@ end
 
 
 
-events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = function()
+cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function()
     local fact_list = cm:model():world():faction_list()
 
     for i = 0, fact_list:num_items()  - 1 do 

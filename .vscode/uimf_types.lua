@@ -109,6 +109,8 @@
 --# assume TEXT_BUTTON.Width: method() --> number
 --# assume TEXT_BUTTON.Height: method() --> number
 --# assume TEXT_BUTTON.Delete: method()
+--# assume TEXT_BUTTON.SetButtonText: method(text: string) 
+
 --frame
 --# assume FRAME.MoveTo: method(xPos: number, yPos: number)
 --# assume FRAME.Move: method(xMove: number, yMove: number)

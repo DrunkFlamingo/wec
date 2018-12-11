@@ -20,6 +20,7 @@ function spawn_locations.init()
 
     self._trigger = nil --:function(character: CA_CHAR, default_is_char: boolean)
     self._isMP = false
+    local events = get_events()
     events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = function()
         if cm:is_multiplayer() then
             self._isMP = true
