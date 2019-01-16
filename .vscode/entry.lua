@@ -66,3 +66,7 @@ require("le/wec_loreful_empires")
 
 --require("emil_qb/battle_script");
 
+---[[war sentiment
+require("war_sentiment/WarSentiment") 
+require("war_sentiment/export_helpers__war_sentiment") 
+--]]
