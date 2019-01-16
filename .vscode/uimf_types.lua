@@ -175,4 +175,5 @@
 --# assume LIST_VIEW.Delete: method()
 --# assume LIST_VIEW.PositionRelativeTo: method(component: WHATEVER, xDiff: number, yDiff: number)
 --# assume LIST_VIEW.MoveTo: method(x: number, y:number)
+--# assume LIST_VIEW.Move: method(xMove: number, yMove: number)
 --# assume LIST_VIEW.Position: method() --> (number, number)

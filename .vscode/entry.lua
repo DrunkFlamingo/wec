@@ -47,7 +47,7 @@ require("controllable_waaghs/export_helpers__control_waaagh")
 --]]
 
 ---[[tp spawns
---require("teleport_spawns/teleport_spawns")
+require("teleport_spawns/teleport_spawns")
 --]]
 
 

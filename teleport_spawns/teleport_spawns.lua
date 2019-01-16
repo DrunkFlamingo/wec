@@ -115,50 +115,137 @@ function spawn_locations.add_trigger_function(self, trigger)
 end
 
 
-
+--ok! so now some time for procedural programming. We are gonna build a UI panel. 
 
 
 --v function(char: CA_CHAR, default_loc_is_char: boolean)
 local function ui_trigger(char, default_loc_is_char)
+    cache = {} --this will cache stuff we need to remember, like the tp location. 
+    cache.is_ui_char = default_loc_is_char -- we are gonna store which panel side we have open, but at first it will be whichever is default!
+    cache.tpx = -1 --:number
+    cache.tpy = -1 --:number
+
+    --v function(x: number, y: number)
+    function cache.tp_to(x, y)
+        cache.tpx = x
+        cache.tpy = y
+    end
     local choice_window = Frame.new("telespawn_frame")
-    choice_window:Resize(600, 800)
+    choice_window:Resize(1000, 900)
     Util.centreComponentOnScreen(choice_window)
     choice_window:SetTitle("Select Agent Spawn Location:")
     local option_list = ListView.new("telespawn_list", choice_window, "VERTICAL")
-    option_list:Resize(500, 700)
+    option_list:Resize(900, 800)
     Util.centreComponentOnComponent(option_list, choice_window)
-    local first_choice_button = TextButton.new("default_choice_button", choice_window, "TEXT", "Home Region")
-    first_choice_button:Resize(300, 45)
-    if default_loc_is_char then
-        first_choice_button:SetButtonText("Faction Leader")
-    end
-    first_choice_button:RegisterForClick(
-        function()
-            choice_window:Delete()
-        end
-    )
-    option_list:AddComponent(first_choice_button)
-    local faction = char:faction()
-    local char_list = faction:character_list()
-    for i = 0, char_list:num_items() - 1 do
-        local current_char = char_list:item_at(i)
-        if (not current_char:region():is_null_interface()) and current_char:region():owning_faction():name() == current_char:faction():name() then
-            --char is a valid spawn point
-            local char_name = effect.get_localised_string(current_char:get_forename())
-            if char_name == nil then
-                char_name = "name_error"
+    option_list:Move(0, - 45)
+    local char_faction = char:faction()
+
+
+    
+    local first_choice_button --:TEXT_BUTTON
+    local function first_choice_button_creation()
+        if ((not default_loc_is_char) and char_faction:has_home_region()) or (char:faction():faction_leader():has_military_force() and default_loc_is_char) then
+            first_choice_button = TextButton.new("default_choice_button", choice_window, "TEXT", "Home Region")
+            if default_loc_is_char then
+                first_choice_button:SetButtonText("Faction Leader")
             end
-            local choice_button = TextButton.new("spawn_choice_button_"..i, choice_window, "TEXT", char_name)
-            choice_button:Resize(300, 45)
-            choice_button:RegisterForClick(
+            first_choice_button:Resize(300, 45)
+            first_choice_button:RegisterForClick(
                 function()
-                    cm:teleport_to(cm:char_lookup_str(char), current_char:logical_position_x() - 1, current_char:logical_position_y() - 1, true)
+                    if default_loc_is_char and cache.is_ui_char then
+                        --nothing!
+                    elseif (not default_loc_is_char) and (not cache.is_ui_char) then
+                        -- nothing!
+                    elseif default_loc_is_char and (not cache.is_ui_char) then
+                        --send the hero to the home settlement!
+                        local home = char:faction():home_region():name()
+                        local xh, yh = cm:find_valid_spawn_location_for_character_from_settlement(char_faction:name(), home, false, false)
+                        if xh == -1 and yh == -1 then
+                            return
+                        end
+                        cm:teleport_to(cm:char_lookup_str(char:cqi()), xh, yh, true) --this should be replaced with the MP event. 
+                    elseif (not default_loc_is_char) and cache.is_ui_char then
+                        --send the hero to the faction leader!
+                        local home = char:faction():faction_leader()
+                        local xh, yh = home:logical_position_x(), home:logical_position_x()
+                        local xh, yh = cm:find_valid_spawn_location_for_character_from_position(char_faction:name(), xh, yh, false)
+                        if xh == -1 and yh == -1 then
+                            return
+                        end
+                        cm:teleport_to(cm:char_lookup_str(char:cqi()), xh, yh, true) --this should be replaced with the MP event. 
+                    end
                     choice_window:Delete()
                 end
             )
-            option_list:AddComponent(choice_button)
+        end
+        option_list:AddComponent(first_choice_button)
+    end
+    local function onRegions()
+        first_choice_button_creation()
+        if not not first_choice_button then
+            first_choice_button:SetButtonText("Home Region")
+        end
+        local region_list = char_faction:region_list()
+        for i = 0, region_list:num_items() - 1 do
+            local current_region = region_list:item_at(i)
+            if (not current_region:settlement():is_null_interface()) and current_region:is_province_capital() then
+                --char is a valid spawn point
+                local char_name = effect.get_localised_string("regions_onscreen_"..current_region:name())
+                if char_name == nil then
+                    char_name = "name_error"
+                end
+                local choice_button = TextButton.new("spawn_choice_button_regions_"..i, choice_window, "TEXT", char_name)
+                choice_button:Resize(300, 45)
+                choice_button:RegisterForClick(
+                    function()
+                        local x = current_region:settlement():logical_position_x()
+                        local y = current_region:settlement():logical_position_y()
+                        local x, y = cm:find_valid_spawn_location_for_character_from_position(char_faction:name(), x, y, false)
+                        cm:teleport_to(cm:char_lookup_str(char),  x,  y, true)
+                        choice_window:Delete()
+                    end
+                )
+                option_list:AddComponent(choice_button)
+            end
+        end
+        
+    end
+    
+
+    local function onChars()
+        first_choice_button_creation()
+        if not not first_choice_button then
+            first_choice_button:SetButtonText("Home Region")
+        end
+        local char_list = char_faction:character_list()
+        for i = 0, char_list:num_items() - 1 do
+            local current_char = char_list:item_at(i)
+            if (not current_char:region():is_null_interface()) and current_char:region():owning_faction():name() == current_char:faction():name() then
+                --char is a valid spawn point
+                local char_name = effect.get_localised_string(current_char:get_forename())
+                if char_name == nil then
+                    char_name = "name_error"
+                end
+                local choice_button = TextButton.new("spawn_choice_button_"..i, choice_window, "TEXT", char_name)
+                choice_button:Resize(300, 45)
+                choice_button:RegisterForClick(
+                    function()
+                        local x = current_char:logical_position_x()
+                        local y = current_char:logical_position_y()
+                        local x, y = cm:find_valid_spawn_location_for_character_from_position(char_faction:name(), x, y, false)
+                        cm:teleport_to(cm:char_lookup_str(char),  x,  y, true)
+                        choice_window:Delete()
+                    end
+                )
+                option_list:AddComponent(choice_button)
+            end
         end
     end
+
+    if default_loc_is_char then onChars() else onRegions() end
+
+    
+    
 end
     
 

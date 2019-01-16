@@ -72,7 +72,8 @@ function llr.create_button(cqi)
         local RespecButton = Util.getComponentWithName("RespecButtonLLR")
         if RespecButton then 
             --# assume RespecButton: BUTTON
-            RespecButton:Delete()
+            RespecButton:SetVisible(true)
+            return
         end
         local parent = find_uicomponent(uic, "background", "skills_subpanel", "stats_reset_holder")
         local RespecButton = Button.new("RespecButtonLLR", parent, "CIRCULAR", "ui/skins/default/icon_home.png")
@@ -115,11 +116,13 @@ core:add_listener(
         return context.string == "character_details_panel"
     end,
     function(context)
-        if llr.current_lord then
-            local ok, err = pcall(function()
-            llr.create_button(llr.current_lord)
-            end) if not ok then llr.log(tostring(err)) end
-        end
+        cm:callback(function ()
+            if llr.current_lord then
+                local ok, err = pcall(function()
+                llr.create_button(llr.current_lord)
+                end) if not ok then llr.log(tostring(err)) end
+            end
+        end, 0.1)
     end,
     true
 )

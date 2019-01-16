@@ -216,6 +216,9 @@
 --#    otherName: string, age: int, male: boolean, agentKey: string, agent_subtypeKey: string, 
 --#    isImmortal: boolean, artSetId: string
 --#)
+--spawn location finding!
+--# assume CM.find_valid_spawn_location_for_character_from_settlement: method(faction_key: string, settlement_key: string, rebellion_spawn: boolean, on_sea: boolean, rebel_spawn_distance: number?) --> (number, number)
+--# assume CM.find_valid_spawn_location_for_character_from_position: method(faction_key: string, x: number, y:number, on_sea: boolean) --> (number, number)
 --saving and loading
 --# assume CM.add_saving_game_callback: method(function(context: WHATEVER))
 --# assume CM.add_loading_game_callback: method(function(context: WHATEVER))
