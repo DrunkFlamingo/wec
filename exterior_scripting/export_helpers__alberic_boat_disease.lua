@@ -22,7 +22,7 @@ function alberic_quest_fix()
             function(context) return (context:character():character_subtype("dlc07_brt_alberic") and context:character():rank() >= 3) 
             end,
             function(context)
-                cm:force_add_and_equip_ancillary(cm:char_lookup_str(context:character():cqi()), "wh_dlc07_anc_weapon_trident_of_manann")
+                cm:force_add_and_equip_ancillary(cm:char_lookup_str(context:character():command_queue_index()), "wh_dlc07_anc_weapon_trident_of_manann")
                 cm:set_saved_value("aberic_item_wili", true)
             end,
             false

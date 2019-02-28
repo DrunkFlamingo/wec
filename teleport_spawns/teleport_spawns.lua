@@ -163,7 +163,7 @@ local function ui_trigger(char, default_loc_is_char)
                         if xh == -1 and yh == -1 then
                             return
                         end
-                        cm:teleport_to(cm:char_lookup_str(char:cqi()), xh, yh, true) --this should be replaced with the MP event. 
+                        cm:teleport_to(cm:char_lookup_str(char:command_queue_index()), xh, yh, true) --this should be replaced with the MP event. 
                     elseif (not default_loc_is_char) and cache.is_ui_char then
                         --send the hero to the faction leader!
                         local home = char:faction():faction_leader()
@@ -172,7 +172,7 @@ local function ui_trigger(char, default_loc_is_char)
                         if xh == -1 and yh == -1 then
                             return
                         end
-                        cm:teleport_to(cm:char_lookup_str(char:cqi()), xh, yh, true) --this should be replaced with the MP event. 
+                        cm:teleport_to(cm:char_lookup_str(char:command_queue_index()), xh, yh, true) --this should be replaced with the MP event. 
                     end
                     choice_window:Delete()
                 end

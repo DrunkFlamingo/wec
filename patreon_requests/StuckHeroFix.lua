@@ -37,7 +37,7 @@ cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function()
                     LOG("\t subtype : " .. tostring(char:character_subtype_key()))
                 end
                 if not (has_mf or is_pol or has_gar_res) then
-                    cm:kill_character(char:cqi(), true, true)
+                    cm:kill_character(char:command_queue_index(), true, true)
                 end
             end
         end

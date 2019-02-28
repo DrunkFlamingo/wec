@@ -248,7 +248,7 @@ function companion_controller.switch_out_waaagh(self, cqi)
             local char = cm:get_faction(real_faction):character_list():item_at(i)
             if cm:char_is_mobile_general_with_army(char) then
                 if char:military_force():morale() > 99 then
-                    if not self:is_army_linked(char:cqi()) then
+                    if not self:is_army_linked(char:command_queue_index()) then
                         army_to_link = char
                     end
                 end
@@ -285,15 +285,15 @@ function companion_controller.switch_out_waaagh(self, cqi)
         army_region = comp_army:region():name()
     end
     --make sure the army getting the waaagh isn't a companion army!
-    if self:is_char_companion(army_to_link:cqi()) then
+    if self:is_char_companion(army_to_link:command_queue_index()) then
         cm:disable_event_feed_events(true, "", "", "military_companion_army_ours");
-        cm:kill_character(comp_army:cqi(), true, true)
+        cm:kill_character(comp_army:command_queue_index(), true, true)
         cm:callback(function() cm:disable_event_feed_events(false, "", "", "military_companion_army_destroyed") end, 1);
         cm:callback(function() cm:disable_event_feed_events(false, "", "", "military_companion_army_ours") end, 1);
         return
     end
 
-    cm:kill_character(comp_army:cqi(), true, true)
+    cm:kill_character(comp_army:command_queue_index(), true, true)
     cm:callback(function() cm:disable_event_feed_events(false, "", "", "military_companion_army_destroyed") end, 1);
     CCLOG("Replacing the army belonging to ["..comp_faction.."] with an army for ["..real_faction.."]")
     CCLOG("\t Spawning at:  ["..tostring(army_location.x).."], ["..tostring(army_location.y).."], in region ["..army_region.."]")
@@ -306,9 +306,9 @@ function companion_controller.switch_out_waaagh(self, cqi)
         army_location.y,
         true, 
         function(cqi)
-            self._armyLinks[army_to_link:cqi()] = cqi
-            self._linkedArmies[army_to_link:cqi()] = true
-            self._companionForces[cm:get_character_by_cqi(cqi):military_force():command_queue_index()] = army_to_link:cqi()
+            self._armyLinks[army_to_link:command_queue_index()] = cqi
+            self._linkedArmies[army_to_link:command_queue_index()] = true
+            self._companionForces[cm:get_character_by_cqi(cqi):military_force():command_queue_index()] = army_to_link:command_queue_index()
             self._companions[cqi] = true
             cm:apply_effect_bundle_to_characters_force("wh_main_bundle_military_upkeep_free_force", cqi, 0, true)
             cm:apply_effect_bundle_to_characters_force("wec_controlled_companion", cqi, 0, true)
@@ -330,7 +330,7 @@ function companion_controller.kill_linked_force(self, linked_army, mf_to_kill)
     self._companionForces[mf] = nil
     if mf_to_kill then
         --# assume mf_to_kill: CA_MILITARY_FORCE
-        cm:kill_character(mf_to_kill:general_character():cqi(), true, true)
+        cm:kill_character(mf_to_kill:general_character():command_queue_index(), true, true)
     end
     cm:kill_character(self._armyLinks[linked_army], true, true)
     cm:callback(function() cm:disable_event_feed_events(false, "", "wh_event_subcategory_character_deaths", "") end, 1);
@@ -351,7 +351,7 @@ end
 
 --v function(self: COMPANION_CONTROLLER, owner_char: CA_CHAR)
 function companion_controller.check_linked_char_validity(self, owner_char)
-    local linked_cqi = owner_char:cqi()
+    local linked_cqi = owner_char:command_queue_index()
     local companion_char_cqi = self._armyLinks[linked_cqi]
     local mf_to_kill = 
     CCLOG("Doing a check on \n\tLinked CQI ["..tostring(linked_cqi).."]\n\tcompanion char CQI ["..tostring(companion_char_cqi).."]")
@@ -383,7 +383,7 @@ function companion_controller.check_companion_mf_validity(self, companion)
     local companion_char_cqi = self._armyLinks[linked_cqi]
     CCLOG("Doing a check on \n\tLinked CQI ["..tostring(linked_cqi).."]\n\tcompanion char CQI ["..tostring(companion_char_cqi).."]\n\tCompanion Force CQI ["..tostring(mf_cqi).."]")
     --make sure the character who is supposed to own the waaagh does own it
-    if companion:general_character():cqi() == companion_char_cqi then
+    if companion:general_character():command_queue_index() == companion_char_cqi then
         --make sure the character who owns the linked force is still valid
         local linked_char = cm:get_character_by_cqi(linked_cqi)
         if cm:char_is_mobile_general_with_army(linked_char) and linked_char:military_force():unit_list():num_items() >= 17 and linked_char:military_force():morale() >= 80 then

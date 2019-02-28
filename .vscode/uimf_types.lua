@@ -67,7 +67,7 @@
 --# assume UTIL.centreComponentOnScreen: function(component: WHATEVER)
 --# assume UTIL.centreComponentOnComponent: function(component: WHATEVER, other_component: WHATEVER)    
 --# assume UTIL.recurseThroughChildrenApplyingFunction: function(parent: WHATEVER, callback:function(child: WHATEVER))
-
+--# assume UTIL.delete: function(uic: CA_UIC)
 
 
 --button
@@ -92,6 +92,8 @@
 --# assume BUTTON.RegisterForClick: method(callback: function(context: WHATEVER?))
 --# assume BUTTON.SetImage: method(path: string)
 --# assume BUTTON.SetDisabled: method(disabled: boolean)
+--# assume BUTTON.uic: CA_UIC
+
 --text button
 --# assume TEXT_BUTTON.MoveTo: method(xPos: number, yPos: number)
 --# assume TEXT_BUTTON.Move: method(XMove: number, yMove: number)
@@ -110,6 +112,7 @@
 --# assume TEXT_BUTTON.Height: method() --> number
 --# assume TEXT_BUTTON.Delete: method()
 --# assume TEXT_BUTTON.SetButtonText: method(text: string) 
+--# assume TEXT_BUTTON.uic: CA_UIC
 
 --frame
 --# assume FRAME.MoveTo: method(xPos: number, yPos: number)

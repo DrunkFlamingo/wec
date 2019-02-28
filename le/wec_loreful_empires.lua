@@ -392,14 +392,14 @@ function(context)
 	if LElogVerbosity < 2 then 
 		return
 	end
-	if context:character():model():pending_battle():has_defender() and context:character():model():pending_battle():defender():cqi() == context:character():cqi() then
+	if context:character():model():pending_battle():has_defender() and context:character():model():pending_battle():defender():command_queue_index() == context:character():command_queue_index() then
 		-- The character is the Defender
 		local result = context:character():model():pending_battle():defender_battle_result();
 
 		if result == "close_victory" or result == "decisive_victory" or result == "heroic_victory" or result == "pyrrhic_victory" then
 			LELOG("Battle Influencer:-- Result --\n"..context:character():faction():name().." Won! ("..result..")");
 		end;
-	elseif context:character():model():pending_battle():has_attacker() and context:character():model():pending_battle():attacker():cqi() == context:character():cqi() then
+	elseif context:character():model():pending_battle():has_attacker() and context:character():model():pending_battle():attacker():command_queue_index() == context:character():command_queue_index() then
 		-- The character is the Attacker
 		local result = context:character():model():pending_battle():attacker_battle_result();
 

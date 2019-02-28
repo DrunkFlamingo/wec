@@ -352,7 +352,7 @@ local function CreatePanel()
 
         local advice_exists = false
         local advisor = find_uicomponent(core:get_ui_root(), "advice_interface")
-        if not not advisor then
+        if not not advisor and advisor:Visible() then
             advice_exists = true
             advisor:SetVisible(false)
         end

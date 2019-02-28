@@ -92,6 +92,7 @@
 --# assume CA_UIC.SimulateClick: method()
 --# assume CA_UIC.SimulateMouseOn: method()
 --# assume CA_UIC.Visible: method() --> boolean
+--# assume CA_UIC.Divorce: method()
 
 --# assume CA_UIC.SetImage: method(path: string)
 --# assume CA_UIC.SetCanResizeHeight: method(state: boolean)
@@ -340,7 +341,7 @@
 --# assume CA_CHAR.get_forename: method() --> string
 --# assume CA_CHAR.get_surname: method() --> string
 --# assume CA_CHAR.command_queue_index: method() --> CA_CQI
---# assume CA_CHAR.cqi: method() --> CA_CQI
+---# assume CA_CHAR.cqi: method() --> CA_CQI
 --# assume CA_CHAR.rank: method() --> int
 --# assume CA_CHAR.won_battle: method() --> boolean
 --# assume CA_CHAR.battles_fought: method() --> number
@@ -522,6 +523,7 @@
 --# assume CA_PENDING_BATTLE.ambush_battle: method() --> boolean
 --# assume CA_PENDING_BATTLE.has_been_fought: method() --> boolean
 --# assume CA_PENDING_BATTLE.set_piece_battle_key: method() --> string
+--# assume CA_PENDING_BATTLE.is_active: method() --> boolean
 
 -- CORE
 --# assume CORE.get_ui_root: method() --> CA_UIC

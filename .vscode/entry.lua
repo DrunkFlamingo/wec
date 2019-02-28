@@ -4,7 +4,7 @@ require("mcm/export_helpers__mcm_basic_settings")
 _G.sfo = false --:boolean
 
 ---[[ Legendary Lord Respecs
-require("llr/export_helpers__llr_core")
+require("llr/export_helpers__one_button_respec")
 --]]
 
 ---[[ Old World Rites
@@ -70,3 +70,12 @@ require("le/wec_loreful_empires")
 require("war_sentiment/WarSentiment") 
 require("war_sentiment/export_helpers__war_sentiment") 
 --]]
+
+
+CRYN_EXAMPLE_STRING = "put_default_value_here" --:string
+CRYN_EXAMPLE_NUM_VAR_WITH_MCHOICE = 0 --:number
+CRYN_EXAMPLE_NUM_VAR_WITH_VARIABLE = 0 --:number
+CRYN_EXAMPLE_BOOLEAN = true --:boolean
+
+
+

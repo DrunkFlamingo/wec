@@ -382,11 +382,11 @@ core:add_listener(
     "GarrisonOccupiedEvent",
     function(context)
         --is the occupying faction an exile?
-        return exile_manager:army_is_exiles(context:character():cqi())
+        return exile_manager:army_is_exiles(context:character():command_queue_index())
     end,
     function(context)
         --revive them and gift them the settlement. 
-        exile_manager:revive_faction(context:character():cqi(), context:garrison_residence():region())
+        exile_manager:revive_faction(context:character():command_queue_index(), context:garrison_residence():region())
     end,
     true
 )
@@ -400,7 +400,7 @@ core:add_listener(
     end,
     function(context)
         --disable or enable their buttons, depending on whether they are an exile.
-        local cqi = context:character():cqi() --:CA_CQI
+        local cqi = context:character():command_queue_index() --:CA_CQI
         exile_manager._currentChar = cqi
         if exile_manager:army_is_exiles(cqi) then
             exile_manager:disable_buttons()
@@ -432,7 +432,7 @@ events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1]  = funct
         local vlad_armies = cm:get_faction("wh_main_dwf_dwarfs"):character_list()
         for i = 0, vlad_armies:num_items() -1 do
             cm:callback(function()
-                cm:kill_character(vlad_armies:item_at(i):cqi(), true, true)
+                cm:kill_character(vlad_armies:item_at(i):command_queue_index(), true, true)
             end, i+1/10)
         end
 
@@ -472,7 +472,7 @@ local function find_second_army()
     for i = 0, char_list:num_items() - 1 do
         local char = char_list:item_at(i)
         if cm:char_is_mobile_general_with_army(char) then
-            if char:cqi() == first_char:cqi() then
+            if char:command_queue_index() == first_char:command_queue_index() then
 
             else
                 local dist = distance_2D(ax, ay, char:logical_position_x(), char:logical_position_y())
@@ -484,7 +484,7 @@ local function find_second_army()
         end
     end
     if closest_char then
-        return closest_char:cqi()
+        return closest_char:command_queue_index()
     else
         exile_manager:log("failed to find the other char!")
         return nil

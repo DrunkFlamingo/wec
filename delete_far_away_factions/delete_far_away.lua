@@ -164,7 +164,7 @@ function delete_far_away()
 			for i = 0, characters:num_items() - 1 do
 				if cm:char_is_mobile_general_with_army(characters:item_at(i)) then
 					cm:callback(function()
-						cm:kill_character(characters:item_at(i):cqi(), true, true)
+						cm:kill_character(characters:item_at(i):command_queue_index(), true, true)
 					end, (i+1)/10)
 				end
 			end

@@ -8,8 +8,8 @@ core:add_listener(
         return context:character():faction():is_human()
     end,
     function(context)
-        cc._currentChar = context:character():cqi()
-        if cc:is_char_companion(context:character():cqi()) then
+        cc._currentChar = context:character():command_queue_index()
+        if cc:is_char_companion(context:character():command_queue_index()) then
             cc:disable_buttons()
         else
             cc:enable_buttons()
@@ -26,7 +26,7 @@ core:add_listener(
         return context:character():faction():is_human() or context:character():faction():name():find("_waaagh") or context:character():faction():name():find("_brayherd")
     end,
     function(context)
-        cc:switch_out_waaagh(context:character():cqi())
+        cc:switch_out_waaagh(context:character():command_queue_index())
     end,
     true
 )
@@ -36,7 +36,7 @@ core:add_listener(
     "CompControlUnitDisbandedChecks",
     "UnitDisbanded",
     function(context)
-        return cc:is_army_linked(context:unit():force_commander():cqi())
+        return cc:is_army_linked(context:unit():force_commander():command_queue_index())
     end,
     function(context)
         cc:log("CompControlUnitDisbandedChecks sending a char validity check!")
@@ -49,7 +49,7 @@ core:add_listener(
     "CompControlUnitMergedAndDestroyedChecks",
     "UnitMergedAndDestroyed",
     function(context)
-        return cc:is_army_linked(context:unit():force_commander():cqi())
+        return cc:is_army_linked(context:unit():force_commander():command_queue_index())
     end,
     function(context)
         cc:log("CompControlUnitMergedAndDestroyedChecks sending a char validity check!")
@@ -63,7 +63,7 @@ core:add_listener(
     "CompControlCharacterEventChecks",
     "CharacterTurnStart",
     function(context)
-        return cc:is_army_linked(context:character():cqi())
+        return cc:is_army_linked(context:character():command_queue_index())
     end,
     function(context)
         local char = context:character()--:CA_CHAR
@@ -83,14 +83,14 @@ core:add_listener(
     function(context)
         local pb = context:pending_battle() --:CA_PENDING_BATTLE
         local character = context:character() --:CA_CHAR
-        if cc:is_army_linked(character:cqi()) then
+        if cc:is_army_linked(character:command_queue_index()) then
             cc:log("CharactersLostBattle first part sending a char validity check!")
             cc:check_linked_char_validity(character)
         end
         local enemies = cm:pending_battle_cache_get_enemies_of_char(character)
         for i = 1, #enemies do
             local enemy = enemies[i]
-            if cc:is_army_linked(enemy:cqi()) then
+            if cc:is_army_linked(enemy:command_queue_index()) then
                 cc:log("CharactersLostBattle loop sending a char validity check!")
                 cc:check_linked_char_validity(enemy)
             end
@@ -169,7 +169,7 @@ local function find_second_army()
     for i = 0, char_list:num_items() - 1 do
         local char = char_list:item_at(i)
         if cm:char_is_mobile_general_with_army(char) then
-            if char:cqi() == first_char:cqi() then
+            if char:command_queue_index() == first_char:command_queue_index() then
 
             else
                 local dist = distance_2D(ax, ay, char:logical_position_x(), char:logical_position_y())
@@ -181,7 +181,7 @@ local function find_second_army()
         end
     end
     if closest_char then
-        return closest_char:cqi()
+        return closest_char:command_queue_index()
     else
         return nil
     end
@@ -252,8 +252,8 @@ function apply_upkeep_penalty(faction)
 	for i = 1, mf_list:num_items() - 1 do
 		current_mf = mf_list:item_at(i);
 		
-		if not current_mf:is_armed_citizenry() and not current_mf:has_effect_bundle(effect_bundle) and current_mf:has_general() and not character_is_black_ark(current_mf:general_character()) and (not _G.companion_control:is_army_linked(current_mf:general_character():cqi())) then
-			cm:apply_effect_bundle_to_characters_force(effect_bundle, current_mf:general_character():cqi(), 0, true);
+		if not current_mf:is_armed_citizenry() and not current_mf:has_effect_bundle(effect_bundle) and current_mf:has_general() and not character_is_black_ark(current_mf:general_character()) and (not _G.companion_control:is_army_linked(current_mf:general_character():command_queue_index())) then
+			cm:apply_effect_bundle_to_characters_force(effect_bundle, current_mf:general_character():command_queue_index(), 0, true);
 		end;
 	end;
 end;

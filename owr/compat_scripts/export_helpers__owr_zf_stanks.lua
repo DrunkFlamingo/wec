@@ -28,8 +28,8 @@ core:add_listener(
                 if char:has_military_force() and char:region():name() == home_region then
                     if char:military_force():unit_list():num_items() < 3 and char:military_force():unit_list():has_unit("wh_main_emp_veh_steam_tank") then
                         if cm:random_number(10) > 4 then
-                            cm:remove_unit_from_character(cm:char_lookup_str(char:cqi()), "wh_main_emp_veh_steam_tank")
-                            cm:grant_unit_to_character(cm:char_lookup_str(char:cqi()), stanks[cm:random_number(#stanks)])
+                            cm:remove_unit_from_character(cm:char_lookup_str(char:command_queue_index()), "wh_main_emp_veh_steam_tank")
+                            cm:grant_unit_to_character(cm:char_lookup_str(char:command_queue_index()), stanks[cm:random_number(#stanks)])
                             break
                         end
                     end
