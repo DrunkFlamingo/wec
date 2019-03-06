@@ -1,4 +1,5 @@
 mcm = _G.mcm
+if not not mcm then
 --[[local mod = mcm:register_mod("tests", "Empire of Man", "toooool tip xd")
 local mod2 = mcm:register_mod("secondtest", "Old World Rites", "tooooooooollllltiiiiiiipppppp")
 local multiple_choice = mod:add_tweaker("test_tweaker", "test tweaker", "fuck you thats what")
@@ -500,4 +501,8 @@ else
     cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function()
         mcm:process_all_mods()
     end
+end
+
+
+
 end

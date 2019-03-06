@@ -67,17 +67,11 @@ DF_CHAOS_ARMY_LIST =  {"wh_dlc01_chs_inf_forsaken_0", "wh_main_chs_mon_chaos_war
 DF_HERD_ARMY_LIST = {"wh_dlc03_bst_inf_centigors_0", "wh_dlc03_bst_inf_minotaurs_0", "wh_dlc03_bst_mon_chaos_spawn_0", "wh_dlc03_bst_inf_gor_herd_0", "wh_dlc03_bst_inf_gor_herd_0",
 "wh_dlc03_bst_inf_bestigor_herd_0", "wh_dlc03_bst_inf_ungor_spearmen_0", "wh_dlc03_bst_inf_gor_herd_1", "wh_dlc03_bst_inf_gor_herd_1", "wh_dlc03_bst_inf_ungor_raiders_0", "wh_dlc03_bst_inf_ungor_raiders_0"} --:vector<string>
 
-DF_HERD_ARMY_FACTION = {"wh_dlc03_bst_beastmen",
-"wh_dlc03_bst_redhorn",
-"wh_dlc03_bst_jagged_horn",
-"wh2_main_bst_blooded_axe",
-"wh2_main_bst_manblight",
-"wh2_main_bst_ripper_horn",
-"wh2_main_bst_shadowgor"} --:vector<string>
+DF_HERD_ARMY_FACTION = "" --:string
 DF_CHAOS_ARMY_FACTION = "wh2_main_chs_chaos_incursion_lzd" --:string
 
 DF_SPAWN_LOCATIONS = {
-    ["wh_main_goromandy_mountains_baersonlings_camp"] = {762,594}, 
+     ["wh_main_goromandy_mountains_baersonlings_camp"] = {762,594}, 
     ["wh_main_eastern_oblast_volksgrad"] = {724,584}, 
     ["wh_main_eastern_oblast_praag"] = {699,585}, 
     ["wh_main_goromandy_mountains_frozen_landing"] = {734,624}, 
@@ -235,8 +229,120 @@ DF_SPAWN_LOCATIONS = {
     ["wh2_main_isthmus_of_lustria_ziggurat_of_dawn"] = {70,325}, 
     ["wh2_main_isthmus_of_lustria_skeggi"] = {90,327}, 
     ["wh2_main_isthmus_of_lustria_hexoatl"] = {48,293}, 
-    ["wh2_main_isthmus_of_lustria_fallen_gates"] = {21,317}
-} --:map<string, {number, number}>
+    ["wh2_main_isthmus_of_lustria_fallen_gates"] = {21,317},
+    ["wh_main_northern_worlds_edge_mountains_karak_ungor"] = {739,494}, 
+    ["wh_main_peak_pass_karak_kadrin"] = {717,445}, 
+    ["wh_main_zhufbar_oakenhammer"] = {687,391}, 
+    ["wh_main_zhufbar_zhufbar"] = {707,396}, 
+    ["wh_main_rib_peaks_grom_peak"] = {728,401}, 
+    ["wh_main_zhufbar_karag_dromar"] = {656,376}, 
+    ["wh_main_black_mountains_mighdal_vongalbarak"] = {617,371}, 
+    ["wh_main_black_mountains_karak_hirn"] = {565,353}, 
+    ["wh_main_southern_grey_mountains_grimhold"] = {525,351}, 
+    ["wh_main_southern_grey_mountains_karak_norn"] = {515,373}, 
+    ["wh_main_southern_grey_mountains_karak_azgaraz"] = {484,410}, 
+    ["wh_main_estalia_bilbali"] = {389,288}, 
+    ["wh_main_estalia_magritta"] = {390,249}, 
+    ["wh_main_estalia_tobaro"] = {408,254}, 
+    ["wh2_main_skavenblight_skavenblight"] = {448,271}, 
+    ["wh_main_tilea_miragliano"] = {481,268}, 
+    ["wh_main_tilea_luccini"] = {492,215}, 
+    ["wh2_main_sartosa_sartosa"] = {471,198}, 
+    ["wh_main_western_border_princes_myrmidens"] = {536,272}, 
+    ["wh_main_the_vaults_zarakzil"] = {510,274}, 
+    ["wh_main_the_vaults_karak_bhufdar"] = {498,295}, 
+    ["wh_main_western_border_princes_zvorak"] = {559,312}, 
+    ["wh_main_the_vaults_karak_izor"] = {540,334}, 
+    ["wh_main_eastern_border_princes_matorca"] = {592,323}, 
+    ["wh_main_black_mountains_karak_angazhar"] = {588,334}, 
+    ["wh_main_eastern_border_princes_akendorf"] = {632,341}, 
+    ["wh_main_blood_river_valley_varenka_hills"] = {687,340}, 
+    ["wh_main_the_silver_road_karaz_a_karak"] = {722,353}, 
+    ["wh_main_blood_river_valley_dok_karaz"] = {668,311}, 
+    ["wh_main_blood_river_valley_barak_varr"] = {643,316}, 
+    ["wh_main_death_pass_iron_rock"] = {688,294}, 
+    ["wh_main_death_pass_karag_dron"] = {716,317}, 
+    ["wh_main_death_pass_karak_drazh"] = {717,281}, 
+    ["wh_main_eastern_badlands_karak_eight_peaks"] = {720,266}, 
+    ["wh_main_eastern_badlands_valayas_sorrow"] = {693,260}, 
+    ["wh_main_eastern_badlands_crooked_fang_fort"] = {720,238}, 
+    ["wh_main_eastern_badlands_dringorackaz"] = {746,239}, 
+    ["wh_main_desolation_of_nagash_karak_azul"] = {764,250}, 
+    ["wh_main_blightwater_karak_azgal"] = {691,197}, 
+    ["wh_main_blightwater_kradtommen"] = {741,191}, 
+    ["wh_main_blightwater_misty_mountain"] = {776,176}, 
+    ["wh2_main_devils_backbone_lahmia"] = {822,172}, 
+    ["wh2_main_devils_backbone_mahrak"] = {816,123}, 
+    ["wh2_main_devils_backbone_lybaras"] = {848,129}, 
+    ["wh2_main_crater_of_the_walking_dead_doom_glade"] = {853,99}, 
+    ["wh2_main_crater_of_the_walking_dead_rasetra"] = {823,79}, 
+    ["wh2_main_southlands_jungle_teotiqua"] = {835,29}, 
+    ["wh2_main_southlands_jungle_golden_tower_of_the_gods"] = {859,50}, 
+    ["wh2_main_kingdom_of_beasts_the_cursed_jungle"] = {884,67}, 
+    ["wh2_main_kingdom_of_beasts_temple_of_skulls"] = {935,31}, 
+    ["wh2_main_kingdom_of_beasts_serpent_coast"] = {974,20}, 
+    ["wh2_main_charnel_valley_granite_massif"] = {786,121}, 
+    ["wh2_main_charnel_valley_karag_orrud"] = {746,119}, 
+    ["wh2_main_southlands_worlds_edge_mountains_mount_arachnos"] = {748,111}, 
+    ["wh_main_western_badlands_stonemine_tower"] = {630,288}, 
+    ["wh_main_western_badlands_bitterstone_mine"] = {645,251}, 
+    ["wh_main_western_badlands_ekrund"] = {611,251}, 
+    ["wh_main_western_badlands_dragonhorn_mines"] = {627,228}, 
+    ["wh_main_southern_badlands_gronti_mingol"] = {579,219}, 
+    ["wh_main_southern_badlands_galbaraz"] = {612,186}, 
+    ["wh_main_southern_badlands_agrul_migdhal"] = {613,154}, 
+    ["wh_main_southern_badlands_gor_gazan"] = {552,163}, 
+    ["wh_main_blightwater_deff_gorge"] = {696,163}, 
+    ["wh2_main_ash_river_quatar"] = {681,124}, 
+    ["wh2_main_ash_river_numas"] = {630,117}, 
+    ["wh2_main_ash_river_springs_of_eternal_life"] = {661,84}, 
+    ["wh2_main_shifting_sands_ka-sabar"] = {725,36}, 
+    ["wh2_main_southlands_worlds_edge_mountains_karak_zorn"] = {747,20}, 
+    ["wh2_main_heart_of_the_jungle_oreons_camp"] = {692,26}, 
+    ["wh2_main_shifting_sands_antoch"] = {666,32}, 
+    ["wh2_main_shifting_sands_bhagar"] = {607,39}, 
+    ["wh2_main_land_of_the_dervishes_plain_of_tuskers"] = {607,22}, 
+    ["wh2_main_great_mortis_delta_black_pyramid_of_nagash"] = {583,63}, 
+    ["wh2_main_great_desert_of_araby_black_tower_of_arkhan"] = {566,44}, 
+    ["wh2_main_land_of_the_dervishes_sudenburg"] = {565,34}, 
+    ["wh2_main_great_desert_of_araby_bel_aliad"] = {484,76}, 
+    ["wh2_main_great_desert_of_araby_pools_of_despair"] = {518,77}, 
+    ["wh2_main_land_of_the_dead_khemri"] = {579,130}, 
+    ["wh2_main_land_of_the_dead_zandri"] = {518,120}, 
+    ["wh2_main_coast_of_araby_al_haikk"] = {465,130}, 
+    ["wh2_main_coast_of_araby_copher"] = {418,121}, 
+    ["wh2_main_land_of_assassins_lashiek"] = {404,56}, 
+    ["wh2_main_land_of_assassins_palace_of_the_wizard_caliph"] = {397,26}, 
+    ["wh2_main_headhunters_jungle_mangrove_coast"] = {214,21}, 
+    ["wh2_main_headhunters_jungle_oyxl"] = {193,24}, 
+    ["wh2_main_headhunters_jungle_marks_of_the_old_ones"] = {209,41}, 
+    ["wh2_main_southern_great_jungle_axlotl"] = {169,48}, 
+    ["wh2_main_southern_great_jungle_subatuun"] = {145,15}, 
+    ["wh2_main_spine_of_sotek_mine_of_the_bearded_skulls"] = {78,27}, 
+    ["wh2_main_spine_of_sotek_hualotal"] = {87,60}, 
+    ["wh2_main_southern_great_jungle_itza"] = {105,73}, 
+    ["wh2_main_vampire_coast_the_awakening"] = {213,118}, 
+    ["wh2_main_vampire_coast_pox_marsh"] = {232,159}, 
+    ["wh2_main_northern_great_jungle_xahutec"] = {150,160}, 
+    ["wh2_main_the_creeping_jungle_temple_of_kara"] = {124,171}, 
+    ["wh2_main_the_creeping_jungle_tlaxtlan"] = {106,151}, 
+    ["wh2_main_northern_great_jungle_chaqua"] = {108,116}, 
+    ["wh2_main_northern_great_jungle_xlanhuapec"] = {151,99}, 
+    ["wh2_main_the_creeping_jungle_tlanxla"] = {69,136}, 
+    ["wh2_main_jungles_of_green_mists_spektazuma"] = {31,168}, 
+    ["wh2_main_jungles_of_green_mists_wellsprings_of_eternity"] = {23,111}, 
+    ["wh2_main_huahuan_desert_chamber_of_visions"] = {30,76}, 
+    ["wh2_main_huahuan_desert_sentinels_of_xeti"] = {16,52}, 
+    ["wh2_main_huahuan_desert_the_golden_colossus"] = {27,15}, 
+    ["wh2_main_southern_jungle_of_pahualaxa_floating_pyramid"] = {86,200}, 
+    ["wh2_main_southern_jungle_of_pahualaxa_the_high_sentinel"] = {78,227}, 
+    ["wh2_main_southern_jungle_of_pahualaxa_pahuax"] = {73,256}, 
+    ["wh2_main_southern_jungle_of_pahualaxa_monument_of_the_moon"] = {95,259}, 
+    ["wh2_main_northern_jungle_of_pahualaxa_swamp_town"] = {51,259}, 
+    ["wh2_main_northern_jungle_of_pahualaxa_shrine_of_sotek"] = {37,248}, 
+    ["wh2_main_northern_jungle_of_pahualaxa_macu_peaks"] = {31,264}, 
+    ["wh2_main_northern_jungle_of_pahualaxa_port_reaver"] = {57,285}
+}--:map<string, {number, number}>
 
 
 
@@ -383,7 +489,7 @@ local function spawn_beastmen(region)
     end
     GOCLOG("Assembled the spawn string as ["..unit_string.."] ")
     cm:create_force(
-        DF_HERD_ARMY_FACTION[cm:random_number(#DF_HERD_ARMY_FACTION)],
+        DF_HERD_ARMY_FACTION,
         unit_string,
         region:name(),
         DF_SPAWN_LOCATIONS[region:name()][1],
@@ -544,23 +650,27 @@ function WRITE(text)
     popLog :close()
 end
 
---]]
+
 core:add_listener(
     "WritingDownShit",
     "ShortcutTriggered",
     function(context) return context.string == "camera_bookmark_view0"; end, --default F9
     function(context)
-        
-        local x = 1
-        local y = 1
-        --v function()
-        local function check_next()
-
+        if not cm:get_saved_value("wars_declared_testing") then
+            for i = 0, cm:model():world():faction_list():num_items() - 1 do
+                if not cm:model():world():faction_list():item_at(i):is_dead() or cm:model():world():faction_list():item_at(i):name() == "wh_main_chs_chaos" then
+                    cm:force_declare_war(cm:model():world():faction_list():item_at(i):name(), "wh_main_chs_chaos", false, false)
+                    cm:set_saved_value("wars_declared_testing", true)
+                end
+            end
         end
+
+        local character = cm:get_faction("wh_main_chs_chaos"):faction_leader()
+        WRITE("[\""..character:region():name().." \"] = {"..character:logical_position_x()..","..character:logical_position_y().."}, \n")
     end,
     true
 )
-
+--]]
 
 local mcm = _G.mcm
 if not not mcm then
@@ -671,7 +781,7 @@ if not not mcm then
         GOCLOG("MCM Modified Spawn Rate to ["..goc_settings.DF_CHAOS_SPAWN_CHANCE.."]!")
     end)
     cog:add_variable("max_army_size", 5, 20, 14, 1, "Army Maximum Size", "Maximum potential size of a spawned army"):add_callback(function(context)
-        local max = context:get_mod("gates_of_chaos"):get_variable_with_key("max_army_size"):current_value() - 1
+        local max = context:get_mod("gates_of_chaos"):get_variable_with_key("max_army_size"):current_value()
         local mid = max - 2 
         local low = mid - 2
         goc_settings.DF_CHAOS_ARMY_SIZES = {low, mid, max}

@@ -995,6 +995,7 @@ function mod_configuration_manager.add_new_game_only_callback(self, callback)
 end
 
 
-
-mod_configuration_manager.init():error_checker()
-core:add_static_object("mod_configuration_manager", _G.mcm, true)
+if not not Util then
+    mod_configuration_manager.init():error_checker()
+    core:add_static_object("mod_configuration_manager", _G.mcm, true)
+end
