@@ -5,6 +5,7 @@ _G.sfo = false --:boolean
 
 ---[[ Legendary Lord Respecs
 require("llr/export_helpers__one_button_respec")
+require("llr/respec_on_confed")
 --]]
 
 ---[[ Old World Rites

@@ -498,6 +498,7 @@
 --# assume CA_FACTION.has_home_region: method() --> boolean
 --# assume CA_FACTION.factions_met: method() --> CA_FACTION_LIST
 --# assume CA_FACTION.factions_at_war_with: method() --> CA_FACTION_LIST
+--# assume CA_FACTION.factions_of_same_subculture: method() --> CA_FACTION_LIST
 --# assume CA_FACTION.at_war: method() --> boolean
 --# assume CA_FACTION.has_pooled_resource: method(resource: string) --> boolean
 --# assume CA_FACTION.pooled_resource: method(resource: string) --> CA_POOLED
