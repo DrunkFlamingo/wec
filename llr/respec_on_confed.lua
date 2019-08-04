@@ -73,7 +73,7 @@ end
 function legendary_lord_respec.confederation_occured(self, confederation)
     for i = 0, confederation:character_list():num_items() - 1 do
         local current_character = confederation:character_list():item_at(i)
-        if self._legendaryLords[current_character:character_subtype_key()] ~= confederation:name() then
+        if self._legendaryLords[current_character:character_subtype_key()] and (self._legendaryLords[current_character:character_subtype_key()] ~= confederation:name()) then
             self:log(" Confederation ["..confederation:name().."] recieved character ["..current_character:character_subtype_key().."]")
             self:lord_confederated_into_faction(current_character, confederation)
         end
@@ -99,4 +99,3 @@ cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context)
     llr:build_lord_list()
     llr:activate()
 end
-
